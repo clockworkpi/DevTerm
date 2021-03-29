@@ -1,0 +1,13 @@
+[Unit]
+Description=socat as virtual serial port
+
+[Service]
+Type=simple
+ExecStart=socat -d -d pty,link=/tmp/DEVTERM_PRINTER_OUT,raw,echo=0 pty,link=/tmp/DEVTERM_PRINTER_IN,raw,echo=0 
+ExecStartPost=/usr/local/bin/devterm_socat.sh
+Restart=on-failure
+RestartSec=2
+
+
+[Install]
+WantedBy=multi-user.target

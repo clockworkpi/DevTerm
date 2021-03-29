@@ -1,0 +1,11 @@
+[Unit]
+Description=devterm printer main process
+After=devterm-socat
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/devterm_thermal_printer.elf
+
+
+[Install]
+WantedBy=multi-user.target
