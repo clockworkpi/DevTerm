@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS  = -g -Wall
 LDFLAUS = 
 INCLUDES = 
-LIBS = -lwiringPi
+LIBS = -lwiringPi -lm
 
 MAIN = devterm_thermal_printer.elf
 

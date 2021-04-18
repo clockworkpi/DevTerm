@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h> 
 #include <string.h>
+#include <math.h>
 
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
@@ -101,7 +102,7 @@ uint8_t header_init() {
   
   //adc.setChannels(pin, 1); //this is actually the pin you want to measure
   
-  //pinMode(THERMISTORPIN,INPUT_ANALOG); // 数字io没有 模拟接口。adc 读温度暂时不搞 
+  pinMode(THERMISTORPIN,INPUT); // 数字io没有 模拟接口。adc 读温度暂时不搞 
   
   /*
   //SPI.begin(); //Initialize the SPI_1 port.
@@ -334,9 +335,9 @@ void print_dots_8bit(CONFIG*cfg,uint8_t *Array, uint8_t characters,uint8_t feed_
 
 uint16_t temperature() {
   
-  /*
+  
   double Rthermistor = 0, TempThermistor = 0;
-  uint16 ADCSamples=0;
+  uint16_t ADCSamples=0;
   int Sample = 1;
   uint16_t ADCConvertedValue;
 
@@ -358,9 +359,9 @@ uint16_t temperature() {
   TempThermistor = 1/TempThermistor;
 
   return  (uint16_t)(TempThermistor - 273.15);
-  */
   
-  return  (uint16_t)(0);
+  
+  //return  (uint16_t)(0);
 }
 
 
