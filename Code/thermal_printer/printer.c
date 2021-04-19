@@ -57,7 +57,7 @@ uint8_t IsPaper()
   
   if(  millis() - printer_vps_time > 10) {
     ENABLE_PEM;
-    if(ASK4PAPER==HIGH) // * temporary set,LOW is what we want**
+    if(ASK4PAPER==LOW) // * LOW is what we want**
     {status = IS_PAPER;}
     else
     {status = NO_PAPER;printf("Error:NO PAPER\n");}
