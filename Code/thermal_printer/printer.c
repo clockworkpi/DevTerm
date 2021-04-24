@@ -539,7 +539,7 @@ void print_image8(CONFIG*cfg){
     
     if(IsPaper()== IS_PAPER) print_dots_8bit_split(cfg,LinePixels,x);
     
-    //feed_pitch1(FEED_PITCH,BACKWARD);
+    //feed_pitch1(FEED_PITCH,cfg->orient);
     y++;
   }
   //feed_pitch1(cfg->feed_pitch,cfg->orient);

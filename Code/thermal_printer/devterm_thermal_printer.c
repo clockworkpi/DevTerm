@@ -422,7 +422,7 @@ void parse_cmd(CONFIG*cfg,uint8_t *cmd, uint8_t cmdidx){
      if(cmd[0] == ASCII_ESC && cmd[1] == 0x4a){
         
         print_lines8(cfg);
-        feed_pitch1(cmd[2],BACKWARD);
+        feed_pitch1(cmd[2],cfg->orient);
         reset_cmd();
      }
      //ESC d n
@@ -430,7 +430,7 @@ void parse_cmd(CONFIG*cfg,uint8_t *cmd, uint8_t cmdidx){
         
         print_lines8(cfg);
         
-        feed_pitch1(cmd[2]*cfg->font->height,BACKWARD);
+        feed_pitch1(cmd[2]*cfg->font->height,cfg->orient);
         reset_cmd();
      }
      //ESC ! n
