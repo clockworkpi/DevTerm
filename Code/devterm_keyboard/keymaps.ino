@@ -48,7 +48,10 @@ enum SKEYS {
   _MOUSE_LEFT,    // Mouse.press(1)
   _MOUSE_MID,     // Mouse.press(2)
   _MOUSE_RIGHT,   // Mouse.press(3)
-  
+  _FN_KEY_UP_ARROW, // Simulate Mouse.move
+  _FN_KEY_DOWN_ARROW, //Mouse.move
+  _FN_KEY_LEFT_ARROW, //Mouse.move
+  _FN_KEY_RIGHT_ARROW //Mouse.move
 
 };
 
@@ -99,7 +102,7 @@ const uint16_t keyboard_maps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [FN_LAYER] = { _PRINT_KEY,_PAUSE_KEY,_VOLUME_M,'`','[',']',KEY_F11,KEY_F12, \ 
     KEY_F1,KEY_F2,KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,\  
-    KEY_F9,KEY_F10,KEY_ESC,KEY_CAPS_LOCK,KEY_UP_ARROW,KEY_DOWN_ARROW,KEY_LEFT_ARROW,KEY_RIGHT_ARROW, \ 
+    KEY_F9,KEY_F10,KEY_ESC,KEY_CAPS_LOCK,_FN_KEY_UP_ARROW,_FN_KEY_DOWN_ARROW,_FN_KEY_LEFT_ARROW,_FN_KEY_RIGHT_ARROW, \ 
     'q','w','e','r','t','y','u',KEY_INSERT, \ 
     'o','p','a','s','d','f','g','h',\  
     'j','k','l','z','x','c','v','b', \ 
@@ -164,7 +167,27 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       dv->Joystick->button(10,mode);
     break;
     
-    
+    case _FN_KEY_UP_ARROW:
+      if(mode == KEY_PRESSED) {
+        dv->Mouse->move(0,-30,0);
+      }
+    break;
+    case _FN_KEY_DOWN_ARROW:
+      if(mode == KEY_PRESSED) {
+        dv->Mouse->move(0,30,0);
+      }
+    break;
+    case _FN_KEY_LEFT_ARROW:
+      if(mode == KEY_PRESSED) {
+        dv->Mouse->move(-30,0,0);
+      }
+    break;
+    case _FN_KEY_RIGHT_ARROW:
+      if(mode == KEY_PRESSED) {
+        dv->Mouse->move(30,0,0);
+      }
+    break;
+            
     default:
       if(mode == KEY_PRESSED) {
         dv->Keyboard->press(k);
