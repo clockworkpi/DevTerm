@@ -169,22 +169,22 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     
     case _FN_KEY_UP_ARROW:
       if(mode == KEY_PRESSED) {
-        dv->Mouse->move(0,-30,0);
+        dv->Mouse->move(0,-5,0);
       }
     break;
     case _FN_KEY_DOWN_ARROW:
       if(mode == KEY_PRESSED) {
-        dv->Mouse->move(0,30,0);
+        dv->Mouse->move(0,5,0);
       }
     break;
     case _FN_KEY_LEFT_ARROW:
       if(mode == KEY_PRESSED) {
-        dv->Mouse->move(-30,0,0);
+        dv->Mouse->move(-5,0,0);
       }
     break;
     case _FN_KEY_RIGHT_ARROW:
       if(mode == KEY_PRESSED) {
-        dv->Mouse->move(30,0,0);
+        dv->Mouse->move(5,0,0);
       }
     break;
             
