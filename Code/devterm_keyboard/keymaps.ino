@@ -225,8 +225,10 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     case  _FN_KEY:
       if(mode == KEY_PRESSED){
         dv->Keyboard_state.layer = FN_LAYER;
+        dv->_Serial->println("into fn layer");
       }else if(mode == KEY_RELEASED ) {
         dv->Keyboard_state.layer = DEF_LAYER;
+        dv->_Serial->println("leave fn layer");
       }
     break;
     

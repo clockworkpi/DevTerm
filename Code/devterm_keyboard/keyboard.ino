@@ -1,9 +1,7 @@
 #include "keyboard.h"
 #include "helper.h"
 
-
-static bool debouncing = false;
-static uint16_t debouncing_time = 0;
+KEY_DEB keyboard_debouncing;
 
 uint8_t matrix_rows[ MATRIX_ROWS ]= {ROW1,ROW2,ROW3,ROW4,ROW5,ROW6,ROW7,ROW8};
 uint8_t matrix_cols[ MATRIX_COLS ] = {COL1,COL2,COL3,COL4,COL5,COL6,COL7,COL8};
@@ -48,7 +46,8 @@ void matrix_init() {
     matrix_debouncing[i] = 0;
     matrix_prev[i] = 0;
   }
-
+ 
+  
   delay(500);
 }
 
@@ -76,12 +75,12 @@ uint8_t matrix_scan(void) {
     digitalWrite(matrix_cols[col],LOW);
     if (matrix_debouncing[col] != data) {
       matrix_debouncing[col] = data;
-      debouncing = true;
-      debouncing_time = millis();
+      keyboard_debouncing.deing = true;
+      keyboard_debouncing.de_time = millis();
     }
   }
 
-  if (debouncing == true  &&  ( (millis() - debouncing_time) > DEBOUNCE )) {
+  if (keyboard_debouncing.deing == true  &&  ( (millis() - keyboard_debouncing.de_time) > DEBOUNCE )) {
     for (int row = 0; row < MATRIX_ROWS; row++) {
       matrix[row] = 0;
       for (int col = 0; col < MATRIX_COLS; col++) {
@@ -89,7 +88,7 @@ uint8_t matrix_scan(void) {
         
       }
      }
-     debouncing = false;
+    keyboard_debouncing.deing = false;
   }
   
   return 1;
@@ -112,7 +111,7 @@ void matrix_press(DEVTERM*dv,uint8_t row,uint8_t col) {
 
   if(matrix_is_on(row,col) == true ){
     sprintf(buff,"%d %d M%d pressed\n",row,col,(row+1)*10+col+1);
-    dv->_Serial->print(buff);
+    //dv->_Serial->print(buff);
     keyboard_action(dv,row,col,KEY_PRESSED);
   }
   
@@ -124,7 +123,7 @@ void matrix_release(DEVTERM*dv,uint8_t row,uint8_t col) {
   
   if(matrix_is_on(row,col) == false ){
     sprintf(buff,"%d %d M%d released\n",row,col,(row+1)*10+col+1);
-    dv->_Serial->print(buff);
+    //dv->_Serial->print(buff);
     keyboard_action(dv,row,col,KEY_RELEASED);
         
   }
@@ -165,7 +164,7 @@ void keyboard_task(DEVTERM*dv)
               jack_idx = r*MATRIX_ROWS+c;
             }else{              
               jack_time +=1;
-              if( jack_time % (DEBOUNCE*20) == 0){
+              if( jack_time % (DEBOUNCE*40) == 0){
                 if(jack_idx > 1){//skip select,start button 
                   matrix_press(dv,r,c);
                 }
@@ -184,5 +183,7 @@ void keyboard_task(DEVTERM*dv)
 
 void keyboard_init(DEVTERM*){
   matrix_init();
- 
+  keyboard_debouncing.deing=false;
+  keyboard_debouncing.de_time = 0;
+  
 }

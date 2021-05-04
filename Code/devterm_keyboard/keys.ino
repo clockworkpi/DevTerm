@@ -1,7 +1,6 @@
 #include "keys.h"
 
-static bool key_debouncing = false;
-static uint16_t key_debouncing_time = 0;
+KEY_DEB keypad_debouncing;
 
 uint8_t keys_io[ KEYS_NUM ]= {KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16};
 
@@ -39,13 +38,15 @@ uint8_t scan_keys(){
   
   if ( keys_debouncing != data ) {
       keys_debouncing = data;
-      key_debouncing = true;
-      key_debouncing_time = millis();
+      
+      keypad_debouncing.deing = true;
+      keypad_debouncing.de_time = millis();
+      
   }
 
-   if (key_debouncing == true  &&  ( (millis() - key_debouncing_time) > KEY_DEBOUNCE )) {
+   if (keypad_debouncing.deing == true  &&  ( (millis() - keypad_debouncing.de_time) > KEY_DEBOUNCE )) {
     keys = keys_debouncing;
-    debouncing = false;
+    keypad_debouncing.deing = false;
   }
 
   return 1;
@@ -67,7 +68,7 @@ void print_keys(DEVTERM*dv) {
 
 void keys_task(DEVTERM*dv){
 
-  uint16_t _change = 0;
+
 
   scan_keys();
 
@@ -92,7 +93,7 @@ void keys_task(DEVTERM*dv){
             keys_jack_idx = c;
           }else{              
             keys_jack_time +=1;
-            if( keys_jack_time % (KEY_DEBOUNCE*20) == 0){
+            if( keys_jack_time % (KEY_DEBOUNCE*40) == 0){
               keypad_action(dv,c,KEY_PRESSED);
             } 
           }
@@ -111,5 +112,8 @@ void keys_init(DEVTERM*dv){
   //center the position
   dv->Joystick->X(511);
   dv->Joystick->Y(511);
+  
+  keypad_debouncing.deing = false;
+  keypad_debouncing.de_time = 0;
   
 }

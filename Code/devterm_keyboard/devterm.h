@@ -3,6 +3,12 @@
 
 
 #include <USBComposite.h>
+typedef struct key_debouncing{
+
+  bool deing;//debouncing
+  uint16_t de_time;
+  
+}KEY_DEB;
 
 typedef struct keyboard_state{
 
