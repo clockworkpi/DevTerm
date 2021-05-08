@@ -43,10 +43,10 @@ void keyboard_init(DEVTERM*);
 #define KEY_PRESSED 1
 #define KEY_RELEASED 0
 
-#define KEY_PRNT_SCRN 0xCE //Print screen
-#define KEY_PAUSE  0xd0
+#define KEY_PRNT_SCRN 0xCE //Print screen - 0x88 == usb hut1_12v2.pdf keyboard code
+#define KEY_PAUSE  0xd0 // - 0x88 == usb hut1_12v2.pdf keyboard code
 
-#define KEY_VOLUME_UP 0x108
-#define KEY_VOLUME_DOWN 0x109
+#define KEY_VOLUME_UP 0x108  // - 0x88 == usb hut1_12v2.pdf keyboard code
+#define KEY_VOLUME_DOWN 0x109 //  - 0x88 == usb hut1_12v2.pdf keyboard code
 
 #endif

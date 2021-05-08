@@ -51,7 +51,9 @@ enum SKEYS {
   _FN_KEY_UP_ARROW, // Simulate Mouse.move
   _FN_KEY_DOWN_ARROW, //Mouse.move
   _FN_KEY_LEFT_ARROW, //Mouse.move
-  _FN_KEY_RIGHT_ARROW //Mouse.move
+  _FN_KEY_RIGHT_ARROW, //Mouse.move
+  _FN_BRIGHTNESS_UP, //USB Consumer brightness up https://github.com/torvalds/linux/blob/7fe10096c1508c7f033d34d0741809f8eecc1ed4/drivers/hid/hid-input.c#L903
+  _FN_BRIGHTNESS_DOWN, //USB Consumer brightness down 
 
 };
 

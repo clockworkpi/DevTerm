@@ -1,6 +1,7 @@
 #ifndef DEVTERM_H
 #define DEVTERM_H
 
+#define KEY_LATENCY 80
 
 #include <USBComposite.h>
 typedef struct key_debouncing{
@@ -23,6 +24,7 @@ class DEVTERM {
     HIDKeyboard *Keyboard;
     HIDMouse *Mouse; 
     HIDJoystick *Joystick;
+    HIDConsumer *Consumer;
     KEYBOARD_STATE Keyboard_state;
     USBCompositeSerial *_Serial;
     //if not to use USBCompositeSerial,then use default Serial

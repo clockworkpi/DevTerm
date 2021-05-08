@@ -93,7 +93,7 @@ void keys_task(DEVTERM*dv){
             keys_jack_idx = c;
           }else{              
             keys_jack_time +=1;
-            if( keys_jack_time % (KEY_DEBOUNCE*40) == 0){
+            if( keys_jack_time % (KEY_DEBOUNCE*KEY_LATENCY) == 0){
               keypad_action(dv,c,KEY_PRESSED);
             } 
           }

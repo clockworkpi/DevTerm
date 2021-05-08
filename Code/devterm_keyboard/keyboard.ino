@@ -164,7 +164,7 @@ void keyboard_task(DEVTERM*dv)
               jack_idx = r*MATRIX_ROWS+c;
             }else{              
               jack_time +=1;
-              if( jack_time % (DEBOUNCE*40) == 0){
+              if( jack_time % (DEBOUNCE*KEY_LATENCY) == 0){
                 if(jack_idx > 1){//skip select,start button 
                   matrix_press(dv,r,c);
                 }

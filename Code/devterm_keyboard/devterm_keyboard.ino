@@ -10,6 +10,14 @@
 USBHID HID;
 DEVTERM dev_term;
 
+const uint8_t reportDescription[] = { 
+   HID_CONSUMER_REPORT_DESCRIPTOR(),
+   HID_KEYBOARD_REPORT_DESCRIPTOR(),
+   HID_JOYSTICK_REPORT_DESCRIPTOR(),
+   HID_MOUSE_REPORT_DESCRIPTOR()
+};
+
+
 void setup() {
   USBComposite.setManufacturerString("ClockworkPI");
   USBComposite.setProductString("DevTerm");
@@ -18,6 +26,7 @@ void setup() {
   dev_term.Keyboard = new HIDKeyboard(HID);
   dev_term.Joystick = new HIDJoystick(HID);
   dev_term.Mouse    = new HIDMouse(HID);
+  dev_term.Consumer = new HIDConsumer(HID);
   
   dev_term.Keyboard_state.shift = 0;
   dev_term.Keyboard_state.layer = 0;
@@ -25,7 +34,7 @@ void setup() {
   
   dev_term._Serial = new  USBCompositeSerial;
   
-  HID.begin(*dev_term._Serial,HID_KEYBOARD_MOUSE_JOYSTICK);
+  HID.begin(*dev_term._Serial,reportDescription, sizeof(reportDescription));
 
   while(!USBComposite);//wait until usb port been plugged in to PC
   
