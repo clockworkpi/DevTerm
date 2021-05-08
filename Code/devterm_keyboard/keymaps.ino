@@ -108,7 +108,7 @@ const uint16_t keyboard_maps[][MATRIX_ROWS][MATRIX_COLS] = {
     'q','w','e','r','t','y','u',KEY_INSERT, \ 
     'o','p','a','s','d','f','g','h',\  
     'j','k','l','z','x','c','v','b', \ 
-    'n','m',',','.','/','\\',';','\'', \ 
+    'n','m',_FN_BRIGHTNESS_DOWN,_FN_BRIGHTNESS_UP,'/','\\',';','\'', \ 
     KEY_DELETE,KEY_RETURN,KEY_RIGHT_ALT,KEY_RIGHT_CTRL,KEY_RIGHT_SHIFT,' ',EMP,EMP}
     
   
@@ -189,7 +189,22 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
         dv->Mouse->move(5,0,0);
       }
     break;
-            
+
+    case _FN_BRIGHTNESS_UP:
+      if(mode == KEY_PRESSED) {
+        dv->Consumer->press(HIDConsumer::BRIGHTNESS_UP);
+      }else {
+        dv->Consumer->release();
+      }
+    break;
+    case _FN_BRIGHTNESS_DOWN:
+      if(mode == KEY_PRESSED) {
+        dv->Consumer->press(HIDConsumer::BRIGHTNESS_DOWN);
+      }else {
+        dv->Consumer->release();
+      }
+    break;
+    
     default:
       if(mode == KEY_PRESSED) {
         dv->Keyboard->press(k);
