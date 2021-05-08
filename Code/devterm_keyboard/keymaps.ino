@@ -250,9 +250,9 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     break;
     case _JOYSTICK_LEFT:
       if(mode == KEY_RELEASED){
-        dv->Joystick->X(0);
-      }else {
         dv->Joystick->X(511);
+      }else {
+        dv->Joystick->X(0);
       }
     break;
     case _JOYSTICK_RIGHT:
