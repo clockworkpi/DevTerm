@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <stdarg.h>
 
 #include <wiringPi.h>
 
