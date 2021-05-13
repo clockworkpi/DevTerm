@@ -60,7 +60,7 @@ uint8_t IsPaper()
     if(ASK4PAPER==LOW) // * LOW is what we want**
     {status = IS_PAPER;}
     else
-    {status = NO_PAPER;printf("Error:NO PAPER\n");}
+    {status = NO_PAPER; PRINTF("Error:NO PAPER\n"); }
     DISABLE_PEM;
   }else {
     status = printer_vps_last_status;
@@ -69,7 +69,7 @@ uint8_t IsPaper()
   
   tmp = temperature();
   if (tmp >= HOT){
-    printf("Printer too Hot\n");
+    PRINTF("Printer too Hot\n");
     status |= HOT_PRINTER;
   }
   
@@ -113,7 +113,7 @@ uint8_t header_init() {
   SPI.begin(); //Initialize the SPI_1 port.
   */
   if (!wiringPiSPISetup (0,  4500000 )) {
-	  printf("SPI init failed,exiting...\n");
+	  PRINTF("SPI init failed,exiting...\n");
   }
   
   /*

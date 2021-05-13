@@ -13,6 +13,8 @@
 
 #define ALINE printf("\n");
 
+#define PRINTF(...) { printf(__VA_ARGS__);fflush(stdout);}
+
 void delayus(unsigned int _us);
 
 uint8_t invert_bit(uint8_t a);
