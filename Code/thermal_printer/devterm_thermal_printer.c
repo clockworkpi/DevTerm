@@ -435,16 +435,13 @@ void parse_cmd(CONFIG*cfg,uint8_t *cmd, uint8_t cmdidx){
      //ESC j n
      if(cmd[0] == ASCII_ESC && cmd[1] == 0x4a){
         
-        print_lines8(cfg);
-        feed_pitch1(cmd[2],cfg->orient);
+        if( print_lines8(cfg) == 0) { feed_pitch1(cmd[2],cfg->orient); }
         reset_cmd();
      }
      //ESC d n
      if(cmd[0] == ASCII_ESC && cmd[1] == 0x64){
         
-        print_lines8(cfg);
-        
-        feed_pitch1(cmd[2]*cfg->font->height,cfg->orient);
+        if( print_lines8(cfg) == 0) { feed_pitch1(cmd[2]*cfg->font->height,cfg->orient); }
         reset_cmd();
      }
      //ESC ! n

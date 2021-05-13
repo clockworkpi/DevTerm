@@ -28,11 +28,11 @@ void print_dots_8bit(CONFIG*cfg,uint8_t *Array, uint8_t characters,uint8_t feed_
 
 uint16_t temperature();
 
-void print_lines8(CONFIG*);
+uint8_t print_lines8(CONFIG*);
 
 uint8_t invert_bit(uint8_t a);
 
-void print_image8(CONFIG*);
+uint8_t print_image6(CONFIG*);
 void print_cut_line(CONFIG*);
 
 void printer_set_font(CONFIG*cfg,uint8_t fnbits);

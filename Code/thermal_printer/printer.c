@@ -368,7 +368,7 @@ uint16_t temperature() {
 #endif
 
 
-void print_lines8(CONFIG*cfg) {
+uint8_t print_lines8(CONFIG*cfg) {
   uint8_t i,j,k;
   int8_t w;
   uint8_t *data;
@@ -383,6 +383,8 @@ void print_lines8(CONFIG*cfg) {
 
   uint8_t lastidx,lastw,lastj;
   int8_t left;
+  uint8_t rv;
+
   pad = current_font.width %BITS8;
   
   if(pad > 0){
@@ -395,7 +397,8 @@ void print_lines8(CONFIG*cfg) {
   pad = i+pad;
   
   row = 0;
-  
+  rv = 0;
+
   data = (uint8_t*)malloc(sizeof(uint8_t)*(pad+1));
   i=0;
 
@@ -485,8 +488,8 @@ void print_lines8(CONFIG*cfg) {
           break;
         }
       }
-      
-      if(IsPaper()== IS_PAPER){
+      rv = IsPaper();
+      if( rv == IS_PAPER){
         //DEBUG("dot_line_idx",dot_line_idx);
         //DEBUG("dot_line_bits",dot_line_bitsidx);
         print_dots_8bit_split(cfg,dot_line_data,dot_line_idx+1);
@@ -505,15 +508,17 @@ void print_lines8(CONFIG*cfg) {
   //Serial.println("print ever");
 
   free(data);
- 
+
+  return rv;
 }
 
 
-void print_image8(CONFIG*cfg){
+uint8_t print_image8(CONFIG*cfg){
 
   uint16_t height;
   uint16_t x,y,addr;
   
+  uint8_t rv;
   uint8_t LinePixels[MAXPIXELS];
 
   uint8_t maxchars= PRINTER_BITS/8;
@@ -521,6 +526,7 @@ void print_image8(CONFIG*cfg){
   y=0;
   addr = 0;
   
+  rv = 0;
   while(y < height )
   {
     x=0;
@@ -536,8 +542,10 @@ void print_image8(CONFIG*cfg){
       
       x++;
     }
-    
-    if(IsPaper()== IS_PAPER) print_dots_8bit_split(cfg,LinePixels,x);
+   	rv = IsPaper(); 
+    if( rv == IS_PAPER) {
+    	print_dots_8bit_split(cfg,LinePixels,x);
+    }
     
     //feed_pitch1(FEED_PITCH,cfg->orient);
     y++;
@@ -549,6 +557,7 @@ void print_image8(CONFIG*cfg){
   cfg->img->idx = 0;
   cfg->img->width = 0;
   
+  return rv;
 }
 
 void print_cut_line(CONFIG*cfg){
