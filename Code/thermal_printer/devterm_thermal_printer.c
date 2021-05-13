@@ -680,7 +680,7 @@ void loop() {
     fp = NULL;
     fp = fopen(FIFO_FILE,"r+b");
     if (fp != NULL) {
-      
+     	g_config.fp = fp; 
       while(1)
       {	
         fread(readbuf,1, 1,fp);
@@ -688,6 +688,7 @@ void loop() {
         parse_serial_stream(&g_config,readbuf[0]);
       }
       fclose(fp);
+      g_config.fp = NULL;
     }
     
     sleep(1);
