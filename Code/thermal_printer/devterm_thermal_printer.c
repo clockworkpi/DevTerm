@@ -45,6 +45,20 @@ FONT current_font;
 
 CONFIG g_config;
 
+int printf_out(CONFIG*cfg, char *format, ...) {
+   va_list args;
+   int rv;
+
+   va_start(args, format);
+   if(cfg->fp != NULL)
+   	rv = vfprintf(cfg->fp, format, args);
+   else {
+   	rv = -1;
+   }
+   va_end(args);
+
+   return rv;
+}
 
 //void printer_set_font(CONFIG*cfg,uint8_t fnbits);
 //void parse_serial_stream(CONFIG*cfg,uint8_t input_ch);
@@ -453,8 +467,9 @@ void parse_cmd(CONFIG*cfg,uint8_t *cmd, uint8_t cmdidx){
        if ( (IsPaper() & NO_PAPER) > 0 ) {
         ret |= 1 << 2;
        }
-
-       printf("%d",ret);
+			 // 1<< 3 == power error
+			 
+       cfg->printf(cfg,"%d",ret);
        reset_cmd();
        return;
      }
@@ -658,20 +673,21 @@ void loop() {
   }
   */
   
-  int fp;
+  FILE*fp=NULL;
   char readbuf[2];
     
   while(1) {
-    fp = -1;
-    fp = open(FIFO_FILE, O_RDONLY, 0666);
-    if (fp != -1) {
+    fp = NULL;
+    fp = fopen(FIFO_FILE,"r+b");
+    if (fp != NULL) {
+      
       while(1)
       {	
-        read(fp,readbuf, 1);
+        fread(readbuf,1, 1,fp);
         //printf("read %x",readbuf[0]);
         parse_serial_stream(&g_config,readbuf[0]);
       }
-      close(fp);
+      fclose(fp);
     }
     
     sleep(1);
@@ -692,7 +708,9 @@ void setup() {
   //Serial.begin(115200); 
 
   init_printer();
-  
+
+ 	g_config.printf = &printf_out;
+
 }
 
 int main(int argc,char**argv) {

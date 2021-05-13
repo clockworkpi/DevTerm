@@ -19,3 +19,6 @@ uint8_t bits_number(uint8_t n)//count bits "1"
     } 
     return count; 
 }
+
+
+

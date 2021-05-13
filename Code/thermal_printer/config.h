@@ -209,6 +209,10 @@ typedef struct _CONFIG
   Margin margin;
   FONT*font;
   ImageCache *img;
+  FILE*fp;
+
+  int (*printf)(struct _CONFIG*, char*, ...);
+
 }CONFIG;
 
 
