@@ -65,14 +65,14 @@ uint8_t IsPaper()
   }else {
     status = printer_vps_last_status;
   }
-  printer_vps_last_status = status;
   
   tmp = temperature();
   if (tmp >= HOT){
     PRINTF("Printer too Hot\n");
     status |= HOT_PRINTER;
   }
-  
+ 
+  printer_vps_last_status = status;
   printer_vps_time = millis();
   
   return status;
@@ -397,7 +397,7 @@ uint8_t print_lines8(CONFIG*cfg) {
   pad = i+pad;
   
   row = 0;
-  rv = 0;
+  rv = IsPaper();
 
   data = (uint8_t*)malloc(sizeof(uint8_t)*(pad+1));
   i=0;
@@ -526,7 +526,7 @@ uint8_t print_image8(CONFIG*cfg){
   y=0;
   addr = 0;
   
-  rv = 0;
+  rv = IsPaper();
   while(y < height )
   {
     x=0;
@@ -542,7 +542,7 @@ uint8_t print_image8(CONFIG*cfg){
       
       x++;
     }
-   	rv = IsPaper(); 
+    rv = IsPaper();
     if( rv == IS_PAPER) {
     	print_dots_8bit_split(cfg,LinePixels,x);
     }
