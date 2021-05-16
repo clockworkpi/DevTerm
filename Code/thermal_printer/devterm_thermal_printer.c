@@ -682,12 +682,16 @@ void loop() {
       {	
         fread(readbuf,1, 1,fp);
         //printf("read %x",readbuf[0]);
-        if(readbuf[0] == ASCII_TAB) {
-        	readbuf[0] = ' ';
-        	parse_serial_stream(&g_config,readbuf[0]);
-	        parse_serial_stream(&g_config,readbuf[0]);
-	      }else{
-	        parse_serial_stream(&g_config,readbuf[0]);
+        if(cfg->state ==  PRINT_STATE) {
+        	if(readbuf[0] == ASCII_TAB) {
+        		readbuf[0] = ' ';
+        		parse_serial_stream(&g_config,readbuf[0]);
+	        	parse_serial_stream(&g_config,readbuf[0]);
+	      	} else {//not a tab
+	        	parse_serial_stream(&g_config,readbuf[0]);
+	      	}
+	      } else { //cfg->state ==  PRINT_STATE
+	      	parse_serial_stream(&g_config,readbuf[0]);
 	      }
       }
       fclose(fp);
