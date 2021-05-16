@@ -682,7 +682,13 @@ void loop() {
       {	
         fread(readbuf,1, 1,fp);
         //printf("read %x",readbuf[0]);
-        parse_serial_stream(&g_config,readbuf[0]);
+        if(readbuf[0] == ASCII_TAB) {
+        	readbuf[0] = ' ';
+        	parse_serial_stream(&g_config,readbuf[0]);
+	        parse_serial_stream(&g_config,readbuf[0]);
+	      }else{
+	        parse_serial_stream(&g_config,readbuf[0]);
+	      }
       }
       fclose(fp);
       g_config.fp = NULL;
