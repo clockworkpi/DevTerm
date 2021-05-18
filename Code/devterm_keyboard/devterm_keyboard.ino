@@ -5,7 +5,7 @@
 
 #include <USBComposite.h>
 
-#define SER_NUM_STR "20210320"
+#define SER_NUM_STR "20210517"
 
 USBHID HID;
 DEVTERM dev_term;
@@ -27,10 +27,13 @@ void setup() {
   dev_term.Joystick = new HIDJoystick(HID);
   dev_term.Mouse    = new HIDMouse(HID);
   dev_term.Consumer = new HIDConsumer(HID);
+
+  dev_term.Keyboard->setAdjustForHostCapsLock(false);
   
-  dev_term.Keyboard_state.shift = 0;
+
   dev_term.Keyboard_state.layer = 0;
-  dev_term.Keyboard_state.caps_lock = 0;
+  dev_term.Keyboard_state.prev_layer = 0;
+  dev_term.Keyboard_state.fn_on = 0;
   
   dev_term._Serial = new  USBCompositeSerial;
   

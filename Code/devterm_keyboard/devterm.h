@@ -1,7 +1,7 @@
 #ifndef DEVTERM_H
 #define DEVTERM_H
 
-#define KEY_LATENCY 80
+#define KEY_LATENCY  140
 
 #include <USBComposite.h>
 typedef struct key_debouncing{
@@ -14,8 +14,8 @@ typedef struct key_debouncing{
 typedef struct keyboard_state{
 
   uint8_t layer;
-  uint8_t shift;
-  uint8_t caps_lock;
+  uint8_t prev_layer;
+  uint8_t fn_on;
   
 }KEYBOARD_STATE;
 

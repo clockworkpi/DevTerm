@@ -57,10 +57,9 @@ enum SKEYS {
 
 };
 
-#define DEF_LAYER   0x00
-#define SHI_LAYER   0x01
-#define CAPS_LAYER  0x02
-#define FN_LAYER    0x03
+#define DEF_LAYER      0x00
+#define FN_LAYER       0x01
+
 
 /*
  * keyboard_maps
@@ -84,24 +83,6 @@ const uint16_t keyboard_maps[][MATRIX_ROWS][MATRIX_COLS] = {
     'n','m',',','.','/','\\',';','\'', \
     KEY_BACKSPACE,KEY_RETURN,KEY_RIGHT_ALT,KEY_RIGHT_CTRL,KEY_RIGHT_SHIFT,' ',EMP,EMP},
  
-   [SHI_LAYER] = {_SELECT_KEY,_START_KEY,_VOLUME_P,'~','{','}','_','+', \ 
-    '!','@','#','$','%','^','&','*',\  
-    '(',')',KEY_ESC,KEY_TAB,KEY_PAGE_UP,KEY_PAGE_DOWN,KEY_HOME,KEY_END, \ 
-    'Q','W','E','R','T','Y','U','I', \ 
-    'O','P','A','S','D','F','G','H',\  
-    'J','K','L','Z','X','C','V','B', \ 
-    'N','M','<','>','?','|',':','"', \ 
-    KEY_BACKSPACE,KEY_RETURN,KEY_RIGHT_ALT,KEY_RIGHT_CTRL,KEY_RIGHT_SHIFT,' ',EMP,EMP},
-  
-  [CAPS_LAYER] = { _SELECT_KEY,_START_KEY,_VOLUME_M,'`','[',']','-','=', \ 
-    '1','2','3','4','5','6','7','8',\  
-    '9','0',KEY_ESC,KEY_TAB,KEY_UP_ARROW,KEY_DOWN_ARROW,KEY_LEFT_ARROW,KEY_RIGHT_ARROW, \ 
-    'Q','W','E','R','T','Y','U','I', \ 
-    'O','P','A','S','D','F','G','H',\  
-    'J','K','L','Z','X','C','V','B', \ 
-    'N','M',',','.','/','\\',';','\'', \ 
-    KEY_BACKSPACE,KEY_RETURN,KEY_RIGHT_ALT,KEY_RIGHT_CTRL,KEY_RIGHT_SHIFT,' ',EMP,EMP},
-
   [FN_LAYER] = { _PRINT_KEY,_PAUSE_KEY,_VOLUME_M,'`','[',']',KEY_F11,KEY_F12, \ 
     KEY_F1,KEY_F2,KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,\  
     KEY_F9,KEY_F10,KEY_ESC,KEY_CAPS_LOCK,_FN_KEY_UP_ARROW,_FN_KEY_DOWN_ARROW,_FN_KEY_LEFT_ARROW,_FN_KEY_RIGHT_ARROW, \ 
@@ -122,46 +103,51 @@ const uint16_t keys_maps[KEYS_NUM] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEF
                                       _MOUSE_LEFT,_MOUSE_MID,_MOUSE_RIGHT};
 
 
+
+void dt_kbd_set_layer(DEVTERM*dv,uint8_t new_layer) {
+  
+  if( dv->Keyboard_state.layer != new_layer) {
+
+    dv->Keyboard_state.prev_layer = dv->Keyboard_state.layer;
+    dv->Keyboard_state.layer = new_layer;
+  }
+}
+
+void dt_kbd_restore_layer(DEVTERM*dv) {
+  
+  dv->Keyboard_state.layer = dv->Keyboard_state.prev_layer;
+  
+}
+
 void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
 
   uint16_t k;
-  
-  k = keyboard_maps[dv->Keyboard_state.layer][row][col];
+
+  if(dv->Keyboard_state.fn_on > 0){
+    k = keyboard_maps[dv->Keyboard_state.fn_on][row][col];
+  }else {
+    k = keyboard_maps[dv->Keyboard_state.layer][row][col];
+  }
 
   if(k == EMP){
     return;
   }
 
   switch(k) {
-    case _LEFT_SHIFT_KEY:
-    case  KEY_RIGHT_SHIFT:
-    if(mode == KEY_PRESSED) {
-      dv->_Serial->println("into shift layer");
-      dv->Keyboard_state.layer = SHI_LAYER;
-      dv->Keyboard->press(k);
-    }else if(mode == KEY_RELEASED) {
-      dv->_Serial->println("leave shift layer");
-      dv->Keyboard_state.layer = DEF_LAYER;
-      dv->Keyboard->release(k);
-    }
-    break;
 
     case  KEY_CAPS_LOCK:
     if(mode == KEY_PRESSED) {
-      dv->Keyboard_state.layer = CAPS_LAYER;
-      dv->Keyboard->press(k);
       
+      dv->Keyboard->press(k);
+      dv->Keyboard->setAdjustForHostCapsLock(true);
     }else if(mode == KEY_RELEASED) {
+      
+      dv->Keyboard->setAdjustForHostCapsLock(false);
       dv->Keyboard->release(k);
-      if(dv->Keyboard_state.caps_lock == 0) {
-        dv->Keyboard_state.caps_lock = 1;
-      }else{
-        dv->Keyboard_state.caps_lock = 0;
-        dv->Keyboard_state.layer = DEF_LAYER;
-      }
     }
     
-    break;   
+    break;
+    
     case _SELECT_KEY:
       dv->Joystick->button(9,mode);
     break;
@@ -230,22 +216,19 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
 
   switch(k) {
     case _LEFT_SHIFT_KEY:
-    case KEY_RIGHT_SHIFT:
       if(mode == KEY_PRESSED) {
-        dv->Keyboard_state.layer = SHI_LAYER;
         dv->Keyboard->press(k);
       }else if(mode == KEY_RELEASED) {
-        dv->Keyboard_state.layer = DEF_LAYER;
         dv->Keyboard->release(k);
       }
     break;    
     case  _FN_KEY:
       if(mode == KEY_PRESSED){
-        dv->Keyboard_state.layer = FN_LAYER;
-        dv->_Serial->println("into fn layer");
+        dv->Keyboard_state.fn_on = FN_LAYER;
+
       }else if(mode == KEY_RELEASED ) {
-        dv->Keyboard_state.layer = DEF_LAYER;
-        dv->_Serial->println("leave fn layer");
+        dv->Keyboard_state.fn_on = 0;
+
       }
     break;
     
@@ -298,17 +281,17 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     break;
     case _MOUSE_MID:
       if(mode == KEY_PRESSED){
-        dv->Mouse->press(2);
+        dv->Mouse->press(4);
       }else if(mode == KEY_RELEASED){
-        dv->Mouse->release(2);
+        dv->Mouse->release(4);
       }
     break;
 
     case _MOUSE_RIGHT:
       if(mode == KEY_PRESSED){
-        dv->Mouse->press(3);
+        dv->Mouse->press(2);
       }else if(mode == KEY_RELEASED){
-        dv->Mouse->release(3);
+        dv->Mouse->release(2);
       }
     break;
     
