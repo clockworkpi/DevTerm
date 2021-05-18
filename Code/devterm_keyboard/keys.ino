@@ -25,7 +25,7 @@ uint8_t scan_keys(){
   uint8_t s;
   
   data = 0;
-  delayMicroseconds(20);
+  delayMicroseconds(30);
   for(int i = 0;i < KEYS_NUM;i++) {
     
     s = digitalRead(keys_io[i]); //HIGH =0,LOW = 1
@@ -47,6 +47,8 @@ uint8_t scan_keys(){
    if (keypad_debouncing.deing == true  &&  ( (millis() - keypad_debouncing.de_time) > KEY_DEBOUNCE )) {
     keys = keys_debouncing;
     keypad_debouncing.deing = false;
+  }else {
+    delay(1);
   }
 
   return 1;

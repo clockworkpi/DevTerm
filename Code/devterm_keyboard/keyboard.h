@@ -17,6 +17,8 @@
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 8
 
+#define MATRIX_KEYS 64 // 8*8
+
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
 #endif

@@ -33,6 +33,11 @@ B16 mouse right
 #define _CMD_KEY        KEY_RIGHT_GUI 
 #define _LEFT_ALT       KEY_LEFT_ALT 
 
+#define _FN_KEY_UP_ARROW     KEY_PAGE_UP
+#define _FN_KEY_DOWN_ARROW   KEY_PAGE_DOWN
+#define _FN_KEY_LEFT_ARROW   KEY_HOME
+#define _FN_KEY_RIGHT_ARROW  KEY_END
+
 enum SKEYS {
   _SELECT_KEY =0xe8,  //Joystick.button(n)
   _START_KEY,          //Joystick.button(n)
@@ -48,10 +53,7 @@ enum SKEYS {
   _MOUSE_LEFT,    // Mouse.press(1)
   _MOUSE_MID,     // Mouse.press(2)
   _MOUSE_RIGHT,   // Mouse.press(3)
-  _FN_KEY_UP_ARROW, // Simulate Mouse.move
-  _FN_KEY_DOWN_ARROW, //Mouse.move
-  _FN_KEY_LEFT_ARROW, //Mouse.move
-  _FN_KEY_RIGHT_ARROW, //Mouse.move
+
   _FN_BRIGHTNESS_UP, //USB Consumer brightness up https://github.com/torvalds/linux/blob/7fe10096c1508c7f033d34d0741809f8eecc1ed4/drivers/hid/hid-input.c#L903
   _FN_BRIGHTNESS_DOWN, //USB Consumer brightness down 
 
@@ -72,7 +74,7 @@ enum SKEYS {
  * M71 - M78
  * M81 - M88
  */
-const uint16_t keyboard_maps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint16_t keyboard_maps[][MATRIX_KEYS] = {
   
   [DEF_LAYER] = { _SELECT_KEY,_START_KEY,_VOLUME_M,'`','[',']','-','=', \
     '1','2','3','4','5','6','7','8',\  
@@ -92,9 +94,10 @@ const uint16_t keyboard_maps[][MATRIX_ROWS][MATRIX_COLS] = {
     'n','m',_FN_BRIGHTNESS_DOWN,_FN_BRIGHTNESS_UP,'/','\\',';','\'', \ 
     KEY_DELETE,KEY_RETURN,KEY_RIGHT_ALT,KEY_RIGHT_CTRL,KEY_RIGHT_SHIFT,' ',EMP,EMP}
     
-  
-  
 };
+
+
+static uint8_t fn_actions[MATRIX_KEYS]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 const uint16_t keys_maps[KEYS_NUM] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEFT, \
                                       _JOYSTICK_RIGHT,_JOYSTICK_A,_JOYSTICK_B, \
@@ -122,11 +125,13 @@ void dt_kbd_restore_layer(DEVTERM*dv) {
 void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
 
   uint16_t k;
-
+  uint8_t addr;
+  addr = row*MATRIX_COLS+col;
   if(dv->Keyboard_state.fn_on > 0){
-    k = keyboard_maps[dv->Keyboard_state.fn_on][row][col];
+    k = keyboard_maps[dv->Keyboard_state.fn_on][addr];
+    fn_actions[addr] = 1;
   }else {
-    k = keyboard_maps[dv->Keyboard_state.layer][row][col];
+    k = keyboard_maps[dv->Keyboard_state.layer][addr];
   }
 
   if(k == EMP){
@@ -134,6 +139,13 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
   }
 
   switch(k) {
+    case KEY_RIGHT_SHIFT:{
+      if(mode == KEY_PRESSED) {
+        dv->Keyboard->press(k);
+      }else {
+        dv->Keyboard->release(k);
+      }
+    }break;
 
     case  KEY_CAPS_LOCK:
     if(mode == KEY_PRESSED) {
@@ -155,27 +167,6 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       dv->Joystick->button(10,mode);
     break;
     
-    case _FN_KEY_UP_ARROW:
-      if(mode == KEY_PRESSED) {
-        dv->Mouse->move(0,-5,0);
-      }
-    break;
-    case _FN_KEY_DOWN_ARROW:
-      if(mode == KEY_PRESSED) {
-        dv->Mouse->move(0,5,0);
-      }
-    break;
-    case _FN_KEY_LEFT_ARROW:
-      if(mode == KEY_PRESSED) {
-        dv->Mouse->move(-5,0,0);
-      }
-    break;
-    case _FN_KEY_RIGHT_ARROW:
-      if(mode == KEY_PRESSED) {
-        dv->Mouse->move(5,0,0);
-      }
-    break;
-
     case _FN_BRIGHTNESS_UP:
       if(mode == KEY_PRESSED) {
         dv->Consumer->press(HIDConsumer::BRIGHTNESS_UP);
@@ -196,6 +187,10 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
         dv->Keyboard->press(k);
       }else if(mode == KEY_RELEASED) {
         dv->Keyboard->release(k);
+        
+        if(dv->Keyboard_state.fn_on > 0){
+          fn_actions[addr] = 0;
+        }
       }
     break;
   }
@@ -227,8 +222,16 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
         dv->Keyboard_state.fn_on = FN_LAYER;
 
       }else if(mode == KEY_RELEASED ) {
-        dv->Keyboard_state.fn_on = 0;
+        //release all pressed fn keys if they still been pressing
+        for(int i=0;i<64;i++) {
+          if(fn_actions[i] !=0) {
+            k = keyboard_maps[dv->Keyboard_state.fn_on][i];
+            dv->Keyboard->release(k);
+            fn_actions[i] = 0;
+          }
+        }
 
+        dv->Keyboard_state.fn_on = 0;
       }
     break;
     

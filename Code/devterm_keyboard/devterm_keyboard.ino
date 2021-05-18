@@ -34,6 +34,7 @@ void setup() {
   dev_term.Keyboard_state.layer = 0;
   dev_term.Keyboard_state.prev_layer = 0;
   dev_term.Keyboard_state.fn_on = 0;
+  dev_term.Keyboard_state.shift = 0;
   
   dev_term._Serial = new  USBCompositeSerial;
   
@@ -48,7 +49,7 @@ void setup() {
   
   dev_term._Serial->println("setup done");
 
-  //delay(3000);
+  delay(1000);
 }
 
 void loop() {
