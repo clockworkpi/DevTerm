@@ -26,8 +26,7 @@ B16 mouse right
 */
 #define _PRINT_KEY KEY_PRNT_SCRN
 #define _PAUSE_KEY KEY_PAUSE
-#define _VOLUME_M KEY_VOLUME_DOWN
-#define _VOLUME_P KEY_VOLUME_UP
+
 #define _LEFT_SHIFT_KEY KEY_LEFT_SHIFT 
 #define _LEFT_CTRL_KEY  KEY_LEFT_CTRL
 #define _CMD_KEY        KEY_RIGHT_GUI 
@@ -57,6 +56,9 @@ enum SKEYS {
   _FN_BRIGHTNESS_UP, //USB Consumer brightness up https://github.com/torvalds/linux/blob/7fe10096c1508c7f033d34d0741809f8eecc1ed4/drivers/hid/hid-input.c#L903
   _FN_BRIGHTNESS_DOWN, //USB Consumer brightness down 
 
+  _VOLUME_M,
+  _VOLUME_P,
+
 };
 
 #define DEF_LAYER      0x00
@@ -85,7 +87,7 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
     'n','m',',','.','/','\\',';','\'', \
     KEY_BACKSPACE,KEY_RETURN,KEY_RIGHT_ALT,KEY_RIGHT_CTRL,KEY_RIGHT_SHIFT,' ',EMP,EMP},
  
-  [FN_LAYER] = { _PRINT_KEY,_PAUSE_KEY,_VOLUME_M,'`','[',']',KEY_F11,KEY_F12, \ 
+  [FN_LAYER] = { _PRINT_KEY,_PAUSE_KEY,_VOLUME_P,'`','[',']',KEY_F11,KEY_F12, \ 
     KEY_F1,KEY_F2,KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,\  
     KEY_F9,KEY_F10,KEY_ESC,KEY_CAPS_LOCK,_FN_KEY_UP_ARROW,_FN_KEY_DOWN_ARROW,_FN_KEY_LEFT_ARROW,_FN_KEY_RIGHT_ARROW, \ 
     'q','w','e','r','t','y','u',KEY_INSERT, \ 
@@ -182,6 +184,21 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       }
     break;
     
+    case _VOLUME_P:{
+      if(mode == KEY_PRESSED) {
+        dv->Consumer->press(HIDConsumer::VOLUME_UP);
+      }else {
+        dv->Consumer->release();
+      }
+    }break;
+    case _VOLUME_M:{
+      if(mode == KEY_PRESSED) {
+        dv->Consumer->press(HIDConsumer::VOLUME_DOWN);
+      }else {
+        dv->Consumer->release();
+      }
+    }break;
+     
     default:
       if(mode == KEY_PRESSED) {
         dv->Keyboard->press(k);
