@@ -108,6 +108,10 @@ const uint16_t keys_maps[KEYS_NUM] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEF
                                       _MOUSE_LEFT,_MOUSE_MID,_MOUSE_RIGHT};
 
 
+uint8_t check_pd2(){ // if swtich 2 in back is set to on(HIGH)
+
+  return digitalRead(PD2);
+}
 
 void dt_kbd_set_layer(DEVTERM*dv,uint8_t new_layer) {
   
@@ -163,10 +167,28 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     break;
     
     case _SELECT_KEY:
-      dv->Joystick->button(9,mode);
+      if(check_pd2() == HIGH) {
+        k = ' ';
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else { 
+        dv->Joystick->button(9,mode);
+      }
     break;
     case _START_KEY:
-      dv->Joystick->button(10,mode);
+      if(check_pd2() == HIGH) {
+        k = KEY_RETURN;
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else { 
+        dv->Joystick->button(10,mode);
+      }
     break;
     
     case _FN_BRIGHTNESS_UP:
@@ -253,44 +275,116 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     break;
     
     case _JOYSTICK_UP:
-      if(mode == KEY_RELEASED){
-        dv->Joystick->Y(511);
-      }else {
-        dv->Joystick->Y(0);
+      if(check_pd2() == HIGH) {
+        k = KEY_UP_ARROW;
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else {    
+        if(mode == KEY_RELEASED){
+          dv->Joystick->Y(511);
+        }else {
+          dv->Joystick->Y(0);
+        }
       }
     break;
     case _JOYSTICK_DOWN:
-      if(mode == KEY_RELEASED){
-        dv->Joystick->Y(511);
-      }else {
-        dv->Joystick->Y(1023);
+      if(check_pd2() == HIGH) {
+        k = KEY_DOWN_ARROW;
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else { 
+        if(mode == KEY_RELEASED){
+          dv->Joystick->Y(511);
+        }else {
+          dv->Joystick->Y(1023);
+        }
       }
     break;
     case _JOYSTICK_LEFT:
-      if(mode == KEY_RELEASED){
-        dv->Joystick->X(511);
-      }else {
-        dv->Joystick->X(0);
+      if(check_pd2() == HIGH) {
+        k = KEY_LEFT_ARROW;
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else { 
+        if(mode == KEY_RELEASED){
+          dv->Joystick->X(511);
+        }else {
+          dv->Joystick->X(0);
+        }
       }
     break;
     case _JOYSTICK_RIGHT:
-      if(mode == KEY_RELEASED){
-        dv->Joystick->X(511);
+      if(check_pd2() == HIGH) {
+        k = KEY_RIGHT_ARROW;
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
       }else {
-        dv->Joystick->X(1023);
+        if(mode == KEY_RELEASED){
+          dv->Joystick->X(511);
+        }else {
+          dv->Joystick->X(1023);
+        }
       }
     break;
     case _JOYSTICK_A:
-      dv->Joystick->button(2,mode);
+      if(check_pd2() == HIGH) {
+        k = 'j';
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else {
+        dv->Joystick->button(2,mode);
+      }
     break;
     case _JOYSTICK_B:
-      dv->Joystick->button(3,mode);
+      if(check_pd2() == HIGH) {
+        k = 'k';
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else {    
+        dv->Joystick->button(3,mode);
+      }
     break;
     case _JOYSTICK_X:
-      dv->Joystick->button(1,mode);
+      if(check_pd2() == HIGH) {
+        k = 'u';
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else {
+        dv->Joystick->button(1,mode);
+      }
     break;
     case _JOYSTICK_Y:
-      dv->Joystick->button(4,mode);
+      if(check_pd2() == HIGH) {
+        k = 'i';
+        if(mode == KEY_PRESSED) {
+          dv->Keyboard->press(k);
+        }else if(mode == KEY_RELEASED) {
+          dv->Keyboard->release(k);
+        } 
+      }else {    
+        dv->Joystick->button(4,mode);
+      }
     break;
     case _MOUSE_LEFT:
       if(mode == KEY_PRESSED){

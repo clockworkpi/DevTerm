@@ -49,6 +49,8 @@ void setup() {
   
   dev_term._Serial->println("setup done");
 
+  pinMode(PD2,INPUT);// switch 2 in back 
+  
   delay(1000);
 }
 
