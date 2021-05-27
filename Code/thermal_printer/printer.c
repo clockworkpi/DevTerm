@@ -333,6 +333,26 @@ void print_dots_8bit(CONFIG*cfg,uint8_t *Array, uint8_t characters,uint8_t feed_
     return;
 }
 
+uint16_t read_adc() {
+  long ret;
+  char c[16];
+  FILE *fptr;
+  if ((fptr = fopen(ADC_FILE, "r")) == NULL) {
+    printf("Error! ADC File cannot be opened\n");
+    // Program exits if the file pointer returns NULL.
+    return 0;
+  }
+  fscanf(fptr, "%[^\n]", c);
+  //printf("Data from the file:\n%s", c);
+  fclose(fptr);
+
+  ret = strtol(c, NULL, 10);
+  //printf("the number ret %d\n",ret);
+
+  return (uint16_t)ret;
+}
+
+
 uint16_t temperature() {
   
   
@@ -344,7 +364,8 @@ uint16_t temperature() {
  
   while(Sample<=NumSamples)
   {
-      ADCSamples += analogRead(THERMISTORPIN);
+      //ADCSamples += analogRead(THERMISTORPIN); //stm32
+      ADCSamples += read_adc();
       Sample++;
   }
   //Thermistor Resistance at x Kelvin

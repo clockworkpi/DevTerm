@@ -5,9 +5,9 @@
 
 #include "keys_io_map.h"
 
-#define BOUNCE_INTERVAL       30
-#define BASE_MOVE_PIXELS      5
-#define EXPONENTIAL_BOUND     15
+#define BOUNCE_INTERVAL       100
+#define BASE_MOVE_PIXELS      3
+#define EXPONENTIAL_BOUND     10
 #define EXPONENTIAL_BASE      1.2
 
 #define BTN_PIN               KEY0
