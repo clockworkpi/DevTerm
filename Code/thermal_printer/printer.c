@@ -22,6 +22,7 @@ uint8_t as;
 
 static unsigned int printer_vps_time;
 static uint8_t printer_vps_last_status;
+static uint8_t printer_temp_check;
 
 void printer_send_data8(uint8_t w)
 {
@@ -62,15 +63,25 @@ uint8_t IsPaper()
     else
     {status = NO_PAPER; PRINTF("Error:NO PAPER\n"); }
     DISABLE_PEM;
+
+    if(printer_temp_check > 20) {
+      tmp = temperature();
+    
+      if (tmp >= HOT){
+        PRINTF("Printer too Hot\n");
+        status |= HOT_PRINTER;
+      }
+
+     printer_temp_check = 0;
+
+    }else {
+     printer_temp_check++;
+    }
+
   }else {
     status = printer_vps_last_status;
   }
   
-  tmp = temperature();
-  if (tmp >= HOT){
-    PRINTF("Printer too Hot\n");
-    status |= HOT_PRINTER;
-  }
  
   printer_vps_last_status = status;
   printer_vps_time = millis();
@@ -123,6 +134,7 @@ uint8_t header_init() {
   
   printer_vps_time = 0;
   printer_vps_last_status = IS_PAPER;
+  printer_temp_check= 0;
 }
 
 

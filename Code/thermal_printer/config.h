@@ -114,7 +114,7 @@
 #define TempNominal       25 
 #define ADCResolution     1024
 #define SeriesResistor    30000
-#define NumSamples        10
+#define NumSamples        1
 
 #define KELVIN            1
 #define CELSIUS           0
