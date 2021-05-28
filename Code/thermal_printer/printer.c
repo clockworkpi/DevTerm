@@ -3,6 +3,7 @@
 #include <stdint.h> 
 #include <string.h>
 #include <math.h>
+#include <glob.h>
 
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
@@ -23,6 +24,9 @@ uint8_t as;
 static unsigned int printer_vps_time;
 static uint8_t printer_vps_last_status;
 static uint8_t printer_temp_check;
+
+static char adc_file_path[128];
+
 
 void printer_send_data8(uint8_t w)
 {
@@ -135,6 +139,9 @@ uint8_t header_init() {
   printer_vps_time = 0;
   printer_vps_last_status = IS_PAPER;
   printer_temp_check= 0;
+
+  glob_file(ADC_FILE_PAT);
+
 }
 
 
@@ -345,11 +352,11 @@ void print_dots_8bit(CONFIG*cfg,uint8_t *Array, uint8_t characters,uint8_t feed_
     return;
 }
 
-uint16_t read_adc() {
+uint16_t read_adc(char*adc_file) {
   long ret;
   char c[16];
   FILE *fptr;
-  if ((fptr = fopen(ADC_FILE, "r")) == NULL) {
+  if ((fptr = fopen(adc_file, "r")) == NULL) {
     printf("Error! ADC File cannot be opened\n");
     // Program exits if the file pointer returns NULL.
     return 0;
@@ -377,7 +384,7 @@ uint16_t temperature() {
   while(Sample<=NumSamples)
   {
       //ADCSamples += analogRead(THERMISTORPIN); //stm32
-      ADCSamples += read_adc();
+      ADCSamples += read_adc(adc_file_path);
       Sample++;
   }
   //Thermistor Resistance at x Kelvin
@@ -395,6 +402,22 @@ uint16_t temperature() {
   
   
   //return  (uint16_t)(0);
+}
+
+int glob_file(char*av) {
+
+  glob_t globlist;
+
+  if (glob(av, GLOB_PERIOD|GLOB_NOSORT, NULL, &globlist) == GLOB_NOSPACE || glob(av, GLOB_PERIOD|GLOB_NOSORT, NULL, &globlist) == GLOB_NOMATCH)
+    return -1;
+  if (glob(av, GLOB_PERIOD|GLOB_NOSORT, NULL, &globlist) == GLOB_ABORTED)
+    return 1;
+
+  if(globlist.gl_pathc > 0) {
+    strcpy(adc_file_path,globlist.gl_pathv[0]);
+  }
+  return 0;
+
 }
 
 

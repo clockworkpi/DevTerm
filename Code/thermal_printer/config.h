@@ -119,7 +119,7 @@
 #define KELVIN            1
 #define CELSIUS           0
 
-#define ADC_FILE "/sys/class/i2c-dev/i2c-1/device/1-0054/iio:device1/in_voltage_raw"
+#define ADC_FILE_PAT "/sys/bus/iio/devices/iio:device*/in_voltage_raw"
 
 #define HEAT_TIME 300 // heat time,better not greater than 1000,300-1000 0-f
 
