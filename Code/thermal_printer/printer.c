@@ -252,13 +252,13 @@ void print_dots_8bit_split(CONFIG*cfg,uint8_t *Array, uint8_t characters)
 
     pts = pts + bits_number(Array[i]);
     
-    if(pts > MAX_PRINT_PTS) {
+    if(pts > cfg->max_pts) {
       memset(temp,0,48);
       memcpy(temp,_array,i);
       print_dots_8bit(cfg,temp,characters,0);
       pts = bits_number(_array[i]);
       memset(_array,0,i);
-    }else if(pts==MAX_PRINT_PTS) {
+    }else if(pts==cfg->max_pts) {
       memset(temp,0,48);
       memcpy(temp,_array,i+1);      
       print_dots_8bit(cfg,temp,characters,0);
@@ -423,6 +423,28 @@ int glob_file(char*av) {
 
 #endif
 
+int bat_cap_to_pts(CONFIG*cfg) {
+  int pts;
+  long ret;
+  char c[12];
+  FILE *fptr;
+  if ((fptr = fopen(BAT_CAP, "r")) == NULL) {
+    printf("Error! Battery File cannot be opened\n");
+    // Program exits if the file pointer returns NULL.
+    return 0;
+  }
+
+  fscanf(fptr, "%[^\n]", c);
+  //printf("Data from the file:%s\n", c);
+  fclose(fptr);
+
+  ret = strtol(c, NULL, 10);
+  
+  pts = (int)round( (float)ret/10.0 ) + 1;
+  return pts;
+}
+
+
 
 uint8_t print_lines8(CONFIG*cfg) {
   uint8_t i,j,k;
@@ -454,6 +476,8 @@ uint8_t print_lines8(CONFIG*cfg) {
   
   row = 0;
   rv = IsPaper();
+  
+  cfg->max_pts = bat_cap_to_pts(cfg);
 
   data = (uint8_t*)malloc(sizeof(uint8_t)*(pad+1));
   i=0;
@@ -583,6 +607,7 @@ uint8_t print_image8(CONFIG*cfg){
   addr = 0;
   
   rv = IsPaper();
+  cfg->max_pts = bat_cap_to_pts(cfg);
   while(y < height )
   {
     x=0;

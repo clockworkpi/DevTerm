@@ -119,6 +119,7 @@ void init_printer(){
   g_config.density = 0;
 
   g_config.feed_pitch = 2;
+  g_config.max_pts = 1;
   
 }
 

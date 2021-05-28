@@ -3,8 +3,8 @@
 
 #include "config.h"
 
-#define PRINT_SPLIT 6 // max points printed at the same time, 384/PRINT_SPLIT==96
-#define MAX_PRINT_PTS 24
+//#define PRINT_SPLIT 6 // max points printed at the same time, 384/PRINT_SPLIT==96
+//#define MAX_PRINT_PTS 2
 
 void printer_send_data8(uint8_t);
 

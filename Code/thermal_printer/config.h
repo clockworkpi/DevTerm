@@ -123,6 +123,8 @@
 
 #define HEAT_TIME 100 // heat time,better not greater than 1000,300-1000 0-f
 
+#define BAT_CAP "/sys/class/power_supply/axp20x-battery/capacity"
+
 #define int16               uint16_t
 #define int8                uint8_t
 
@@ -206,7 +208,8 @@ typedef struct _CONFIG
   uint8_t density:4; //0-f,300+density*46 HEAT_TIME
 
   uint16_t wordgap:10;//1023 max
-  
+  uint8_t max_pts;// max pts in print_dots_8bit_split
+
   Margin margin;
   FONT*font;
   ImageCache *img;
