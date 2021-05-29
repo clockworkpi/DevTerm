@@ -209,7 +209,8 @@ typedef struct _CONFIG
 
   uint16_t wordgap:10;//1023 max
   uint8_t max_pts;// max pts in print_dots_8bit_split
-
+  uint8_t lock;
+  
   Margin margin;
   FONT*font;
   ImageCache *img;
@@ -224,6 +225,13 @@ typedef struct _SerialCache{
   uint8_t idx;
   uint8_t data[77];//384/5
 }SerialCache;
+
+typedef struct _TimeRec{
+  unsigned int time;
+  uint8_t last_status;
+  uint8_t check;
+  
+}TimeRec;
 
 void PrintDots8bit(uint8_t *Array, uint8_t characters,uint8_t feed_num);
 

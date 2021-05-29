@@ -45,6 +45,8 @@ FONT current_font;
 
 CONFIG g_config;
 
+TimeRec battery_chk_tm;
+
 int printf_out(CONFIG*cfg, char *format, ...) {
    va_list args;
    int rv;
@@ -119,8 +121,13 @@ void init_printer(){
   g_config.density = 0;
 
   g_config.feed_pitch = 2;
-  g_config.max_pts = 1;
+  g_config.max_pts = 2;
+  g_config.lock = 0;
   
+  
+  battery_chk_tm.time = millis();
+  battery_chk_tm.last_status = 0;
+  battery_chk_tm.check = 0;
 }
 
 const  char url[]  ={"Powered by clockworkpi.com"};
@@ -659,6 +666,88 @@ void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
   socat -d -d pty,link=/tmp/DEVTERM_PRINTER_OUT,raw,echo=0 pty,link=/tmp/DEVTERM_PRINTER_IN,raw,echo=0
 */
 
+int read_bat_cap(CONFIG*cfg) {
+  long ret;
+  char c[12];
+  FILE *fptr;
+  if ((fptr = fopen(BAT_CAP, "r")) == NULL) {
+    PRINTF("Error! Battery File cannot be opened\n");
+    // Program exits if the file pointer returns NULL.
+    return -1;
+  }
+
+  fscanf(fptr, "%[^\n]", c);
+  //printf("Data from the file:%s\n", c);
+  fclose(fptr);
+
+  ret = strtol(c, NULL, 10);  
+  
+  return (int)ret;
+  
+}
+
+int bat_cap_to_pts(CONFIG*cfg,int bat) {
+  int pts;
+  
+  pts = (int)round( (float)bat/10.0 ) + 1;
+  return pts;
+}
+
+
+void print_lowpower(CONFIG*cfg) {
+  
+  int i;
+  char*msg = "low power,please charge";
+  
+  reset_cmd();
+  
+  for(i=0;i<strlen(url);i++) {
+    parse_serial_stream(cfg,msg[i]);
+    
+  }
+  parse_serial_stream(cfg,10);
+  reset_cmd();
+    
+}
+
+int check_battery(CONFIG*cfg){
+
+  int bat_cap;
+  
+  bat_cap = 0;
+  
+  if(  millis() - battery_chk_tm.time > 200) {
+    
+    bat_cap = read_bat_cap(cfg);
+    
+    if( bat_cap < 0){
+      cfg->max_pts = 1;//no battery ,so set to the slowest
+      cfg->lock = 0;// unlock printer anyway
+    }
+    
+    if(bat_cap >=0 && bat_cap < 90) {
+      
+      if(cfg->lock == 0) {
+        print_lowpower(cfg);
+        
+      }
+      cfg->lock =1;
+      reset_cmd(); // clear all serial_cache
+    }else {
+      
+      cfg->max_pts = bat_cap_to_pts(cfg,bat_cap);
+      
+      cfg->lock = 0;
+    }
+    
+    battery_chk_tm.time = millis();
+    
+  }
+  
+  return 0;
+
+}
+
 #define FIFO_FILE "/tmp/DEVTERM_PRINTER_OUT"
 
 void loop() {
@@ -680,20 +769,24 @@ void loop() {
     if (fp != NULL) {
      	g_config.fp = fp; 
       while(1)
-      {	
-        fread(readbuf,1, 1,fp);
-        //printf("read %x",readbuf[0]);
-        if(g_config.state ==  PRINT_STATE) {
-        	if(readbuf[0] == ASCII_TAB) {
-        		readbuf[0] = ' ';
-        		parse_serial_stream(&g_config,readbuf[0]);
-	        	parse_serial_stream(&g_config,readbuf[0]);
-	      	} else {//not a tab
-	        	parse_serial_stream(&g_config,readbuf[0]);
-	      	}
-	      } else { //cfg->state ==  PRINT_STATE
-	      	parse_serial_stream(&g_config,readbuf[0]);
-	      }
+      {
+        check_battery(&g_config);
+        
+        if(g_config.lock ==0) {
+          fread(readbuf,1, 1,fp);
+          //printf("read %x",readbuf[0]);
+          if(g_config.state ==  PRINT_STATE) {
+        	  if(readbuf[0] == ASCII_TAB) {
+        		  readbuf[0] = ' ';
+        		  parse_serial_stream(&g_config,readbuf[0]);
+	        	  parse_serial_stream(&g_config,readbuf[0]);
+	      	  } else {//not a tab
+	        	  parse_serial_stream(&g_config,readbuf[0]);
+	      	  }
+	        } else { //cfg->state ==  PRINT_STATE
+	      	  parse_serial_stream(&g_config,readbuf[0]);
+	        }
+        }
       }
       fclose(fp);
       g_config.fp = NULL;
