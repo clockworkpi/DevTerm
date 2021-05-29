@@ -121,9 +121,10 @@
 
 #define ADC_FILE_PAT "/sys/bus/iio/devices/iio:device*/in_voltage_raw"
 
-#define HEAT_TIME 100 // heat time,better not greater than 1000,300-1000 0-f
+#define HEAT_TIME 100 // heat time + (0-f)*46
 
 #define BAT_CAP "/sys/class/power_supply/axp20x-battery/capacity"
+#define BAT_THRESHOLD 14 // %14 battery = low power
 
 #define int16               uint16_t
 #define int8                uint8_t

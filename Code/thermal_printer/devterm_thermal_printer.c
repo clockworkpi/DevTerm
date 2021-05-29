@@ -118,7 +118,7 @@ void init_printer(){
   g_config.state = PRINT_STATE;
 
   g_config.img = &img_cache;
-  g_config.density = 0;
+  g_config.density = 6;
 
   g_config.feed_pitch = 2;
   g_config.max_pts = 2;
@@ -222,7 +222,7 @@ NULL
 };
   
   
-  cfg->density = 4;
+  cfg->density = 6;
   
   k = (os120_width/8)*os120_height;
   memcpy(cfg->img->cache,os120_bits,k);
@@ -697,17 +697,31 @@ int bat_cap_to_pts(CONFIG*cfg,int bat) {
 void print_lowpower(CONFIG*cfg) {
   
   int i;
-  char*msg = "low power,please charge";
-  
+  char*msg = "Low Power,please charge";
+
   reset_cmd();
-  
-  for(i=0;i<strlen(url);i++) {
+
+  printer_set_font(cfg,4);
+
+  for(i=0;i<strlen(msg);i++) {
     parse_serial_stream(cfg,msg[i]);
-    
+
   }
   parse_serial_stream(cfg,10);
   reset_cmd();
-    
+
+  for(i=0;i<strlen(msg);i++) {
+    parse_serial_stream(cfg,msg[i]);
+
+  }
+  parse_serial_stream(cfg,10);
+  reset_cmd();
+
+  feed_pitch1(128,cfg->orient);
+  printer_set_font(cfg,0);
+
+  PRINTF("%s\n",msg);
+
 }
 
 int check_battery(CONFIG*cfg){
@@ -723,15 +737,17 @@ int check_battery(CONFIG*cfg){
     if( bat_cap < 0){
       cfg->max_pts = 1;//no battery ,so set to the slowest
       cfg->lock = 0;// unlock printer anyway
+      PRINTF("no battery,slowest printing\n");
     }
     
-    if(bat_cap >=0 && bat_cap < 90) {
+    if(bat_cap >=0 && bat_cap <= BAT_THRESHOLD) {
       
       if(cfg->lock == 0) {
         print_lowpower(cfg);
         
       }
       cfg->lock =1;
+      PRINTF("printer locked\n");
       reset_cmd(); // clear all serial_cache
     }else {
       
@@ -744,6 +760,10 @@ int check_battery(CONFIG*cfg){
     
   }
   
+  if(cfg->lock == 1) {
+    reset_cmd();
+  }
+
   return 0;
 
 }
@@ -770,10 +790,10 @@ void loop() {
      	g_config.fp = fp; 
       while(1)
       {
+        fread(readbuf,1, 1,fp);
         check_battery(&g_config);
         
         if(g_config.lock ==0) {
-          fread(readbuf,1, 1,fp);
           //printf("read %x",readbuf[0]);
           if(g_config.state ==  PRINT_STATE) {
         	  if(readbuf[0] == ASCII_TAB) {
@@ -783,7 +803,7 @@ void loop() {
 	      	  } else {//not a tab
 	        	  parse_serial_stream(&g_config,readbuf[0]);
 	      	  }
-	        } else { //cfg->state ==  PRINT_STATE
+	        } else { //g_config.state == PRINT_STATE
 	      	  parse_serial_stream(&g_config,readbuf[0]);
 	        }
         }
