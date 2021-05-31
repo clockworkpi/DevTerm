@@ -5,7 +5,7 @@
 
 #include <USBComposite.h>
 
-#define SER_NUM_STR "20210515"
+#define SER_NUM_STR "20210531"
 
 USBHID HID;
 DEVTERM dev_term;

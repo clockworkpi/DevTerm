@@ -22,12 +22,26 @@ int x_move, y_move;
 Direction x_direction(LEFT_PIN, RIGHT_PIN);
 Direction y_direction(UP_PIN, DOWN_PIN);
 
+TrackSpeed Normal_ts;
+TrackSpeed Detail_ts;
+TrackSpeed *ts_ptr;
+
 void trackball_task(DEVTERM*dv) {
+  
+  if(dv-> Keyboard_state.fn_on > 0) {
+    ts_ptr = &Detail_ts;
+  }else {
+    ts_ptr = &Normal_ts;
+  }
+
+  x_direction.ts = ts_ptr;
+  y_direction.ts = ts_ptr;
+  
   btn_read_state = digitalRead(BTN_PIN);
   
   if(btn_read_state != btn_state) {
     btn_current_action_time = millis();
-    if(btn_current_action_time - btn_last_action_time > BOUNCE_INTERVAL) {
+    if(btn_current_action_time - btn_last_action_time > ts_ptr->bounce_interval ) {
       btn_state = btn_read_state;
       btn_last_action_time = btn_current_action_time;
       
@@ -50,4 +64,16 @@ void trackball_task(DEVTERM*dv) {
 
 void trackball_init(DEVTERM*){
   pinMode(BTN_PIN,INPUT);
+
+  Normal_ts.bounce_interval = 30;
+  Normal_ts.base_move_pixels = 5;
+  Normal_ts.exponential_bound = 14;
+  Normal_ts.exponential_base = 1.2;
+
+  Detail_ts.bounce_interval = 100;
+  Detail_ts.base_move_pixels = 3;
+  Detail_ts.exponential_bound = 10;
+  Detail_ts.exponential_base = 1.2;
+
+  
 }
