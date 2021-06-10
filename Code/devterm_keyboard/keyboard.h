@@ -20,7 +20,7 @@
 #define MATRIX_KEYS 64 // 8*8
 
 #ifndef DEBOUNCE
-#   define DEBOUNCE 5
+#   define DEBOUNCE 16
 #endif
 
 void init_rows();
