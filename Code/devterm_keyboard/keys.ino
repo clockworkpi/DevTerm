@@ -12,7 +12,9 @@ static uint16_t keys_prev;
 void init_keys(){
   int i;
   for(i=0;i<KEYS_NUM;i++) {
-    pinMode( keys_io[i],INPUT_PULLUP);  
+
+    pinMode( keys_io[i],INPUT_PULLUP); 
+
   }
 }
 
@@ -23,13 +25,12 @@ uint8_t scan_keys(){
   data = 0;
   delayMicroseconds(30);
   for(int i = 0;i < KEYS_NUM;i++) {
+
+    s = read_io(keys_io[i]);
+    s ^= 1;
     
-    s = digitalRead(keys_io[i]); //HIGH =0,LOW = 1
-    if( s == LOW ){
-      data |= 1 << i;
-    }else {
-      data |= 0 << i;
-    }
+    data |= s << i;
+
   }
   
   if ( keys_debouncing != data ) {

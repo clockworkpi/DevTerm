@@ -11,13 +11,37 @@ static uint8_t matrix[MATRIX_ROWS];
 static uint8_t matrix_debouncing[MATRIX_COLS];
 static uint8_t matrix_prev[MATRIX_ROWS];
 
+uint8_t read_kbd_io(uint8_t io) {
+
+#if defined KEYBOARD_PULL  && KEYBOARD_PULL  == 0  
+  if(digitalRead(io) == LOW ){
+    return 0;
+  }else {
+    return 1;
+  }
+#elif defined KEYBOARD_PULL  && KEYBOARD_PULL  == 1 
+   if(digitalRead(io) == LOW ){
+    return 1;
+  }else {
+    return 0;
+  }
+#endif
+
+}
+
 void init_rows(){
   int i;
   for(i=0;i<8;i++) {
+    
+#if defined KEYBOARD_PULL  && KEYBOARD_PULL  == 0   
     pinMode(matrix_rows[i],OUTPUT);
     digitalWrite(matrix_rows[i],LOW);
+    pinMode(matrix_rows[i],INPUT_PULLDOWN);
     
-    pinMode(matrix_rows[i],INPUT_PULLDOWN);  
+#elif defined KEYBOARD_PULL  && KEYBOARD_PULL  == 1 
+    pinMode(matrix_rows[i],INPUT_PULLUP);
+#endif
+  
   }
 }
 
@@ -51,23 +75,33 @@ uint8_t matrix_scan(void) {
   uint8_t data;
   for(int col = 0; col < MATRIX_COLS;col++){
     data = 0;
-    digitalWrite(matrix_cols[col],HIGH);
-  
+    
+#if defined KEYBOARD_PULL  && KEYBOARD_PULL  == 1
 
+    digitalWrite(matrix_cols[col],LOW);
+#elif defined KEYBOARD_PULL  && KEYBOARD_PULL  == 0
+    digitalWrite(matrix_cols[col],HIGH);
+
+#endif
     delayMicroseconds(30);
 
     data =(
-          ( read_io(matrix_rows[0]) << 0 )  |
-          ( read_io(matrix_rows[1]) << 1 )  |
-          ( read_io(matrix_rows[2]) << 2 )  |
-          ( read_io(matrix_rows[3]) << 3 )  |
-          ( read_io(matrix_rows[4]) << 4 )  |
-          ( read_io(matrix_rows[5]) << 5 )  | 
-          ( read_io(matrix_rows[6]) << 6 )  |
-          ( read_io(matrix_rows[7]) << 7 )  
+          ( read_kbd_io(matrix_rows[0]) << 0 )  |
+          ( read_kbd_io(matrix_rows[1]) << 1 )  |
+          ( read_kbd_io(matrix_rows[2]) << 2 )  |
+          ( read_kbd_io(matrix_rows[3]) << 3 )  |
+          ( read_kbd_io(matrix_rows[4]) << 4 )  |
+          ( read_kbd_io(matrix_rows[5]) << 5 )  | 
+          ( read_kbd_io(matrix_rows[6]) << 6 )  |
+          ( read_kbd_io(matrix_rows[7]) << 7 )  
     );
 
+#if defined KEYBOARD_PULL  && KEYBOARD_PULL  == 1
+    digitalWrite(matrix_cols[col],HIGH);
+#elif defined KEYBOARD_PULL  && KEYBOARD_PULL  == 0
     digitalWrite(matrix_cols[col],LOW);
+#endif
+
     if (matrix_debouncing[col] != data) {
       matrix_debouncing[col] = data;
       keyboard_debouncing.deing = true;

@@ -34,5 +34,6 @@ class DEVTERM {
     //USBSerial *_Serial;//_Serial = &Serial;
 };
 
+#define KEYBOARD_PULL 1 // 1 for PULLUP, 0 FOR PULLDOWN
 
 #endif
