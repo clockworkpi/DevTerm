@@ -11,11 +11,6 @@ static uint8_t matrix[MATRIX_ROWS];
 static uint8_t matrix_debouncing[MATRIX_COLS];
 static uint8_t matrix_prev[MATRIX_ROWS];
 
-static int8_t jack_idx=-1;
-static uint16_t jack_time = 0;
-
-
-
 void init_rows(){
   int i;
   for(i=0;i<8;i++) {
@@ -82,11 +77,13 @@ uint8_t matrix_scan(void) {
 
   if (keyboard_debouncing.deing == true  &&  ( (millis() - keyboard_debouncing.de_time) > DEBOUNCE )) {
     for (int row = 0; row < MATRIX_ROWS; row++) {
+            
       matrix[row] = 0;
       for (int col = 0; col < MATRIX_COLS; col++) {
         matrix[row] |= ((matrix_debouncing[col] & (1 << row) ? 1 : 0) << col);
         
       }
+      
      }
     keyboard_debouncing.deing = false;
   }else{
@@ -131,9 +128,12 @@ void matrix_release(DEVTERM*dv,uint8_t row,uint8_t col) {
   }
   
 }
-
+/*
 void keyboard_task(DEVTERM*dv)
 {
+
+  static int8_t jack_idx=-1;
+  static uint16_t jack_time = 0;
 
   uint8_t matrix_row = 0;
   uint8_t matrix_change = 0;
@@ -181,7 +181,39 @@ void keyboard_task(DEVTERM*dv)
   
   
 }
+*/
 
+void keyboard_task(DEVTERM*dv)
+{
+
+  uint8_t matrix_row = 0;
+  uint8_t matrix_change = 0;
+  uint8_t pressed = 0;
+  
+  matrix_scan();
+  
+  for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
+    matrix_row = matrix_get_row(r);
+    matrix_change = matrix_row ^ matrix_prev[r];
+    if (matrix_change) { 
+      uint8_t col_mask = 1;
+      for (uint8_t c = 0; c < MATRIX_COLS; c++, col_mask <<= 1) {
+        if (matrix_change & col_mask) {
+          pressed = (matrix_row & col_mask); 
+          if(pressed != 0) {
+            matrix_press(dv,r,c);
+          }else {
+            matrix_release(dv,r,c);
+          }
+          matrix_prev[r] ^= col_mask;
+
+         }
+      }
+    }
+  }
+
+
+}
 
 void keyboard_init(DEVTERM*){
   matrix_init();

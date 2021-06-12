@@ -9,10 +9,6 @@ static uint16_t keys;
 static uint16_t keys_debouncing;
 static uint16_t keys_prev;
 
-
-static int8_t keys_jack_idx=-1;
-static uint16_t keys_jack_time = 0;
-
 void init_keys(){
   int i;
   for(i=0;i<KEYS_NUM;i++) {
@@ -67,10 +63,10 @@ void print_keys(DEVTERM*dv) {
   
   
 }
-
+/*
 void keys_task(DEVTERM*dv){
-
-
+  static int8_t keys_jack_idx=-1;
+  static uint16_t keys_jack_time = 0;
 
   scan_keys();
 
@@ -107,7 +103,35 @@ void keys_task(DEVTERM*dv){
   keys_prev = keys;
  
 }
+*/
+void keys_task(DEVTERM*dv){
+  
+  scan_keys();
 
+  uint16_t _mask =1;
+  uint16_t _change = 0;
+  uint16_t _pressed = 0;
+  
+  _change = keys ^ keys_prev;
+
+  if(_change) {
+    
+    for(uint8_t c=0;c < KEYS_NUM;c++,_mask <<=1) {
+      if (_change & _mask) {
+        _pressed = keys & _mask;
+        if(_pressed) {
+          keypad_action(dv,c,KEY_PRESSED);
+        }else {
+          keypad_action(dv,c,KEY_RELEASED);
+        }
+
+        keys_prev ^= _mask;
+      }
+  
+    }
+  }
+  
+}
 void keys_init(DEVTERM*dv){
 
   init_keys();
