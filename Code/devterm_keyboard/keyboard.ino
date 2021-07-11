@@ -83,7 +83,7 @@ uint8_t matrix_scan(void) {
     digitalWrite(matrix_cols[col],HIGH);
 
 #endif
-    delayMicroseconds(30);
+    delayMicroseconds(700);
 
     data =(
           ( read_kbd_io(matrix_rows[0]) << 0 )  |
@@ -162,60 +162,6 @@ void matrix_release(DEVTERM*dv,uint8_t row,uint8_t col) {
   }
   
 }
-/*
-void keyboard_task(DEVTERM*dv)
-{
-
-  static int8_t jack_idx=-1;
-  static uint16_t jack_time = 0;
-
-  uint8_t matrix_row = 0;
-  uint8_t matrix_change = 0;
-
-  matrix_scan();
-  for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
-    matrix_row = matrix_get_row(r);
-    
-      uint8_t col_mask =1;
-      for(uint8_t c=0;c < MATRIX_COLS;c++,col_mask <<=1){
- 
-        if( ( (matrix_prev[r] & col_mask) == 0) && ( (matrix_row & col_mask) > 0) ) {
-          matrix_press(dv,r,c);
-        }
-        
-        if( ( (matrix_prev[r] & col_mask) > 0) && ( (matrix_row & col_mask) == 0)  ) {
-
-          matrix_release(dv,r,c);
-        }
-        
-        if( ( (matrix_prev[r] & col_mask) > 0) && ( (matrix_row & col_mask) > 0)  ) {//same key
-
-          
-          if( jack_idx == -1){
-            jack_idx = r*MATRIX_ROWS+c;
-          }else{
-            
-            if(jack_idx != r*MATRIX_ROWS+c) {
-              jack_time = 0;
-              jack_idx = r*MATRIX_ROWS+c;
-            }else{              
-              jack_time +=1;
-              if( jack_time % (DEBOUNCE*KEY_LATENCY) == 0){
-                if(jack_idx > 1){//skip select,start button 
-                  matrix_press(dv,r,c);
-                }
-              } 
-            }
-          }
-        }
-      }
-      
-      matrix_prev[r] = matrix_row;
-    }
-  
-  
-}
-*/
 
 void keyboard_task(DEVTERM*dv)
 {

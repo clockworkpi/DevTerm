@@ -64,47 +64,7 @@ void print_keys(DEVTERM*dv) {
   
   
 }
-/*
-void keys_task(DEVTERM*dv){
-  static int8_t keys_jack_idx=-1;
-  static uint16_t keys_jack_time = 0;
 
-  scan_keys();
-
-  uint16_t _mask =1;
-  for(uint8_t c=0;c < KEYS_NUM;c++,_mask <<=1){
-
-    if( (keys_prev & _mask) == 0 && (keys & _mask) > 0){
-      keypad_action(dv,c,KEY_PRESSED);
-    }
-    if( (keys_prev & _mask) > 0 && (keys & _mask) == 0){
-      keypad_action(dv,c,KEY_RELEASED);
-    }
-    
-    if( (keys_prev & _mask) > 0 && (keys & _mask) > 0) { ////same key
-
-      if( c >= 0 && c < 4) {// only allow B1-B4 
-        if( keys_jack_idx == -1){
-          keys_jack_idx = c;
-        }else{
-          if(keys_jack_idx != c) {
-            keys_jack_time = 0;
-            keys_jack_idx = c;
-          }else{              
-            keys_jack_time +=1;
-            if( keys_jack_time % (KEY_DEBOUNCE*KEY_LATENCY) == 0){
-              keypad_action(dv,c,KEY_PRESSED);
-            } 
-          }
-        }
-      }
-    }
-  }
-
-  keys_prev = keys;
- 
-}
-*/
 void keys_task(DEVTERM*dv){
   
   scan_keys();
