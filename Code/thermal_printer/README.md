@@ -20,3 +20,9 @@ print the test page
 `echo -en "\x12\x54" >  /tmp/DEVTERM_PRINTER_IN`
 
 
+### How to run it from source
+
+* make  
+* sudo systemctl stop devterm-printer   
+* sudo cp -rf devterm_thermal_printer.elf /usr/local/bin  
+* sudo systemctl start devterm-printer  
