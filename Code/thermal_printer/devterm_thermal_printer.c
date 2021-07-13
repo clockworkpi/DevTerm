@@ -1,6 +1,6 @@
 // for ltp02-245
 // 203 dpi, 384dots in 48mm(1.88976inch) every dots == 0.125mm, 1byte==8dots==1mm
-// make clean && make && ./stm32duino_thermal_printer.bin 
+// make clean && make && ./*.elf 
 //#include <SPI.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -354,7 +354,7 @@ NULL
 
 //-----------------------------------
 //grid
-
+/*
   for(ch = 0;ch <16;ch++){
     if(ch%2==0)
       j = 0xff;
@@ -372,7 +372,7 @@ NULL
       print_dots_8bit_split(cfg,(uint8_t*)buf,48);
     }
   }
-
+*/
 //--------------------------------------------------------
   feed_pitch1(cfg->font->height*2,cfg->orient);
   
