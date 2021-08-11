@@ -119,7 +119,7 @@
 #define KELVIN            1
 #define CELSIUS           0
 
-#define ADC_FILE_PAT "/sys/bus/iio/devices/iio:device*/in_voltage_raw"
+#define ADC_FILE_PAT "/tmp/devterm_adc"
 
 #define HEAT_TIME 100 // heat time + (0-f)*46
 
