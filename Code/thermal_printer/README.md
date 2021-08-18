@@ -2,7 +2,7 @@
 
 `echo -e “Hello DevTerm\n\n\n\n\n\n” > /tmp/DEVTERM_PRINTER_IN`
 
-`cat xxx.txt > /tmp/DEVTERM_PRINTER_IN`
+`cat file.txt > /tmp/DEVTERM_PRINTER_IN`
 
 ### Eos/Pos commands example
 
