@@ -1,10 +1,15 @@
 # DevTerm Thermal printer 
 
+### Console commands example
+
+
 `echo “Hello DevTerm” > /tmp/DEVTERM_PRINTER_IN`
 
 `echo -e “Hello DevTerm\n\n\n\n\n\n” > /tmp/DEVTERM_PRINTER_IN`
 
 `cat file.txt > /tmp/DEVTERM_PRINTER_IN`
+
+`ncal -hb | tee > /tmp/DEVTERM_PRINTER_IN`
 
 ### Eos/Pos commands example
 
