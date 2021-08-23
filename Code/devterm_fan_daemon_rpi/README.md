@@ -2,7 +2,7 @@
  
 ## Install
 
-**devterm is pre-installed this package, so devterm cm3 users do not need to repeat the installation steps**
+**Devterm is pre-installed this package, so devterm cm3 users do not need to repeat the installation steps**
 
 ```
 wget -O - https://raw.githubusercontent.com/clockworkpi/apt/main/debian/KEY.gpg | sudo apt-key add -
@@ -17,7 +17,7 @@ Edit `/usr/local/bin/temp_fan_daemon.py`
 
 line starts with `MAX_TEMP=80`
 
-change the value of MAX_TEMP to whatever youlike 
+For devterm cm3(rpi os) the  recommended MAX_TEMP is in range 60-80 
 
 then restart systemd service to take effect
 
