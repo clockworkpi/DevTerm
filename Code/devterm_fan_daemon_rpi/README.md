@@ -1,6 +1,9 @@
 # Fan control daemon for devterm cm3(rpi os)
  
 ## Install
+
+**devterm is pre-installed this package, so devterm cm3 users do not need to repeat the installation steps**
+
 ```
 wget -O - https://raw.githubusercontent.com/clockworkpi/apt/main/debian/KEY.gpg | sudo apt-key add -
 echo "deb https://raw.githubusercontent.com/clockworkpi/apt/main/debian/ stable main" | sudo tee -a /etc/apt/sources.list.d/clockworkpi.list
