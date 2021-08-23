@@ -1,0 +1,10 @@
+[Unit]
+Description=devterm a06 fan control daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/temp_fan_daemon_a06.py
+
+
+[Install]
+WantedBy=multi-user.target
