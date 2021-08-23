@@ -1,0 +1,95 @@
+// CUPS PPD Compiler CUPS v2.1.3
+// (Don't edit .ppd directly, edit this file instead, then use 
+//	ppdc cpi.drv to generate cpi58.ppd and others)
+
+// common for all thermal printers
+Version "1.2"
+DriverType custom
+ManualCopies Yes
+Throughput 1
+Attribute "PSVersion" "" "(3010.000) 550"
+Attribute "LanguageLevel" "" "3"
+Attribute "DefaultColorSpace" "" "Gray"
+Attribute "FileSystem" "" "False"
+Attribute "LandscapeOrientation" "" "Plus90"
+Attribute "TTRasterizer" "" "Type42"
+Attribute "VariablePaperSize" "" "True"
+Filter "application/vnd.cups-raster 100 rastertocpi"
+ColorDevice False
+VariablePaperSize Yes
+
+// cutter
+Option "CutMedia/Cut Media" PickOne AnySetup 10
+ *Choice "None/No cutting" "<</CutMedia 0>>setpagedevice"
+  Choice "EndOfPage/Cut at every page" "<</CutMedia 4>>setpagedevice"
+  Choice "EndOfJob/Cut at every job" "<</CutMedia 2>>setpagedevice"
+
+Option "Resolution/Resolution" PickOne AnySetup 10
+ *Choice "203x203dpi/203 DPI Grayscale" "<</HWResolution[203 203]/cupsColorSpace 3>>setpagedevice"
+
+HWMargins 14 0 14 0
+
+// feeding, spacing
+Group "BlankGroup/Blank Options"
+  Option "FeedDist/Feed distance" PickOne AnySetup 10
+    Choice "0feed3mm/3mm" "<</AdvanceDistance 24>>setpagedevice"
+    Choice "1feed6mm/6mm" "<</AdvanceDistance 48>>setpagedevice"
+   *Choice "2feed9mm/9mm" "<</AdvanceDistance 72>>setpagedevice"
+    Choice "3feed12mm/12mm" "<</AdvanceDistance 96>>setpagedevice"
+    Choice "4feed15mm/15mm" "<</AdvanceDistance 120>>setpagedevice"
+    Choice "5feed18mm/18mm" "<</AdvanceDistance 144>>setpagedevice"
+    Choice "6feed21mm/21mm" "<</AdvanceDistance 168>>setpagedevice"
+    Choice "7feed24mm/24mm" "<</AdvanceDistance 192>>setpagedevice"
+    Choice "8feed27mm/27mm" "<</AdvanceDistance 216>>setpagedevice"
+    Choice "9feed30mm/30mm" "<</AdvanceDistance 240>>setpagedevice"
+    Choice "10feed33mm/33mm" "<</AdvanceDistance 264>>setpagedevice"
+    Choice "11feed36mm/36mm" "<</AdvanceDistance 288>>setpagedevice"
+    Choice "12feed39mm/39mm" "<</AdvanceDistance 312>>setpagedevice"
+    Choice "13feed42mm/42mm" "<</AdvanceDistance 336>>setpagedevice"
+    Choice "14feed45mm/45mm" "<</AdvanceDistance 360>>setpagedevice"
+
+  Option "FeedWhere/When to feed" PickOne AnySetup 10
+    Choice "None/Never" ""
+    Choice "AfterPage/After each page" "<</AdvanceMedia 4>>setpagedevice"
+   *Choice "AfterJob/After whole printing" "<</AdvanceMedia 2>>setpagedevice"
+
+  Option "BlankSpace/Blank space at page's end" Boolean AnySetup 10
+    Choice "True/Print" "<</cupsInteger6 1>>setpagedevice"
+   *Choice "False/None" "<</cupsInteger6 0>>setpagedevice"
+
+Installable "OptionCutter/Cutter"
+    UIConstraints "*CutMedia *OptionCutter False"
+
+//	Attribute cupsUIConstraints CutterOff "*OptionCutter False *CutMedia"
+//    Attribute cupsUIResolver CutterOff "*CutMedia None"
+
+// 58mm printers
+{
+  #define POINTS 164
+  #define PIXELS 384
+
+  // model num is used by filter to determine raster width. 384 for 48mm, 560 for 70mm
+  ModelNumber $PIXELS
+  MinSize $POINTS 56
+  MaxSize $POINTS 9286
+
+ *CustomMedia "X48MMY65MM/58mm x 65mm" $POINTS 182 14 0 14 0 "<</PageSize[$POINTS 182]>>setpagedevice" "<</PageSize[$POINTS 182]>>setpagedevice"
+  CustomMedia "X48MMY105MM/58mm x 105mm" $POINTS 298 14 0 14 0 "<</PageSize[$POINTS 298]>>setpagedevice" "<</PageSize[$POINTS 298]>>setpagedevice"
+  CustomMedia "X48MMY210MM/58mm x 210mm" $POINTS 595 14 0 14 0 "<</PageSize[$POINTS 595]>>setpagedevice" "<</PageSize[$POINTS 595]>>setpagedevice"
+  CustomMedia "X48MMY297MM/58mm x 297mm" $POINTS 842 14 0 14 0 "<</PageSize[$POINTS 842]>>setpagedevice" "<</PageSize[$POINTS 842]>>setpagedevice"
+  CustomMedia "X48MMY3276MM/58mm x 3276mm" $POINTS 9286 14 0 14 0 "<</PageSize[$POINTS 9286]>>setpagedevice" "<</PageSize[$POINTS 9286]>>setpagedevice"
+
+  // Clockworkpi CPI-58
+  {
+    Manufacturer "Clockworkpi"
+    ModelName "CPI-58"
+    PCFileName "cpi58.ppd"
+    Attribute "NickName" "" "Clockworkpi CPI-58"
+    Attribute "ShortNickName" "" "CPI-58"
+    Attribute "Product" "" "(cpi-58)"
+    Attribute "1284DeviceID" "" "MFG:Clockworkpi;CMD:Clockworkpi;MDL:CPI-58;CLS:PRINTER;"
+  }
+
+}
+
+

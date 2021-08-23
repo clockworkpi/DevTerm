@@ -1,0 +1,126 @@
+*PPD-Adobe: "4.3"
+*%%%% PPD file for CPI-58 with CUPS.
+*%%%% Created by the CUPS PPD Compiler CUPS v2.2.12.
+*FormatVersion: "4.3"
+*FileVersion: "1.2"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "cpi58.ppd"
+*Product: "(cpi-58)"
+*Manufacturer: "Clockworkpi"
+*ModelName: "Clockworkpi CPI-58"
+*ShortNickName: "CPI-58"
+*NickName: "Clockworkpi CPI-58"
+*PSVersion: "(3010.000) 550"
+*LanguageLevel: "3"
+*ColorDevice: False
+*DefaultColorSpace: Gray
+*FileSystem: False
+*Throughput: "1"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*% Driver-defined attributes...
+*VariablePaperSize: True
+*1284DeviceID: "MFG:Clockworkpi;CMD:Clockworkpi;MDL:CPI-58;CLS:PRINTER;"
+*cupsVersion: 2.2
+*cupsModelNumber: 384
+*cupsManualCopies: True
+*cupsFilter: "application/vnd.cups-raster 100 rastertocpi"
+*cupsLanguages: "en"
+*UIConstraints: *CutMedia *OptionCutter False
+*UIConstraints: *OptionCutter False *CutMedia
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: X48MMY65MM
+*PageSize X48MMY65MM/58mm x 65mm: "<</PageSize[164 182]>>setpagedevice"
+*PageSize X48MMY105MM/58mm x 105mm: "<</PageSize[164 298]>>setpagedevice"
+*PageSize X48MMY210MM/58mm x 210mm: "<</PageSize[164 595]>>setpagedevice"
+*PageSize X48MMY297MM/58mm x 297mm: "<</PageSize[164 842]>>setpagedevice"
+*PageSize X48MMY3276MM/58mm x 3276mm: "<</PageSize[164 9286]>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: X48MMY65MM
+*PageRegion X48MMY65MM/58mm x 65mm: "<</PageSize[164 182]>>setpagedevice"
+*PageRegion X48MMY105MM/58mm x 105mm: "<</PageSize[164 298]>>setpagedevice"
+*PageRegion X48MMY210MM/58mm x 210mm: "<</PageSize[164 595]>>setpagedevice"
+*PageRegion X48MMY297MM/58mm x 297mm: "<</PageSize[164 842]>>setpagedevice"
+*PageRegion X48MMY3276MM/58mm x 3276mm: "<</PageSize[164 9286]>>setpagedevice"
+*CloseUI: *PageRegion
+*DefaultImageableArea: X48MMY65MM
+*ImageableArea X48MMY65MM/58mm x 65mm: "14 0 150 182"
+*ImageableArea X48MMY105MM/58mm x 105mm: "14 0 150 298"
+*ImageableArea X48MMY210MM/58mm x 210mm: "14 0 150 595"
+*ImageableArea X48MMY297MM/58mm x 297mm: "14 0 150 842"
+*ImageableArea X48MMY3276MM/58mm x 3276mm: "14 0 150 9286"
+*DefaultPaperDimension: X48MMY65MM
+*PaperDimension X48MMY65MM/58mm x 65mm: "164 182"
+*PaperDimension X48MMY105MM/58mm x 105mm: "164 298"
+*PaperDimension X48MMY210MM/58mm x 210mm: "164 595"
+*PaperDimension X48MMY297MM/58mm x 297mm: "164 842"
+*PaperDimension X48MMY3276MM/58mm x 3276mm: "164 9286"
+*MaxMediaWidth: "164"
+*MaxMediaHeight: "9286"
+*HWMargins: 14 0 14 0
+*CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
+*ParamCustomPageSize Width: 1 points 164 164
+*ParamCustomPageSize Height: 2 points 56 9286
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
+*OpenUI *CutMedia/Cut Media: PickOne
+*OrderDependency: 10 AnySetup *CutMedia
+*DefaultCutMedia: None
+*CutMedia None/No cutting: "<</CutMedia 0>>setpagedevice"
+*CutMedia EndOfPage/Cut at every page: "<</CutMedia 4>>setpagedevice"
+*CutMedia EndOfJob/Cut at every job: "<</CutMedia 2>>setpagedevice"
+*CloseUI: *CutMedia
+*OpenUI *Resolution/Resolution: PickOne
+*OrderDependency: 10 AnySetup *Resolution
+*DefaultResolution: 203x203dpi
+*Resolution 203x203dpi/203 DPI Grayscale: "<</HWResolution[203 203]/cupsColorSpace 3>>setpagedevice"
+*CloseUI: *Resolution
+*OpenGroup: InstallableOptions/Installable Options
+*OpenUI *OptionCutter/Cutter: Boolean
+*OrderDependency: 10 AnySetup *OptionCutter
+*DefaultOptionCutter: False
+*OptionCutter False/Not Installed: ""
+*OptionCutter True/Installed: ""
+*CloseUI: *OptionCutter
+*CloseGroup: InstallableOptions
+*OpenGroup: BlankGroup/Blank Options
+*OpenUI *FeedDist/Feed distance: PickOne
+*OrderDependency: 10 AnySetup *FeedDist
+*DefaultFeedDist: 2feed9mm
+*FeedDist 0feed3mm/3mm: "<</AdvanceDistance 24>>setpagedevice"
+*FeedDist 1feed6mm/6mm: "<</AdvanceDistance 48>>setpagedevice"
+*FeedDist 2feed9mm/9mm: "<</AdvanceDistance 72>>setpagedevice"
+*FeedDist 3feed12mm/12mm: "<</AdvanceDistance 96>>setpagedevice"
+*FeedDist 4feed15mm/15mm: "<</AdvanceDistance 120>>setpagedevice"
+*FeedDist 5feed18mm/18mm: "<</AdvanceDistance 144>>setpagedevice"
+*FeedDist 6feed21mm/21mm: "<</AdvanceDistance 168>>setpagedevice"
+*FeedDist 7feed24mm/24mm: "<</AdvanceDistance 192>>setpagedevice"
+*FeedDist 8feed27mm/27mm: "<</AdvanceDistance 216>>setpagedevice"
+*FeedDist 9feed30mm/30mm: "<</AdvanceDistance 240>>setpagedevice"
+*FeedDist 10feed33mm/33mm: "<</AdvanceDistance 264>>setpagedevice"
+*FeedDist 11feed36mm/36mm: "<</AdvanceDistance 288>>setpagedevice"
+*FeedDist 12feed39mm/39mm: "<</AdvanceDistance 312>>setpagedevice"
+*FeedDist 13feed42mm/42mm: "<</AdvanceDistance 336>>setpagedevice"
+*FeedDist 14feed45mm/45mm: "<</AdvanceDistance 360>>setpagedevice"
+*CloseUI: *FeedDist
+*OpenUI *FeedWhere/When to feed: PickOne
+*OrderDependency: 10 AnySetup *FeedWhere
+*DefaultFeedWhere: AfterJob
+*FeedWhere None/Never: ""
+*FeedWhere AfterPage/After each page: "<</AdvanceMedia 4>>setpagedevice"
+*FeedWhere AfterJob/After whole printing: "<</AdvanceMedia 2>>setpagedevice"
+*CloseUI: *FeedWhere
+*OpenUI *BlankSpace/Blank space at page's end: Boolean
+*OrderDependency: 10 AnySetup *BlankSpace
+*DefaultBlankSpace: False
+*BlankSpace True/Print: "<</cupsInteger6 1>>setpagedevice"
+*BlankSpace False/None: "<</cupsInteger6 0>>setpagedevice"
+*CloseUI: *BlankSpace
+*CloseGroup: BlankGroup
+*DefaultFont: Courier
+*% End of cpi58.ppd, 05572 bytes.
