@@ -1,0 +1,10 @@
+[Unit]
+Description=devterm raspberry pi fan control daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python2 /usr/local/bin/temp_fan_daemon.py
+
+
+[Install]
+WantedBy=multi-user.target
