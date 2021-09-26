@@ -1,0 +1,61 @@
+diff --git a/config/boards/clockworkpi-a06.conf b/config/boards/clockworkpi-a06.conf
+new file mode 100644
+index 000000000..cb914d1c0
+--- /dev/null
++++ b/config/boards/clockworkpi-a06.conf
+@@ -0,0 +1,7 @@
++# Rockchip RK3399 hexa core 4GB RAM SoC WiFi/BT
++BOARD_NAME="Clockworkpi A06"
++BOARDFAMILY="rk3399"
++BOOTCONFIG="clockworkpi-a06-rk3399_defconfig"
++KERNEL_TARGET="legacy,current,edge"
++FULL_DESKTOP="yes"
++BOOT_LOGO="desktop"
+diff --git a/config/kernel/linux-rockchip64-current.config b/config/kernel/linux-rockchip64-current.config
+index a777730db..891a37384 100644
+--- a/config/kernel/linux-rockchip64-current.config
++++ b/config/kernel/linux-rockchip64-current.config
+@@ -4405,8 +4405,8 @@ CONFIG_MFD_AAT2870_CORE=y
+ # CONFIG_MFD_BCM590XX is not set
+ # CONFIG_MFD_BD9571MWV is not set
+ CONFIG_MFD_AC100=m
+-CONFIG_MFD_AXP20X=m
+-# CONFIG_MFD_AXP20X_I2C is not set
++CONFIG_MFD_AXP20X=y
++CONFIG_MFD_AXP20X_I2C=y
+ CONFIG_MFD_AXP20X_RSB=m
+ CONFIG_MFD_CROS_EC_DEV=y
+ # CONFIG_MFD_MADERA is not set
+@@ -4521,7 +4521,7 @@ CONFIG_REGULATOR_88PG86X=m
+ CONFIG_REGULATOR_AAT2870=m
+ CONFIG_REGULATOR_AS3711=m
+ CONFIG_REGULATOR_AS3722=m
+-CONFIG_REGULATOR_AXP20X=m
++CONFIG_REGULATOR_AXP20X=y
+ CONFIG_REGULATOR_BD70528=m
+ CONFIG_REGULATOR_BD71828=m
+ # CONFIG_REGULATOR_CROS_EC is not set
+@@ -5470,6 +5470,7 @@ CONFIG_DRM_PANEL_TPO_TPG110=m
+ CONFIG_DRM_PANEL_TRULY_NT35597_WQXGA=m
+ # CONFIG_DRM_PANEL_VISIONOX_RM69299 is not set
+ CONFIG_DRM_PANEL_XINPENG_XPP055C272=m
++CONFIG_DRM_PANEL_CWD686=m
+ # end of Display Panels
+ 
+ CONFIG_DRM_BRIDGE=y
+@@ -5645,6 +5646,7 @@ CONFIG_BACKLIGHT_GPIO=m
+ # CONFIG_BACKLIGHT_ARCXCNN is not set
+ CONFIG_BACKLIGHT_RAVE_SP=m
+ CONFIG_BACKLIGHT_LED=m
++CONFIG_BACKLIGHT_OCP8178=m
+ # end of Backlight & LCD device support
+ 
+ CONFIG_VIDEOMODE_HELPERS=y
+@@ -5939,6 +5941,7 @@ CONFIG_SND_SOC_HDMI_CODEC=m
+ CONFIG_SND_SOC_ES7134=m
+ CONFIG_SND_SOC_ES7241=m
+ CONFIG_SND_SOC_ES8316=m
++CONFIG_SND_SOC_ES8323=m
+ CONFIG_SND_SOC_ES8328=m
+ CONFIG_SND_SOC_ES8328_I2C=m
+ CONFIG_SND_SOC_ES8328_SPI=m

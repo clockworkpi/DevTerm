@@ -1,0 +1,12 @@
+cd ~
+git clone https://github.com/armbian/build.git
+git clone https://github.com/clockworkpi/DevTerm.git
+
+cd build
+git apply ~/DevTerm/Code/patch/armbian_build_a06/patch/armbian.patch
+cp ~/DevTerm/Code/patch/armbian_build_a06/patch/kernel*.patch userpatches/kernel/rockchip64-current/
+cp ~/DevTerm/Code/patch/armbian_build_a06/patch/uboot*.patch userpatches/u-boot/u-boot-rockchip64-mainline/
+
+#Then exec ./compile.sh under armbian build
+cd ~/build && ./compile.sh 
+
