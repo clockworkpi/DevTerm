@@ -126,7 +126,7 @@ class A06:
         freq = ""
         with open(gpu_freq_path,"r") as f: freq = f.read().strip()
         mhz = int(freq)/1000000
-        return "%dMhz" % mhz
+        return "%dMHz" % mhz
 
     def set_gpu(self,gov,hz):
         gpu_sys_path = "/sys/devices/platform/ff9a0000.gpu/devfreq/ff9a0000.gpu"
@@ -240,7 +240,7 @@ def print_gear_map(gear):
             print(val) 
       
 def print_help_msg():
-    print("Useage: devterm-a06-gearbox [OPTION]...")
+    print("Usage: devterm-a06-gearbox [OPTION]...")
     print("Show or set the CPU operating frequency,online status and GPU operating frequency for DevTerm A06.")
     print()
     print(" -s, --set [n] set a speed mode between the number 1-5:")
