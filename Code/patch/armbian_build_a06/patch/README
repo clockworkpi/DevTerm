@@ -3,6 +3,9 @@ git clone https://github.com/armbian/build.git
 git clone https://github.com/clockworkpi/DevTerm.git
 
 cd build
+
+git reset --hard 43d179914ae9e1ebb5d72315d9f9f68f5fb3e330
+
 git apply ~/DevTerm/Code/patch/armbian_build_a06/patch/armbian.patch
 cp ~/DevTerm/Code/patch/armbian_build_a06/patch/kernel*.patch userpatches/kernel/rockchip64-current/
 cp ~/DevTerm/Code/patch/armbian_build_a06/patch/uboot*.patch userpatches/u-boot/u-boot-rockchip64-mainline/
