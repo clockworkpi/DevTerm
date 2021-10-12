@@ -208,8 +208,8 @@ class A06:
             self.set_cpu_on_off(1,0)
             self.set_cpu_on_off(2,0)
             self.set_cpu_on_off(3,0)
-            self.set_cpu_max_freq(4,600000)
-            self.set_cpu_max_freq(5,600000)
+            self.set_cpu_max_freq(4,1008000)
+            self.set_cpu_max_freq(5,1008000)
             self.set_gpu(self.gpu_governor,self.gpu_max_freq*2)
             self.set_cpu_gov4(self.cpu_scaling_governor)
         if self.gear == 5:
