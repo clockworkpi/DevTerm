@@ -6,30 +6,81 @@ import sys,getopt
 import subprocess
 import time
 
-gear_m =  []
-gear_m.append("    +-----------------------------------+-----------------+-----------+") #0
-gear_m.append("    |            Cortex-A53             |   Cortex-A72    | Mali-T860 |") #1
-gear_m.append("    +--------+--------+--------+--------+--------+--------+-----------+") #2
-gear_m.append("    | CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |   GPU     |") #3
-gear_m.append("+---+--------+--------+--------+--------+--------+--------+-----------+") #4
-gear_m.append("| 1 | 600 MHz|                  OFF                       |           |") #5
-gear_m.append("+---+--------+--------+-----------------------------------+  200 MHz  +") #6
-gear_m.append("| 2 |     800 MHz     |                OFF                |           |") #7
-gear_m.append("+---+-----------------+-----------------+-----------------+-----------+") #8
-gear_m.append("| 3 |              1008 MHz             |       OFF       |           |") #9
-gear_m.append("+---+-----------------------------------+-----------------+           +") #10
-gear_m.append("| 4 |                OFF                |     1008 MHz    |  400 MHz  |") #11
-gear_m.append("+---+-----------------------------------+-----------------+           +") #12
-gear_m.append("| 5 |                OFF                |     1200 MHz    |           |") #13
-gear_m.append("+---+-----------------------------------+-----------------+-----------+") #14
+# The gearings below were picked based on various tests by the ClockworkPi devs.
+# The maximum-performance maximum-power gearing is present for completeness, but
+# shouldn't be needed for most uses.
+#
+# You can customise the gearings by editing the list below. The valid freqencies
+# for CPU <N> can be looked up here (substituting for <N>):
+#     /sys/devices/system/cpu/cpu<N>/cpufreq/scaling_available_frequencies
+#
+# The valid GPU frequencies can be looked up here:
+#     /sys/devices/platform/ff9a0000.gpu/devfreq/ff9a0000.gpu/available_frequencies
+#
+# Gears are numbered in-order, starting from 1.
+# It's up to you to ensure that they are sorted by performance :)
+def gears():
+    return [
+        gear(
+            little=(600000,),
+            use="simple writing tasks with long battery life"),
+        gear(
+            little=(800000,) * 2,
+            use="browsing most websites with long battery life"),
+        gear(
+            little=(1008000,) * 4,
+            gpu_freq=400000000,
+            use="most 2D games and emulators"),
+        gear(
+            big=(1008000,) * 2,
+            gpu_freq=400000000,
+            use="playing videos and 3D games"),
+        gear(
+            big=(1200000,) * 2,
+            gpu_freq=400000000,
+            use="performance-first tasks"),
+        gear(
+            little=(1416000,) * 4,
+            big=(1800000,) * 2,
+            gpu_freq=800000000,
+            use="max performance, max power (usage)"),
+    ]
 
+GPU_GOV_SIMPLE = "simple_ondemand"
+GPU_GOV_PERF = "performance"
 
-gear_idx = []
-gear_idx.append("|*1*| 600 MHz|                  OFF                       |           | <===") #0 => 5
-gear_idx.append("|*2*|     800 MHz     |                OFF                |           | <===") #1 => 7
-gear_idx.append("|*3*|              1008 MHz             |       OFF       |           | <===") #9
-gear_idx.append("|*4*|                OFF                |     1008 MHz    |  400 MHz  | <===") #11
-gear_idx.append("|*5*|                OFF                |     1200 MHz    |           | <===") #13
+# Helper to convert the concise gear format above into a full description.
+#
+# `little` and `big` define the number of A53 and A72 CPU cores to enable, and
+# their maximum frequencies (in kHZ). Cores that are omitted or set to zero are
+# disabled.
+def gear(
+    little=(0, 0, 0, 0),
+    big=(0, 0),
+    gpu_freq=200000000,
+    gpu_gov=GPU_GOV_SIMPLE,
+    use="",
+):
+    # Extend to 4 little and 2 big cores (matching the A06).
+    assert len(little) <= 4
+    assert len(big) <= 2
+    cpu = little + (0,) * (4 - len(little)) + big + (0,) * (2 - len(big))
+
+    # At least one CPU must be enabled
+    assert sum(cpu) > 0
+    return {
+        "cpu": cpu,
+        "gpu_freq": gpu_freq,
+        "gpu_gov": gpu_gov,
+        "use": use,
+    }
+
+# We placed gears() at the top of the file to make it easier to find and edit.
+# Now that we've defined the helpers it needs, evaluate the gears.
+gears = gears()
+
+def load_gear(gear):
+    return gears[gear - 1]
 
 
 
@@ -54,9 +105,7 @@ def isDigit(x):
 class A06:
     cpus = []
     cpu_scaling_governor= "schedutil"
-    gpu_governor="simple_ondemand"
-    gpu_max_freq=200000000
-    gear       = 1 # 1-5
+    gear       = load_gear(1) # 1-5
     null_out = "2>/dev/null"
     def __init__(self):
       self.cpus = []
@@ -68,7 +117,7 @@ class A06:
         self.cpus.sort()
     
     def get_cpu_gov(self):
-        if self.gear < 4:
+        if self.gear["cpu"][0] > 0:
             cpu_gov_path = "/sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
         else:
             cpu_gov_path = "/sys/devices/system/cpu/cpufreq/policy4/scaling_governor"
@@ -140,7 +189,7 @@ class A06:
 
 
     def print_cpu_gpu_gov(self):
-        print("CPU Governor: %s    GPU Governor: %s" % (self.get_cpu_gov(),self.gpu_governor))
+        print("CPU Governor: %s    GPU Governor: %s" % (self.get_cpu_gov(), self.gear["gpu_gov"]))
     
     def print_cur_status(self):
         global  cur_stat
@@ -166,91 +215,62 @@ class A06:
         self.print_cpu_gpu_gov()
          
     def set_gear(self,g):
-        self.gear = g
-        if self.gear == 1:
-            self.set_cpu_on_off(0,1)
-            self.set_cpu_on_off(1,0)
-            self.set_cpu_on_off(2,0)
-            self.set_cpu_on_off(3,0)
-            self.set_cpu_on_off(4,0)        
-            self.set_cpu_on_off(5,0)
-            self.set_cpu_max_freq(0,600000)
-            self.set_gpu(self.gpu_governor,self.gpu_max_freq)
+        self.gear = load_gear(g)
+
+        for (cpu, freq) in enumerate(self.gear["cpu"]):
+            enabled = freq > 0
+            self.set_cpu_on_off(cpu, int(enabled))
+            if enabled:
+                self.set_cpu_max_freq(cpu, freq)
+
+        self.set_gpu(self.gear["gpu_gov"], self.gear["gpu_freq"])
+
+        # TODO: Generalise this
+        if self.gear["cpu"][0] > 0:
             self.set_cpu_gov0(self.cpu_scaling_governor)
-        if self.gear == 2:
-            self.set_cpu_on_off(0,1)
-            self.set_cpu_on_off(1,1)
-            self.set_cpu_on_off(2,0)
-            self.set_cpu_on_off(3,0)
-            self.set_cpu_on_off(4,0)        
-            self.set_cpu_on_off(5,0)
-            self.set_cpu_max_freq(0,800000)
-            self.set_cpu_max_freq(1,800000)
-            self.set_gpu(self.gpu_governor,self.gpu_max_freq)
-            self.set_cpu_gov0(self.cpu_scaling_governor)
-        if self.gear == 3:
-            self.set_cpu_on_off(0,1)
-            self.set_cpu_on_off(1,1)
-            self.set_cpu_on_off(2,1)
-            self.set_cpu_on_off(3,1)
-            self.set_cpu_on_off(4,0)
-            self.set_cpu_on_off(5,0)
-            self.set_cpu_max_freq(0,1008000)
-            self.set_cpu_max_freq(1,1008000)
-            self.set_cpu_max_freq(2,1008000)
-            self.set_cpu_max_freq(3,1008000)
-            self.set_gpu(self.gpu_governor,self.gpu_max_freq*2)
-            self.set_cpu_gov0(self.cpu_scaling_governor)
-        if self.gear == 4:
-            self.set_cpu_on_off(4,1)
-            self.set_cpu_on_off(5,1)
-            self.set_cpu_on_off(0,0)
-            self.set_cpu_on_off(1,0)
-            self.set_cpu_on_off(2,0)
-            self.set_cpu_on_off(3,0)
-            self.set_cpu_max_freq(4,1008000)
-            self.set_cpu_max_freq(5,1008000)
-            self.set_gpu(self.gpu_governor,self.gpu_max_freq*2)
-            self.set_cpu_gov4(self.cpu_scaling_governor)
-        if self.gear == 5:
-            self.set_cpu_on_off(4,1)
-            self.set_cpu_on_off(5,1)
-            self.set_cpu_on_off(0,0)
-            self.set_cpu_on_off(1,0)
-            self.set_cpu_on_off(2,0)
-            self.set_cpu_on_off(3,0)
-            self.set_cpu_max_freq(4,1200000)
-            self.set_cpu_max_freq(5,1200000)
-            self.set_gpu(self.gpu_governor,self.gpu_max_freq*2)
+        else:
             self.set_cpu_gov4(self.cpu_scaling_governor)
 
 
 
 def print_gear_map(gear):
-    global gear_m
-    rp = -1
+    print("    +-----------------------------------+-----------------+-----------+")
+    print("    |            Cortex-A53             |   Cortex-A72    | Mali-T860 |")
+    print("    +--------+--------+--------+--------+--------+--------+-----------+")
+    print("    | CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |   GPU     |")
+    div = "+---+--------+--------+--------+--------+--------+--------+-----------+"
+    print(div)
 
-    if gear > 0:
-        rp = 5 + (gear -1)*2
-
-    for idx, val in enumerate(gear_m):
-        if idx == rp:
-            print(gear_idx[gear-1])
+    def freq(khz):
+        mhz = khz/1000
+        if mhz >= 1000:
+            return "%d MHz" % mhz
+        elif mhz > 0:
+            return " %d MHz" % mhz
         else:
-            print(val) 
-      
+            return "  OFF   "
+
+    for idx, val in enumerate(gears):
+        g = idx + 1
+        selected = g == gear
+        print("|%s|%s| %s  |%s" % (
+            ("*%s*" if selected else " %s ") % g,
+            "|".join([freq(cpu) for cpu in val["cpu"]]),
+            freq(val["gpu_freq"]/1000),
+            " <===" if selected else "",
+        ))
+        print(div)
+
 def print_help_msg():
     print("Usage: devterm-a06-gearbox [OPTION]...")
     print("Show or set the CPU operating frequency,online status and GPU operating frequency for DevTerm A06.")
     print()
-    print(" -s, --set [n] set a speed mode between the number 1-5:")
-    print("               1 for simple writing tasks with long battery life.")
-    print("               2 for browsing most websites with long battery life.")
-    print("               3 for most 2D games and emulators.")
-    print("               4 for playing videos and 3D games.")
-    print("               5 for performance-first tasks.")
+    print(" -s, --set [n] set a speed mode between the number 1-%d:" % len(gears))
+    for (i, _) in enumerate(gears):
+        print("               %d for %s." % (i + 1, gears[i]["use"]))
     print()
     print("Examples:")
+    # TODO: Generate this example
     print("Set to mode 1, single LITTLE core @600MHz(max), GPU@200MHz.")
     print("   $ devterm-a06-gearbox -s 1")
 
@@ -271,8 +291,8 @@ def main(argv):
         elif opt in ("-s","--set"):
             if(isDigit(arg)):
                 gear = int(arg)
-                if gear > 5 or gear < 1:
-                    print("illegal input: mode range 1-5")
+                if gear not in range(1, len(gears) + 1):
+                    print("illegal input: mode range 1-%d" % len(gears))
                     sys.exit(-1)
            
     
