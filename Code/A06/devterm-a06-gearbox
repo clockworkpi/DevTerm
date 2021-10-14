@@ -7,6 +7,8 @@ import subprocess
 import time
 
 # The gearings below were picked based on various tests by the ClockworkPi devs.
+# The maximum-performance maximum-power gearing is present for completeness, but
+# shouldn't be needed for most uses.
 #
 # You can customise the gearings by editing the list below. The valid freqencies
 # for CPU <N> can be looked up here (substituting for <N>):
@@ -37,6 +39,11 @@ def gears():
             big=(1200000,) * 2,
             gpu_freq=400000000,
             use="performance-first tasks"),
+        gear(
+            little=(1416000,) * 4,
+            big=(1800000,) * 2,
+            gpu_freq=800000000,
+            use="max performance, max power (usage)"),
     ]
 
 GPU_GOV_SIMPLE = "simple_ondemand"
