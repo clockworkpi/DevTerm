@@ -217,11 +217,18 @@ class A06:
     def set_gear(self,g):
         self.gear = load_gear(g)
 
-        for (cpu, freq) in enumerate(self.gear["cpu"]):
-            enabled = freq > 0
-            self.set_cpu_on_off(cpu, int(enabled))
-            if enabled:
-                self.set_cpu_max_freq(cpu, freq)
+        if g > 3:
+            for (cpu, freq) in reversed(list(enumerate(self.gear["cpu"]))):
+                enabled = freq > 0
+                self.set_cpu_on_off(cpu, int(enabled))
+                if enabled:
+                    self.set_cpu_max_freq(cpu, freq)
+        else:
+            for (cpu, freq) in enumerate(self.gear["cpu"]):
+                enabled = freq > 0
+                self.set_cpu_on_off(cpu, int(enabled))
+                if enabled:
+                    self.set_cpu_max_freq(cpu, freq)
 
         self.set_gpu(self.gear["gpu_gov"], self.gear["gpu_freq"])
 
