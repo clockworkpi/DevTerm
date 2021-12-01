@@ -164,7 +164,7 @@ void label_print_f(CONFIG*cfg,char*label,float m,char*last){
 }
 
 void label_print_i(CONFIG*cfg,char*label,int m,char*last){
-  char buf[48];
+  char buf[MAXPIXELS];
   uint8_t i,j;
 
   if(m == -1)
@@ -173,7 +173,7 @@ void label_print_i(CONFIG*cfg,char*label,int m,char*last){
     sprintf(buf,"%d%s",m,last);
   
   j = strlen(buf);
-  i = 48-strlen(label)-j-1; 
+  i = MAXPIXELS-strlen(label)-j-1; 
 
   if(m == -1)
     sprintf(buf,"%s%*s%s",label,i,"",last);
@@ -198,7 +198,7 @@ void printer_test(CONFIG*cfg){
   uint8_t ch;
   uint16_t k;
   
-  char buf[48];  
+  char buf[MAXPIXELS];  
   char *font_names[]={"8x16thin_1","5x7_ISO8859_1","6x12_ISO8859_1","7x14_ISO8859_1","8x16thin_2",NULL};
 
   /*

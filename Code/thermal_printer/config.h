@@ -134,9 +134,7 @@
 #define Fontrows            ((uint8_t)24)
 #define FontColums          ((uint8_t)16)
 
-#define Maxdotsperline      ((uint16_t)384)
 #define nextcharactercolum  ((uint8_t)Fontrows/8) // = 3
-#define Maxcharacterperline ((uint16_t)Maxdotsperline/FontColums) // 384/16=24
 
 
 
@@ -155,17 +153,25 @@
 #define ESC_STATE 1
 #define GET_IMAGE 2
 
-
 #define ALIGN_LEFT 0
 #define ALIGN_CENTER 1
 #define ALIGN_RIGHT 2
 
-#define MAX_DOTS 384
 #define IMAGE_MAX 9224
 
 #define BITS8 8
-#define PRINTER_BITS 384
+
+
+#define MAX_DOTS 384
+#define PRINTER_BITS MAX_DOTS
 #define MAXPIXELS 48
+
+#ifdef MTP03
+#define MAX_DOTS 576
+#define PRINTER_BITS MAX_DOTS
+#define MAXPIXELS 72
+#endif
+
 
 //extract bits 
 #define LAST(k,n) ((k) & ((1<<(n))-1))
