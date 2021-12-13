@@ -59,7 +59,8 @@ uint8_t IsPaper()
 {
   uint8_t status;
   uint8_t tmp;
-  
+  return IS_PAPER;
+ 
   if(  millis() - printer_vps_time > 10) {
     ENABLE_PEM;
     if(ASK4PAPER==LOW) // * LOW is what we want**
@@ -240,26 +241,26 @@ uint8_t feed_pitch1(uint64_t lines, uint8_t forward_backward)
 
 void print_dots_8bit_split(CONFIG*cfg,uint8_t *Array, uint8_t characters) 
 {
-  uint8_t i=0,y=0, MAX=48;
+  uint8_t i=0,y=0, MAX=MAXPIXELS;
   uint8_t blank;
   uint16_t pts;
-  uint8_t temp[48];
-  uint8_t _array[48];
+  uint8_t temp[MAXPIXELS];
+  uint8_t _array[MAXPIXELS];
   pts = 0;
-  memcpy(_array,Array,48);
+  memcpy(_array,Array,MAXPIXELS);
   
   while( (i< characters) && (i < MAX)) {
 
     pts = pts + bits_number(Array[i]);
     
     if(pts > cfg->max_pts) {
-      memset(temp,0,48);
+      memset(temp,0,MAXPIXELS);
       memcpy(temp,_array,i);
       print_dots_8bit(cfg,temp,characters,0);
       pts = bits_number(_array[i]);
       memset(_array,0,i);
     }else if(pts==cfg->max_pts) {
-      memset(temp,0,48);
+      memset(temp,0,MAXPIXELS);
       memcpy(temp,_array,i+1);      
       print_dots_8bit(cfg,temp,characters,0);
       pts=0;
@@ -280,7 +281,7 @@ void print_dots_8bit_split(CONFIG*cfg,uint8_t *Array, uint8_t characters)
 
 void print_dots_8bit(CONFIG*cfg,uint8_t *Array, uint8_t characters,uint8_t feed_num) 
 {
-  uint8_t i=0,y=0, MAX=48;
+  uint8_t i=0,y=0, MAX=MAXPIXELS;
   uint8_t blank;
   
       ENABLE_VH;
