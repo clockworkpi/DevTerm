@@ -16,7 +16,7 @@
 #   define KEY_DEBOUNCE 5
 #endif
 
-#define KEYS_NUM 16
+#define KEYS_NUM 17
 
 
 void keys_task(DEVTERM*);

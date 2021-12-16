@@ -58,7 +58,7 @@ enum SKEYS {
 
   _VOLUME_M,
   _VOLUME_P,
-
+  _TRACKBALL_BTN,
 };
 
 #define DEF_LAYER      0x00
@@ -105,7 +105,7 @@ const uint16_t keys_maps[KEYS_NUM] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEF
                                       _JOYSTICK_RIGHT,_JOYSTICK_A,_JOYSTICK_B, \
                                       _JOYSTICK_X,_JOYSTICK_Y,_LEFT_SHIFT_KEY,_FN_KEY,\
                                       _LEFT_CTRL_KEY,_CMD_KEY , _LEFT_ALT,     \
-                                      _MOUSE_LEFT,_MOUSE_MID,_MOUSE_RIGHT};
+                                      _MOUSE_LEFT,_MOUSE_MID,_MOUSE_RIGHT,_TRACKBALL_BTN};
 
 
 uint8_t check_pd2(){ // if swtich 2 in back is set to on(HIGH)
@@ -241,12 +241,13 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
 void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
 
   uint16_t k;
-  
-  k = keys_maps[col];
 
+  k = keys_maps[col];
+  
   if(k == EMP){
     return;
   }
+
 
   switch(k) {
     case _LEFT_SHIFT_KEY:
@@ -419,7 +420,15 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
         dv->Keyboard->release(k);
       }
     break;
-    
+
+    case _TRACKBALL_BTN:
+      if(mode == KEY_PRESSED) {
+        dv->state->pressMiddleClick();
+      }else {
+        dv->state->releaseMiddleClick();
+        dv->Mouse->click(MOUSE_MIDDLE);
+      }
+    break;
     default:break;
     
   }

@@ -2,6 +2,7 @@
 #define DEVTERM_H
 
 #define KEY_LATENCY  1400
+#include "state.h"
 
 #include <USBComposite.h>
 typedef struct key_debouncing{
@@ -32,6 +33,8 @@ class DEVTERM {
     //**Serial and USBCompositeSerial can not use together, otherwise the keyboard firmware uploading will be dead**
     //and you will need to find a way out to flash the stm32duino bootloader once again
     //USBSerial *_Serial;//_Serial = &Serial;
+    State *state;
+    uint32_t delta;
 };
 
 #define KEYBOARD_PULL 1 // 1 for PULLUP, 0 FOR PULLDOWN

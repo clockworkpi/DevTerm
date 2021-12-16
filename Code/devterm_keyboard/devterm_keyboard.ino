@@ -2,6 +2,7 @@
 #include "keys.h"
 #include "trackball.h"
 #include "devterm.h"
+#include "tickwaiter.h"
 
 #include <USBComposite.h>
 
@@ -17,6 +18,8 @@ const uint8_t reportDescription[] = {
    HID_MOUSE_REPORT_DESCRIPTOR()
 };
 
+static const uint32_t LOOP_INTERVAL_MS = 0;
+static TickWaiter<LOOP_INTERVAL_MS> waiter;
 
 void setup() {
   USBComposite.setManufacturerString("ClockworkPI");
@@ -29,7 +32,8 @@ void setup() {
   dev_term.Consumer = new HIDConsumer(HID);
 
   dev_term.Keyboard->setAdjustForHostCapsLock(false);
-  
+
+  dev_term.state = new State();
 
   dev_term.Keyboard_state.layer = 0;
   dev_term.Keyboard_state.prev_layer = 0;
@@ -55,8 +59,11 @@ void setup() {
 }
 
 void loop() {
-
+  dev_term.delta = waiter.waitForNextTick();
+  dev_term.state->tick(dev_term.delta);
+  
   trackball_task(&dev_term);
+  
   keys_task(&dev_term); //keys above keyboard
   keyboard_task(&dev_term);
   

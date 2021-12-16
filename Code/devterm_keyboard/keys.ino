@@ -2,12 +2,12 @@
 
 KEY_DEB keypad_debouncing;
 
-uint8_t keys_io[ KEYS_NUM ]= {KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16};
+uint8_t keys_io[ KEYS_NUM ]= {KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY0};
 
 /* keys state(1:on, 0:off) */
-static uint16_t keys;
-static uint16_t keys_debouncing;
-static uint16_t keys_prev;
+static uint32_t keys;
+static uint32_t keys_debouncing;
+static uint32_t keys_prev;
 
 void init_keys(){
   int i;
@@ -19,7 +19,7 @@ void init_keys(){
 }
 
 uint8_t scan_keys(){
-  uint16_t data;
+  uint32_t data;
   uint8_t s;
   
   data = 0;
@@ -69,9 +69,9 @@ void keys_task(DEVTERM*dv){
   
   scan_keys();
 
-  uint16_t _mask =1;
-  uint16_t _change = 0;
-  uint16_t _pressed = 0;
+  uint32_t _mask =1;
+  uint32_t _change = 0;
+  uint32_t _pressed = 0;
   
   _change = keys ^ keys_prev;
 

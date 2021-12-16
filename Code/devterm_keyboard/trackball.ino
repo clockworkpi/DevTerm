@@ -9,71 +9,103 @@
 
 #include <USBComposite.h>
 
+
 #include "trackball.h"
 
+#include "ratemeter.h"
+#include "glider.h"
+#include "math.h"
 
-int btn_state;
-int btn_read_state;
-unsigned long btn_current_action_time;
-unsigned long btn_last_action_time;
 
-// mouse move
-int x_move, y_move;
-Direction x_direction(LEFT_PIN, RIGHT_PIN);
-Direction y_direction(UP_PIN, DOWN_PIN);
+ 
+enum Axis: uint8_t {
+  AXIS_X,
+  AXIS_Y,
+  AXIS_NUM,
+};
 
-TrackSpeed Normal_ts;
-TrackSpeed Detail_ts;
-TrackSpeed *ts_ptr;
+static int8_t distances[AXIS_NUM];
+static RateMeter rateMeter[AXIS_NUM];
+static Glider glider[AXIS_NUM];
 
-void trackball_task(DEVTERM*dv) {
-  
-  if(dv-> Keyboard_state.fn_on > 0) {
-    ts_ptr = &Detail_ts;
-  }else {
-    ts_ptr = &Normal_ts;
+static const int8_t WHEEL_DENOM = 2;
+static int8_t wheelBuffer;
+
+static float rateToVelocityCurve(float input) {
+  return std::pow(std::abs(input) / 50, 1.5);
+}
+
+template<Axis AXIS, int8_t Direction>
+static void interrupt() {
+  distances[AXIS] += Direction;
+  rateMeter[AXIS].onInterrupt();
+  glider[AXIS].setDirection(Direction);
+
+  const auto rx = rateMeter[AXIS_X].rate();
+  const auto ry = rateMeter[AXIS_Y].rate();
+
+  const auto rate = std::sqrt(rx * rx + ry * ry);
+  const auto ratio = rateToVelocityCurve(rate) / rate;
+
+  const auto vx = rx * ratio;
+  const auto vy = ry * ratio;
+
+  if (AXIS == AXIS_X) {
+    glider[AXIS_X].update(vx, rateMeter[AXIS_X].delta());
+    glider[AXIS_Y].updateSpeed(vy);
+  } else {
+    glider[AXIS_X].updateSpeed(vx);
+    glider[AXIS_Y].update(vy, rateMeter[AXIS_Y].delta());
   }
-
-  x_direction.ts = ts_ptr;
-  y_direction.ts = ts_ptr;
-  
-  btn_read_state = digitalRead(BTN_PIN);
-  
-  if(btn_read_state != btn_state) {
-    btn_current_action_time = millis();
-    if(btn_current_action_time - btn_last_action_time > ts_ptr->bounce_interval ) {
-      btn_state = btn_read_state;
-      btn_last_action_time = btn_current_action_time;
-      
-      if(btn_state == HIGH) {
-        dv->Mouse->release();
-      } else {
-        dv->Mouse->press();
+}
+ 
+void trackball_task(DEVTERM*dv) {
+  int8_t x = 0, y = 0, w = 0;
+  noInterrupts();
+  rateMeter[AXIS_X].tick(dv->delta);
+  rateMeter[AXIS_Y].tick(dv->delta);
+  const auto mode = dv->state->moveTrackball();
+  switch(mode){
+    case TrackballMode::Mouse: {
+      const auto rX = glider[AXIS_X].glide(dv->delta);
+      const auto rY = glider[AXIS_Y].glide(dv->delta);
+      x = rX.value;
+      y = rY.value;
+      if (rX.stopped) {
+        glider[AXIS_Y].stop();
       }
+      if (rY.stopped) {
+        glider[AXIS_Y].stop();
+      }
+
+      break;
+    }
+    case TrackballMode::Wheel: {
+      wheelBuffer += distances[AXIS_Y];
+      w = wheelBuffer / WHEEL_DENOM;
+      wheelBuffer -= w * WHEEL_DENOM;
+      break;
     }
   }
+  distances[AXIS_X] = 0;
+  distances[AXIS_Y] = 0;
+  interrupts();
 
-  x_move = x_direction.read_action();
-  y_move = y_direction.read_action();
-  if(x_move != 0 || y_move != 0) {
-    dv->Mouse->move(x_move, y_move, 0);
-  }
-  
+  dv->Mouse->move(x, y, -w);
+ 
 }
 
 
 void trackball_init(DEVTERM*){
-  pinMode(BTN_PIN,INPUT);
 
-  Normal_ts.bounce_interval = 30;
-  Normal_ts.base_move_pixels = 5;
-  Normal_ts.exponential_bound = 14;
-  Normal_ts.exponential_base = 1.2;
+  pinMode(LEFT_PIN, INPUT);
+  pinMode(UP_PIN, INPUT);
+  pinMode(RIGHT_PIN, INPUT);
+  pinMode(DOWN_PIN, INPUT);
 
-  Detail_ts.bounce_interval = 100;
-  Detail_ts.base_move_pixels = 3;
-  Detail_ts.exponential_bound = 10;
-  Detail_ts.exponential_base = 1.2;
-
+  attachInterrupt(LEFT_PIN, &interrupt<AXIS_X, -1>, ExtIntTriggerMode::CHANGE);
+  attachInterrupt(RIGHT_PIN, &interrupt<AXIS_X, 1>, ExtIntTriggerMode::CHANGE);
+  attachInterrupt(UP_PIN, &interrupt<AXIS_Y, -1>, ExtIntTriggerMode::CHANGE);
+  attachInterrupt(DOWN_PIN, &interrupt<AXIS_Y, 1>, ExtIntTriggerMode::CHANGE);
   
 }
