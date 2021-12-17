@@ -32,7 +32,7 @@ static const int8_t WHEEL_DENOM = 2;
 static int8_t wheelBuffer;
 
 static float rateToVelocityCurve(float input) {
-  return std::pow(std::abs(input) / 50, 1.5);
+  return std::pow(std::abs(input) / 50, 1.4);
 }
 
 template<Axis AXIS, int8_t Direction>
