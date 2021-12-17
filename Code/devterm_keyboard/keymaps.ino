@@ -395,10 +395,11 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
       }
     break;
     case _MOUSE_MID:
-      if(mode == KEY_PRESSED){
-        dv->Mouse->press(4);
-      }else if(mode == KEY_RELEASED){
-        dv->Mouse->release(4);
+      if(mode == KEY_PRESSED) {
+        dv->state->pressMiddleClick();
+      }else {
+        dv->state->releaseMiddleClick();
+        dv->Mouse->click(MOUSE_MIDDLE);
       }
     break;
 
@@ -422,11 +423,10 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     break;
 
     case _TRACKBALL_BTN:
-      if(mode == KEY_PRESSED) {
-        dv->state->pressMiddleClick();
-      }else {
-        dv->state->releaseMiddleClick();
-        dv->Mouse->click(MOUSE_MIDDLE);
+      if(mode == KEY_PRESSED){
+        dv->Mouse->press(1);
+      }else if(mode == KEY_RELEASED){
+        dv->Mouse->release(1);
       }
     break;
     default:break;
