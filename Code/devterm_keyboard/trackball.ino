@@ -91,7 +91,9 @@ void trackball_task(DEVTERM*dv) {
   distances[AXIS_Y] = 0;
   interrupts();
 
-  dv->Mouse->move(x, y, -w);
+  if(x !=0 || y != 0 || -w!=0) {
+    dv->Mouse->move(x, y, -w);
+  }
  
 }
 
