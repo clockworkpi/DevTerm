@@ -22,6 +22,13 @@ void RateMeter::onInterrupt() {
 
 void RateMeter::tick(millis_t delta) {
   cutoff.updateTime(delta);
+  if (!cutoff.get()) {
+    averageDelta += delta;
+  }
+}
+
+void RateMeter::expire() {
+  cutoff.expire();
 }
 
 uint16_t RateMeter::delta() const {
