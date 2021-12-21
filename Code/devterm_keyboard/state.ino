@@ -6,13 +6,23 @@
 
 State::State()
   : fn(false),
-    middleClick(false)
+    middleClick(false),
+    scrolled(false)
 {
 }
 
 void State::tick(millis_t delta)
 {
   middleClickTimeout.updateTime(delta);
+}
+void State::setScrolled() {
+  if(middleClick==true){
+    scrolled = true;
+  }
+}
+
+bool State::getScrolled() {
+  return scrolled;
 }
 
 void State::pressMiddleClick() {
@@ -22,6 +32,7 @@ void State::pressMiddleClick() {
 
 bool State::releaseMiddleClick() {
   middleClick = false;
+  scrolled = false;
   const auto timeout = middleClickTimeout.get();
   return !timeout;
 }

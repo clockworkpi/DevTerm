@@ -25,9 +25,12 @@ class State
 
     void pressMiddleClick();
     bool releaseMiddleClick();
+    bool getScrolled();
+    void setScrolled();
     TrackballMode moveTrackball();
   private:
     bool middleClick;
+    bool scrolled;
     Timeout<uint16_t, MIDDLE_CLICK_TIMEOUT_MS> middleClickTimeout;
 };
 

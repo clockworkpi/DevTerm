@@ -241,7 +241,7 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
 void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
 
   uint16_t k;
-
+ 
   k = keys_maps[col];
   
   if(k == EMP){
@@ -398,8 +398,12 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
       if(mode == KEY_PRESSED) {
         dv->state->pressMiddleClick();
       }else {
+        if(dv->state->getScrolled() == false){
+          //if no scrolling happend ,do as a normal mid mouse key click
+          dv->Mouse->click(MOUSE_MIDDLE);
+        }
         dv->state->releaseMiddleClick();
-        dv->Mouse->click(MOUSE_MIDDLE);
+   
       }
     break;
 

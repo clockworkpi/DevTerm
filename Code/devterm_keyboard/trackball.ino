@@ -35,8 +35,8 @@ static float rateToVelocityCurve(float input) {
   return std::pow(std::abs(input) / 50, 1.4);
 }
 
-template<Axis AXIS, int8_t Direction>
-static void interrupt() {
+template<Axis AXIS, int8_t Direction >
+static void interrupt( ) {
   distances[AXIS] += Direction;
   rateMeter[AXIS].onInterrupt();
   glider[AXIS].setDirection(Direction);
@@ -53,11 +53,14 @@ static void interrupt() {
   if (AXIS == AXIS_X) {
     glider[AXIS_X].update(vx, std::sqrt(rateMeter[AXIS_X].delta()));
     glider[AXIS_Y].updateSpeed(vy);
+    
   } else {
     glider[AXIS_X].updateSpeed(vx);
     glider[AXIS_Y].update(vy, std::sqrt(rateMeter[AXIS_Y].delta()));
 
   }
+
+ 
 }
  
 void trackball_task(DEVTERM*dv) {
@@ -94,6 +97,9 @@ void trackball_task(DEVTERM*dv) {
       wheelBuffer += distances[AXIS_Y];
       w = wheelBuffer / WHEEL_DENOM;
       wheelBuffer -= w * WHEEL_DENOM;
+      if(w != 0){
+        dv->state->setScrolled();
+      }
       break;
     }
   }
@@ -108,14 +114,14 @@ void trackball_task(DEVTERM*dv) {
 }
 
 
-void trackball_init(DEVTERM*){
+void trackball_init(DEVTERM*dv){
 
   pinMode(LEFT_PIN, INPUT);
   pinMode(UP_PIN, INPUT);
   pinMode(RIGHT_PIN, INPUT);
   pinMode(DOWN_PIN, INPUT);
 
-  attachInterrupt(LEFT_PIN, &interrupt<AXIS_X, -1>, ExtIntTriggerMode::CHANGE);
+  attachInterrupt(LEFT_PIN, &interrupt<AXIS_X,-1> , ExtIntTriggerMode::CHANGE);
   attachInterrupt(RIGHT_PIN, &interrupt<AXIS_X, 1>, ExtIntTriggerMode::CHANGE);
   attachInterrupt(UP_PIN, &interrupt<AXIS_Y, -1>, ExtIntTriggerMode::CHANGE);
   attachInterrupt(DOWN_PIN, &interrupt<AXIS_Y, 1>, ExtIntTriggerMode::CHANGE);
