@@ -16,8 +16,13 @@
 
 #### ESC ! n  
 set printer font index,n:0-4  
-`echo -en "\x1b\x0" > /tmp/DEVTERM_PRINTER_IN`
+`echo -en "\x1b\x21\x0" > /tmp/DEVTERM_PRINTER_IN`  
+`echo -en "\x1b\x21\x1" > /tmp/DEVTERM_PRINTER_IN`  
+`echo -en "\x1b\x21\x2" > /tmp/DEVTERM_PRINTER_IN`  
+`echo -en "\x1b\x21\x3" > /tmp/DEVTERM_PRINTER_IN`  
+`echo -en "\x1b\x21\x4" > /tmp/DEVTERM_PRINTER_IN`  
 
+https://github.com/clockworkpi/DevTerm/blob/81addc7f4ba1eb4acb2f59fb1fef70386dbe1f0d/Code/thermal_printer/devterm_thermal_printer.c#L381
 
 #### DC2 # n   
 n:0-F, set printer printing density 
