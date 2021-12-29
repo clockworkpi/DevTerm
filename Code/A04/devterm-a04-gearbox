@@ -26,14 +26,14 @@ def gears():
             little=(888000,) * 2,
             use="browsing most websites with long battery life"),
         gear(
-            little=(1080000,) * 3,
+            little=(1080000,) * 2,
             use="most 2D games and emulators"),
         gear(
-            little=(1488000,) * 4,
+            little=(1320000,) * 4,
             use="playing videos and 3D games"),
-        #gear(
-        #    little=(1800000,) * 4,
-        #    use="max performance, max power (usage)"),
+        gear(
+            little=(1488000,) * 4,
+            use="performance-first tasks"),
     ]
 
 #GPU_GOV_SIMPLE = "simple_ondemand"
