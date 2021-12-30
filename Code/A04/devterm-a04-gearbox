@@ -21,18 +21,18 @@ def gears():
     return [
         gear(
             little=(720000,),
-            use="simple writing tasks with long battery life"),
+            use="simple console tasks with long battery life"),
         gear(
-            little=(888000,) * 2,
-            use="browsing most websites with long battery life"),
+            little=(816000,) * 2,
+            use="simple writing tasks with long battery life"),
         gear(
             little=(1080000,) * 2,
             use="most 2D games and emulators"),
         gear(
-            little=(1320000,) * 4,
-            use="playing videos and 3D games"),
+            little=(1320000,) * 2,
+            use="playing videos and 3D games,browsing websites"),
         gear(
-            little=(1488000,) * 4,
+            little=(1080000,) * 4,
             use="performance-first tasks"),
     ]
 
