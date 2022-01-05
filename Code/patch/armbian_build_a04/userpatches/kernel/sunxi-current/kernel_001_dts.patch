@@ -1,0 +1,672 @@
+diff --git a/arch/arm64/boot/dts/allwinner/Makefile b/arch/arm64/boot/dts/allwinner/Makefile
+index f15fb2eea..68f6e913e 100644
+--- a/arch/arm64/boot/dts/allwinner/Makefile
++++ b/arch/arm64/boot/dts/allwinner/Makefile
+@@ -37,6 +37,7 @@ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h5-nanopi-m1-plus2.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h5-orangepi-prime.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h5-orangepi-zero-plus.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h5-orangepi-zero-plus2.dtb
++dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h6-clockworkpi-a04.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h6-beelink-gs1.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h616-orangepi-zero2.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h6-orangepi-3.dtb
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-clockworkpi-a04.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-clockworkpi-a04.dts
+new file mode 100644
+index 000000000..91b6ee040
+--- /dev/null
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-clockworkpi-a04.dts
+@@ -0,0 +1,465 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++// Copyright (C) 2019 Ondřej Jirman <megous@megous.com>
++
++/dts-v1/;
++
++#include "sun50i-h6.dtsi"
++#include "sun50i-h6-cpu-opp.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++
++/ {
++	model = "Clockworkpi A04";
++	compatible = "clockwork,devterm-a04", "allwinner,sun50i-h6";
++
++	aliases {
++		serial0 = &uart0;
++		serial1 = &uart1;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	connector {
++		compatible = "hdmi-connector";
++		ddc-en-gpios = <&pio 7 2 GPIO_ACTIVE_HIGH>;
++		type = "d";
++
++		port {
++			hdmi_con_in: endpoint {
++				remote-endpoint = <&hdmi_out_con>;
++			};
++		};
++	};
++
++	ext_osc32k: ext_osc32k_clk {
++		#clock-cells = <0>;
++		compatible = "fixed-clock";
++		clock-frequency = <32768>;
++		clock-output-names = "ext_osc32k";
++	};
++
++	reg_vcc5v: vcc5v {
++		/* board wide 5V supply directly from the DC jack */
++		compatible = "regulator-fixed";
++		regulator-name = "vcc-5v";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++	};
++
++	reg_vcc33_wifi: vcc33-wifi {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc33-wifi";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on;
++		vin-supply = <&reg_vcc5v>;
++	};
++
++	reg_vcc_wifi_io: vcc-wifi-io {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc-wifi-io";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-always-on;
++		vin-supply = <&reg_vcc33_wifi>;
++	};
++
++	reg_vdd_gpu: vdd-gpu {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd-gpu";
++		regulator-min-microvolt = <1080000>;
++		regulator-max-microvolt = <1080000>;
++		regulator-always-on;
++	};
++
++	reg_vdd12: vdd-12 {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd-12";
++		regulator-min-microvolt = <1200000>;
++		regulator-max-microvolt = <1200000>;
++		regulator-always-on;
++	};
++
++	wifi_pwrseq: wifi-pwrseq {
++		compatible = "mmc-pwrseq-simple";
++		clocks = <&rtc 1>;
++		clock-names = "ext_clock";
++		reset-gpios = <&pio 2 0 GPIO_ACTIVE_LOW>;
++		post-power-on-delay-ms = <200>;
++	};
++
++	battery: battery@0 {
++				compatible = "simple-battery";
++				constant-charge-current-max-microamp = <2100000>;
++				voltage-min-design-microvolt = <3300000>;
++	};
++
++	ocp8178_backlight: backlight@0 {
++			compatible = "ocp8178-backlight";
++			backlight-control-gpios = <&pio 2 6 GPIO_ACTIVE_HIGH>;
++			default-brightness = <5>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&backlight_control>;
++	};
++
++	panel {
++		compatible = "clockwork,cpi3-lcd";
++		pinctrl-names = "default";
++		pinctrl-0 = <&lcd_pins>;
++		status = "okay";
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			port@0 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0>;
++
++				dsi_bridge_in: endpoint@0 {
++					reg = <0>;
++					remote-endpoint = <&tcon_lcd_out_bridge>;
++				};
++			};
++		};
++	};
++
++	ac200-sound {
++		status = "okay";
++		compatible = "simple-audio-card";
++		simple-audio-card,format		= "i2s";
++		simple-audio-card,frame-master		= <&i2s3_master>;
++		simple-audio-card,bitclock-master	= <&i2s3_master>;
++		simple-audio-card,name = "allwinner,ac200-codec";
++		simple-audio-card,mclk-fs = <512>;
++		i2s3_master: simple-audio-card,cpu {
++			sound-dai = <&i2s3>;
++			system-clock-frequency = <22579200>;
++			dai-tdm-slot-num = <2>;
++			dai-tdm-slot-width = <32>;
++		};
++		simple-audio-card,codec {
++			sound-dai = <&ac200_codec>;
++			system-clock-frequency = <22579200>;
++			dai-tdm-slot-num = <2>;
++			dai-tdm-slot-width = <32>;
++		};
++	};
++
++	ac200_codec_spk: ac200_codec_spk {
++		compatible = "allwinner,ac200_codec";
++		gpio-switch = <&pio 2 12 GPIO_ACTIVE_HIGH>;
++		status = "okay";
++	};
++
++};
++
++&de {
++	status = "okay";
++};
++
++&gpu {
++	mali-supply = <&reg_vdd_gpu>;
++	status = "okay";
++};
++
++&hdmi {
++	status = "okay";
++};
++
++&hdmi_sound {
++	status = "okay";
++};
++
++&i2s1 {
++//	status = "okay";
++};
++
++&i2s3 {
++	status = "okay";
++};
++
++&pwm {
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
++&hdmi_out {
++	hdmi_out_con: endpoint {
++		remote-endpoint = <&hdmi_con_in>;
++	};
++};
++
++&mmc0 {
++	vmmc-supply = <&reg_vcc33_wifi>;
++	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;
++	bus-width = <4>;
++	status = "okay";
++};
++
++&mmc1 {
++	vmmc-supply = <&reg_dldo1>;
++	vqmmc-supply = <&reg_aldo3>;
++	mmc-pwrseq = <&wifi_pwrseq>;
++	bus-width = <4>;
++	non-removable;
++	status = "okay";
++
++	brcm: sdio-wifi@1 {
++		reg = <1>;
++		interrupt-parent = <&pio>;
++		interrupts = <2 1 IRQ_TYPE_LEVEL_LOW>;
++		interrupt-names = "host-wake";
++	};
++};
++
++&pio {
++	vcc-pc-supply = <&reg_vcc_wifi_io>;
++	vcc-pd-supply = <&reg_vcc33_wifi>;
++	vcc-pg-supply = <&reg_vcc_wifi_io>;
++
++	panel_reset: panel-reset {
++		pins = "PC5", "PC10", "PC13";
++		function = "gpio_out";
++	};
++
++	backlight_control: backlight-control {
++		pins = "PC6";
++		function = "gpio_out";
++	};
++
++	lcd_pins: lcd-pin {
++		pins = "PD0", "PD1", "PD2", "PD3", "PD4", "PD5",
++				"PD6", "PD7", "PD8", "PD9", "PD10", "PD11",
++				"PD12", "PD13", "PD14", "PD15", "PD16", "PD17",
++				"PD18", "PD19", "PD20", "PD21";
++		function = "lcd0";
++	};
++
++};
++
++&r_pio {
++
++};
++
++&rtc {
++	clocks = <&ext_osc32k>;
++};
++
++&uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart0_ph_pins>;
++	status = "okay";
++};
++
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	uart-has-rtscts;
++	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm4345c5";
++		clocks = <&rtc 1>;
++		clock-names = "lpo";
++		device-wakeup-gpios = <&pio 2 4 GPIO_ACTIVE_HIGH>; /* PC4 */
++		host-wakeup-gpios = <&pio 2 3 GPIO_ACTIVE_HIGH>; /* PC3 */
++		shutdown-gpios = <&pio 2 2 GPIO_ACTIVE_HIGH>; /* PC2*/
++		max-speed = <1500000>;
++	};
++};
++
++&dwc3 {
++	status = "okay";
++};
++
++&ohci0 {
++	status = "okay";
++};
++
++&ohci3 {
++	status = "okay";
++};
++
++&ehci0 {
++	status = "okay";
++};
++
++&ehci3 {
++	status = "okay";
++};
++
++&usb2otg {
++	dr_mode = "peripheral";
++	status = "okay";
++};
++
++&usb2phy {
++	usb0_id_det-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>;
++	usb0_vbus-supply = <&reg_vcc5v>;
++	usb3_vbus-supply = <&reg_vcc5v>;
++	status = "okay";
++};
++
++&usb3phy {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++
++	axp22x: pmic@34 {
++		interrupt-controller;
++		#interrupt-cells = <1>;
++		compatible = "x-powers,axp221";
++		reg = <0x34>;
++		interrupt-parent = <&pio>;
++		interrupts = <7 7 IRQ_TYPE_LEVEL_LOW>;
++
++		regulators {
++
++			x-powers,dcdc-freq = <3000>;
++
++			reg_aldo1: aldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "audio-vdd";
++			};
++
++			reg_aldo2: aldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "display-vcc";
++			};
++
++			reg_aldo3: aldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-name = "wifi-vdd";
++			};
++
++			reg_dldo1: dldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc1";
++			};
++
++			reg_dldo2: dldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "dldo2";
++			};
++
++			reg_dldo3: dldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "dldo3";
++			};
++
++			reg_dldo4: dldo4 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "dldo4";
++			};
++
++			reg_eldo1: eldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc2";
++			};
++
++			reg_eldo2: eldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc3";
++			};
++
++			reg_eldo3: eldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc4";
++			};
++
++		};
++
++		battery_power_supply: battery-power-supply {
++			compatible = "x-powers,axp221-battery-power-supply";
++			monitored-battery = <&battery>;
++		};
++
++		ac_power_supply: ac_power_supply {
++			compatible = "x-powers,axp221-ac-power-supply";
++		};
++
++	};
++};
++
++&i2c2 {
++	status = "okay";
++
++	dsi_bridge: tc358778@e {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		compatible = "cw,cwd686";
++		reg = <0xe>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&panel_reset>;
++		reset-gpios = <&pio 2 10 GPIO_ACTIVE_HIGH>;
++		power-gpios = <&pio 2 13 GPIO_ACTIVE_HIGH>;
++	};
++};
++
++&i2c3 {
++	status = "okay";
++};
++
++&tcon_lcd {
++	status = "okay";
++
++	ports {
++		tcon_lcd_out: port@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			tcon_lcd_out_bridge: endpoint@0 {
++				reg = <0>;
++				remote-endpoint = <&dsi_bridge_in>;
++			};
++		};
++	};
++
++
++};
++
++&tcon_tv {
++//	status = "okay";
++	status = "disabled";
++};
++
++&spi1 {
++	status = "okay";
++	spidev@0 {
++		compatible = "spidev";
++		reg = <0x0>;
++		spi-max-frequency = <1000000>;
++	};
++};
++
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index fac732484..9e5edb8a7 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -80,7 +80,7 @@
+ 
+ 	de: display-engine {
+ 		compatible = "allwinner,sun50i-h6-display-engine";
+-		allwinner,pipelines = <&mixer0>;
++		allwinner,pipelines = <&mixer0 &mixer1>;
+ 		status = "disabled";
+ 	};
+ 
+@@ -201,6 +201,31 @@
+ 					};
+ 				};
+ 			};
++
++			mixer1: mixer@200000 {
++				compatible = "allwinner,sun50i-h6-de3-mixer-1";
++				reg = <0x200000 0x100000>;
++				clocks = <&display_clocks CLK_BUS_MIXER1>,
++					 <&display_clocks CLK_MIXER1>;
++				clock-names = "bus",
++					      "mod";
++				resets = <&display_clocks RST_MIXER1>;
++				iommus = <&iommu 1>;
++
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					mixer1_out: port@1 {
++						reg = <1>;
++
++						mixer1_out_tcon_top_mixer1: endpoint {
++							remote-endpoint = <&tcon_top_mixer1_in_mixer1>;
++						};
++					};
++				};
++			};
++
+ 		};
+ 
+ 		video-codec@1c0e000 {
+@@ -426,6 +451,11 @@
+ 				function = "i2c3";
+ 			};
+ 
++			ac200_pins: ac200-pins {
++				pins = "PB0";
++				function = "ccir";
++			};
++
+ 			mmc0_pins: mmc0-pins {
+ 				pins = "PF0", "PF1", "PF2", "PF3",
+ 				       "PF4", "PF5";
+@@ -522,6 +552,11 @@
+ 				pins = "PD25", "PD26";
+ 				function = "uart3";
+ 			};
++
++			i2s3_pins: i2s3-pins {
++				pins = "PB12", "PB13", "PB14", "PB15", "PB16";
++				function = "i2s3";
++			};
+ 		};
+ 
+ 		iommu: iommu@30f0000 {
+@@ -724,6 +759,8 @@
+ 				interrupts = <1 20 IRQ_TYPE_LEVEL_LOW>;
+ 				interrupt-controller;
+ 				#interrupt-cells = <1>;
++				pinctrl-names = "default";
++				pinctrl-0 = <&ac200_pins>;
+ 
+ 				ac200_ephy: phy {
+ 					compatible = "x-powers,ac200-ephy";
+@@ -732,6 +769,12 @@
+ 					nvmem-cell-names = "calibration";
+ 					status = "disabled";
+ 				};
++
++				ac200_codec: codec {
++					#sound-dai-cells = <0>;
++					compatible = "x-powers,ac200-codec";
++					status = "okay";
++				};
+ 			};
+ 		};
+ 
+@@ -768,6 +811,21 @@
+ 			status = "disabled";
+ 		};
+ 
++		i2s3: i2s@508f000 {
++			#sound-dai-cells = <0>;
++			compatible = "allwinner,sun50i-h6-i2s";
++			reg = <0x0508f000 0x1000>;
++			interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_I2S3>, <&ccu CLK_I2S3>;
++			clock-names = "apb", "mod";
++			dmas = <&dma 6>, <&dma 6>;
++			resets = <&ccu RST_BUS_I2S3>;
++			dma-names = "rx", "tx";
++			pinctrl-names = "default";
++			pinctrl-0 = <&i2s3_pins>;
++			status = "disabled";
++		};
++
+ 		spdif: spdif@5093000 {
+ 			#sound-dai-cells = <0>;
+ 			compatible = "allwinner,sun50i-h6-spdif";
+@@ -928,7 +986,7 @@
+ 					reg = <0>;
+ 
+ 					hdmi_in_tcon_top: endpoint {
+-						remote-endpoint = <&tcon_top_hdmi_out_hdmi>;
++						remote-endpoint = <&tcon_tv_out_tcon_top>;
+ 					};
+ 				};
+ 
+@@ -985,22 +1043,49 @@
+ 					};
+ 				};
+ 
+-				tcon_top_hdmi_in: port@4 {
++				tcon_top_mixer1_in: port@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					tcon_top_mixer1_in_mixer1: endpoint@1 {
++						reg = <1>;
++						remote-endpoint = <&mixer1_out_tcon_top_mixer1>;
++					};
++				};
++
++				tcon_top_mixer1_out: port@3 {
+ 					#address-cells = <1>;
+ 					#size-cells = <0>;
+-					reg = <4>;
++					reg = <3>;
+ 
+-					tcon_top_hdmi_in_tcon_tv: endpoint@0 {
++					tcon_top_mixer1_out_tcon_lcd: endpoint@0 {
+ 						reg = <0>;
+-						remote-endpoint = <&tcon_tv_out_tcon_top>;
++						remote-endpoint = <&tcon_lcd_in_tcon_top_mixer1>;
+ 					};
+ 				};
++			};
++		};
+ 
+-				tcon_top_hdmi_out: port@5 {
+-					reg = <5>;
++		tcon_lcd: lcd-controller@6511000 {
++			compatible = "allwinner,sun50i-h6-tcon-lcd";
++			reg = <0x06511000 0x1000>;
++			interrupts = <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_TCON_LCD0>, <&ccu CLK_TCON_LCD0>;
++			clock-names = "ahb", "tcon-ch0";
++			clock-output-names = "tcon-lcd-sclk";
++			resets = <&ccu RST_BUS_TCON_LCD0>;
++			reset-names = "lcd";
+ 
+-					tcon_top_hdmi_out_hdmi: endpoint {
+-						remote-endpoint = <&hdmi_in_tcon_top>;
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				tcon_lcd_in: port@0 {
++					reg = <0>;
++
++					tcon_lcd_in_tcon_top_mixer1: endpoint@0 {
++						remote-endpoint = <&tcon_top_mixer1_out_tcon_lcd>;
+ 					};
+ 				};
+ 			};
+@@ -1037,7 +1122,7 @@
+ 
+ 					tcon_tv_out_tcon_top: endpoint@1 {
+ 						reg = <1>;
+-						remote-endpoint = <&tcon_top_hdmi_in_tcon_tv>;
++						remote-endpoint = <&hdmi_in_tcon_top>;
+ 					};
+ 				};
+ 			};

@@ -1,0 +1,24 @@
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index fc3ec3714..05b0e7c8d 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -139,6 +139,7 @@ static const struct thermal_zone_of_device_ops ths_ops = {
+ };
+ 
+ static const struct regmap_config config = {
++	.name = "thermal",
+ 	.reg_bits = 32,
+ 	.val_bits = 32,
+ 	.reg_stride = 4,
+@@ -640,9 +641,9 @@ static const struct ths_thermal_chip sun50i_h5_ths = {
+ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.sensor_num = 2,
+ 	.has_bus_clk_reset = true,
+-	.ft_deviation = 7000,
++	.ft_deviation = -7000,
+ 	.offset = 187744,
+-	.scale = 672,
++	.scale = 550,
+ 	.temp_data_base = SUN50I_H6_THS_TEMP_DATA,
+ 	.calibrate = sun50i_h6_ths_calibrate,
+ 	.init = sun50i_h6_thermal_init,
