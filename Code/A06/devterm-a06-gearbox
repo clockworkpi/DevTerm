@@ -4,7 +4,6 @@ import glob
 import os
 import sys,getopt
 import subprocess
-import time
 
 # The gearings below were picked based on various tests by the ClockworkPi devs.
 # The maximum-performance maximum-power gearing is present for completeness, but
@@ -142,8 +141,6 @@ class A06:
     
     def get_cpu_on_off(self,cpu_num):
         cpu_onoff_file = "/sys/devices/system/cpu/cpu%d/online" % cpu_num
-        onoff = "0"
-        max_freq = "0"
         with open(cpu_onoff_file,"r") as f: onoff = f.read().strip()
         if onoff == "1":
             cpu_max_freq_file = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq" % cpu_num
