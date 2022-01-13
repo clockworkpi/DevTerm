@@ -1,0 +1,16 @@
+diff --git a/lib/configuration.sh b/lib/configuration.sh
+index 6f62e8e4d..f23b05237 100644
+--- a/lib/configuration.sh
++++ b/lib/configuration.sh
+@@ -82,6 +82,11 @@ case $MAINLINE_MIRROR in
+ 		MAINLINE_KERNEL_SOURCE='https://mirrors.bfsu.edu.cn/git/linux-stable.git'
+ 		MAINLINE_FIRMWARE_SOURCE='https://mirrors.bfsu.edu.cn/git/linux-firmware.git'
+ 		;;
++	cuu)
++		MAINLINE_KERNEL_SOURCE='https://github.com/cuu/linux-5.10.60.git'
++		MAINLINE_FIRMWARE_SOURCE='git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git'
++		;;
++
+ 	*)
+ 		MAINLINE_KERNEL_SOURCE='git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git'
+ 		MAINLINE_FIRMWARE_SOURCE='git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git'
