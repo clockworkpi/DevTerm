@@ -6,9 +6,9 @@ cd build
 
 git reset --hard 5fa022603c0948cc59688ba782b3711f980a0be3
 
-cp -rf ~/DevTerm/Code/patch/armbian_build_a04/armbian_build_a04/userpatches/* userpatches/
-cp -rf ~/DevTerm/Code/patch/armbian_build_a04/armbian_build_a04/config/boards/* config/boards/
-cp -rf ~/DevTerm/Code/patch/armbian_build_a04/armbian_build_a04/config/kernel/*  config/kernel/
+cp -rf ~/DevTerm/Code/patch/armbian_build_a04/userpatches/* userpatches/
+cp -rf ~/DevTerm/Code/patch/armbian_build_a04/config/boards/* config/boards/
+cp -rf ~/DevTerm/Code/patch/armbian_build_a04/config/kernel/*  config/kernel/
 
 #Then exec ./compile.sh under armbian build
 cd ~/build && ./compile.sh 
