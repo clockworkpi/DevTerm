@@ -172,6 +172,8 @@
 #define MAXPIXELS 72
 #endif
 
+#define FONT_MODE_0 0 // Internal
+#define FONT_MODE_1 1 // External
 
 //extract bits 
 #define LAST(k,n) ((k) & ((1<<(n))-1))
@@ -188,7 +190,9 @@ typedef struct _FONT {
 
   uint8_t width;//in bits
   uint8_t height;
+  uint8_t mode;//0 internal pcf font array,1 external ttf font file
   const uint8_t *data;
+  char*file;
 }FONT;
 
 typedef struct _ImageCache{
@@ -222,6 +226,9 @@ typedef struct _CONFIG
   FONT*font;
   ImageCache *img;
   FILE*fp;
+  
+  FT_Face *face;
+  FT_Library *ft;
 
   int (*printf)(struct _CONFIG*, char*, ...);
 
@@ -230,7 +237,9 @@ typedef struct _CONFIG
 
 typedef struct _SerialCache{
   uint8_t idx;
-  uint8_t data[77];//384/5
+  uint8_t utf8idx;//0-4
+  //  uint8_t data[77];//384/5, minium size font 5 pixel
+  uint32_t data[MAX_DOTS];//
 }SerialCache;
 
 typedef struct _TimeRec{

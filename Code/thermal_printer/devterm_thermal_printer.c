@@ -19,15 +19,14 @@
 #include "pcf_6x12-ISO8859-1_6x12.h"
 #include "pcf_7x14-ISO8859-1_7x14.h"
 
-
 #include "ttf_Px437_PS2thin1_8x16.h"
 #include "ttf_Px437_PS2thin2_8x16.h"
-
-
 
 #include "config.h"
 #include "utils.h"
 #include "printer.h"
+
+#include "ftype.h"
 
 SerialCache ser_cache;
 
@@ -42,6 +41,10 @@ unsigned long time;
 ImageCache img_cache;
 
 FONT current_font;
+
+FT_Face face;
+
+FT_Library ft;
 
 CONFIG g_config;
 
@@ -72,7 +75,7 @@ void reset_cmd(){
 }
 
 void init_printer(){
-  
+  char *error = NULL;
   memset(cmd,0,10);
 
   newline = 0;
@@ -95,11 +98,23 @@ void init_printer(){
   
   current_font.width=8;current_font.height=16; current_font.data= font_ttf_Px437_PS2thin2_8x16;
 */
-  current_font.width=8;current_font.height=16; current_font.data= font_ttf_Px437_PS2thin1_8x16;
-
-
+  current_font.width = 16;
+  current_font.height = 16;
+  current_font.data= font_ttf_Px437_PS2thin1_8x16;
+  current_font.file = "NotoSansCJK-Regular.ttf";
+  current_font.mode = 1;
+  
   ser_cache.idx=0;
-
+  ser_cache.utf8idx = 0;
+  
+  if( init_ft(current_font.file, &face,&ft,current_font.width,current_font.height,&error)) {
+    g_config.face = &face;
+    g_config.ft   = &ft;
+  }else {
+    g_config.face = null;
+    g_config.ft   = null;
+  }
+  
   g_config.line_space=0;
   g_config.align = ALIGN_LEFT;
   g_config.reverse = 0;
@@ -249,6 +264,7 @@ NULL
   */
   
   for(i=0;i<6;i++){
+    printer_set_font_mode(FONT_MODE_0);
     printer_set_font(cfg,1);
     reset_cmd();
     
@@ -264,6 +280,7 @@ NULL
 //---------------------------------------------     
 
   for(i=1;i<4;i++){
+    printer_set_font_mode(FONT_MODE_0);
     printer_set_font(cfg,0);
     reset_cmd();
     for(j=0;j<strlen(font_names[i]);j++){
@@ -271,7 +288,8 @@ NULL
       parse_serial_stream(cfg,font_names[i][j]);      
     }
     parse_serial_stream(cfg,10);
-    
+
+    printer_set_font_mode(FONT_MODE_0);
     printer_set_font(cfg,i);
     reset_cmd();
     for(ch = 33;ch<127;ch++){
@@ -283,14 +301,15 @@ NULL
     feed_pitch1(48,cfg->orient);
   }
 
-  
+  printer_set_font_mode(FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
   for(j=0;j<strlen(font_names[0]);j++){    
     parse_serial_stream(cfg,font_names[0][j]);      
   }  
   parse_serial_stream(cfg,10);
-  
+
+  printer_set_font_mode(FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
   for(ch = 33;ch<127;ch++){
@@ -301,14 +320,15 @@ NULL
   //Serial.println();
   feed_pitch1(48,cfg->orient);
 
-
+  printer_set_font_mode(FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
   for(j=0;j<strlen(font_names[0]);j++){    
     parse_serial_stream(cfg,font_names[4][j]);      
   }  
   parse_serial_stream(cfg,10);
-  
+
+  printer_set_font_mode(FONT_MODE_0);
   printer_set_font(cfg,4);
   reset_cmd();
   for(ch = 33;ch<127;ch++){
@@ -339,7 +359,8 @@ NULL
   label_print_f(cfg,"Firmware version:",0.1,"");
     
   feed_pitch1(cfg->font->height,cfg->orient);
-//--------------------------------------------------------------  
+//--------------------------------------------------------------
+  printer_set_font_mode(FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
  
@@ -378,39 +399,52 @@ NULL
   
 }
 
+void printer_set_font_mode(CONFIG*cfg, int mode){
+  cfg->font->mode = mode;
+  return;
+}
 void printer_set_font(CONFIG*cfg,uint8_t fnbits){
       uint8_t ret;
       ret =  MID(fnbits,0,3);
+
+      if(cfg->font->mode == 0) {
+        if(ret==0) {
+          cfg->font->width = 8 ;
+          cfg->font->height = 16;
+          cfg->font->data = font_ttf_Px437_PS2thin1_8x16;
+        }
+        
+        if(ret==1){
+          cfg->font->width = 5;
+          cfg->font->height = 7;
+          cfg->font->data = font_pcf_5x7_ISO8859_1_5x7;
+        }
+        
+        if(ret==2){
+          cfg->font->width = 6;
+          cfg->font->height = 12;
+          cfg->font->data = font_pcf_6x12_ISO8859_1_6x12;
+        }
+        
+        if(ret==3){
+          cfg->font->width = 7;
+          cfg->font->height = 14;
+          cfg->font->data = font_pcf_7x14_ISO8859_1_7x14;
+        }
+        
+        if(ret == 4){
+          cfg->font->width = 8 ;
+          cfg->font->height = 16;
+          cfg->font->data = font_ttf_Px437_PS2thin2_8x16;
+        }
+      }
       
-      if(ret==0) {
-        cfg->font->width = 8 ;
+      if(cfg->font->mode == 1 ){
+        cfg->font->width = 16;
         cfg->font->height = 16;
-        cfg->font->data = font_ttf_Px437_PS2thin1_8x16;
+        
       }
       
-      if(ret==1){
-        cfg->font->width = 5;
-        cfg->font->height = 7;
-        cfg->font->data = font_pcf_5x7_ISO8859_1_5x7;
-      }
-            
-      if(ret==2){
-        cfg->font->width = 6;
-        cfg->font->height = 12;
-        cfg->font->data = font_pcf_6x12_ISO8859_1_6x12;
-      }
-      
-      if(ret==3){
-        cfg->font->width = 7;
-        cfg->font->height = 14;
-        cfg->font->data = font_pcf_7x14_ISO8859_1_7x14;
-      }
-      
-      if(ret == 4){
-        cfg->font->width = 8 ;
-        cfg->font->height = 16;
-        cfg->font->data = font_ttf_Px437_PS2thin2_8x16;
-      }  
 }
 
 void parse_cmd(CONFIG*cfg,uint8_t *cmd, uint8_t cmdidx){
@@ -599,6 +633,7 @@ void parse_cmd(CONFIG*cfg,uint8_t *cmd, uint8_t cmdidx){
 
 void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
   uint16_t a;
+  uint8_t bskip;
   
     if(cfg->state == GET_IMAGE){
       cfg->img->cache[cfg->img->idx] = input_ch;
@@ -647,11 +682,33 @@ void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
           cmd_idx++;
           break;
         default:
-          ser_cache.data[ser_cache.idx]=input_ch;
-          ser_cache.idx++;
-
+          if(input_ch < 128) {
+            ser_cache.data[ser_cache.idx]=input_ch;
+            ser_cache.idx++;
+          }else {//utf8 
+            //10xxxxxx bskip == 1
+            bskip = get_slice_len(input_ch);
+            
+            if(bskip == 1) {
+              //append this to int32_t [8:8:8:8] 0xffffffff 4294967295 
+              ser_cache.data[ser_cache.idx] |= input_ch << (8 * (ser_cache.utf8idx+1));
+              ser_cache.utf8idx++;
+              if( ser_cache.utf8idx >= get_slice_len( ser_cache.data[ser_cache.idx] & 0xff) ) {
+                ser_cache_idx++;
+                ser_cache.utf8idx=0;//next character
+              }
+            }
+            
+            if(bskip > 1) {
+              ser_cache.utf8idx =0;
+              ser_cache.data[ser_cache.idx] = input_ch;
+            }
+          
+          }
+          //read utf8 codename
+          //
           a = (ser_cache.idx+1)*current_font.width+(ser_cache.idx)*0+ g_config.margin.width;          
-          if( a >= MAX_DOTS)
+          if( a >= MAX_DOTS)//got enough points to print
           {
             print_lines8(cfg);
             reset_cmd();
