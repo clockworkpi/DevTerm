@@ -691,16 +691,17 @@ void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
             
             if(bskip == 1) {
               //append this to int32_t [8:8:8:8] 0xffffffff 4294967295 
-              ser_cache.data[ser_cache.idx] |= input_ch << (8 * (ser_cache.utf8idx+1));
-              ser_cache.utf8idx++;
-              if( ser_cache.utf8idx >= get_slice_len( ser_cache.data[ser_cache.idx] & 0xff) ) {
-                ser_cache_idx++;
+              ser_cache.data[ser_cache.idx] |= input_ch << (8 * (ser_cache.utf8idx));
+              if( ser_cache.utf8idx == get_slice_len( ser_cache.data[ser_cache.idx] & 0xff) -1 ) {
+                ser_cache.idx++;
                 ser_cache.utf8idx=0;//next character
+              }else {
+                ser_cache.utf8idx++;
               }
             }
             
             if(bskip > 1) {
-              ser_cache.utf8idx =0;
+              ser_cache.utf8idx =1;
               ser_cache.data[ser_cache.idx] = input_ch;
             }
           
