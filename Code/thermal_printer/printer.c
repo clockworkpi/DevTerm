@@ -421,8 +421,128 @@ int glob_file(char*av) {
 
 }
 
-
 #endif
+
+//print with freetype font dots glyph
+uint8_t print_lines_ft(CONFIG*cfg) {
+  uint8_t i,j,k;
+  uint8_t dot_line_data[MAXPIXELS];
+  uint8_t dot_line_idx=0;
+  uint8_t dot_line_bitsidx=0;
+  
+  uint8_t lastidx,lastw,lastj;
+  uint8_t row;
+  
+  int8_t  left = ser_cache.idx;
+
+  line_bits=cfg->margin.width;
+  dot_line_idx = line_bits/8;
+  dot_line_bitsidx = line_bits%8;
+  
+  lastidx = 0;
+  lastw = 0;
+  lastj = 0;
+
+  uint32_t codename;
+  uint8_t *ch;
+  
+  while( left>0 ) {
+    i = lastidx;
+    while(row<current_font.height){
+      line_bits=cfg->margin.width;
+      dot_line_idx = line_bits/8;
+      dot_line_bitsidx = line_bits%8;
+      memset(dot_line_data,0,MAXPIXELS);
+      //line by line bitmap dots to print
+      while( i <ser_cache.idx) {
+        ch = (uint8_t*)&ser_cache.data[i];
+        codename = utf8_to_utf32(ch);
+        
+        FT_UInt gi = FT_Get_Char_Index ( cfg->face, codename);
+        FT_Load_Glyph (cfg->face, gi, FT_LOAD_DEFAULT);
+        int bbox_ymax = cfg->face->bbox.yMax / 64;
+        int y_off = bbox_ymax - cfg->face->glyph->metrics.horiBearingY / 64;
+        int glyph_width  = cfg->face->glyph->metrics.width / 64;
+        int glyph_height = cfg->face->glyph->metrics.height / 64;
+        int advance = cfg->face->glyph->metrics.horiAdvance / 64;
+        int x_off = (advance - glyph_width) / 2;
+        FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
+        
+        j = 0; w= 0;
+        if(lastj !=0){j= lastj;}
+        if(lastw !=0) { w = lastw;}
+        while(w < glyph_width) {
+          if(w > 0 && (w%8) == 0) j++;
+          if(dot_line_bitsidx > 7 ){
+            dot_line_idx++;
+            dot_line_bitxidx=0;
+          }
+          
+          unsigned char p =
+            cfg->face->glyph->bitmap.buffer[row * cfg->face->glyph->bitmap.pitch + w];
+          
+          if(p) {
+            dot_line_data[dot_line_idx ] |= 1<<(7-dot_line_bitsidx);
+          }
+          
+          dot_line_bitsidx++;
+          w++;
+          line_bits++;
+          if(line_bits >= MAX_DOTS) break;
+        }
+        //word gap
+        k = 0;
+        while(k < cfg->wordgap) {
+          if(dot_line_bitsidx>7){
+            dot_line_idx++;
+            dot_line_bitsidx=0;
+          }
+          k++;
+          dot_line_bitsidx++;
+          line_bits++;
+          if(line_bits >= MAX_DOTS)break;
+        }
+        
+        if(line_bits < MAX_DOTS){
+          i++;
+        }
+        
+        if(line_bits >= MAX_DOTS || i >=ser_cache.idx){
+          
+          if(row == (current_font.height-1)) {// last of the row loop         
+            if(w >= current_font.width){
+              lastidx = i+1;
+              lastw =0;
+              lastj =0;
+            }else {              
+              lastidx = i;
+              lastw = w;
+              lastj = j;
+            }
+          }
+          
+          break;
+        }
+        
+      }
+      rv = IsPaper();
+      if( rv == IS_PAPER) {
+        //DEBUG("dot_line_idx",dot_line_idx);
+        //DEBUG("dot_line_bits",dot_line_bitsidx);
+        print_dots_8bit_split(cfg,dot_line_data,dot_line_idx+1);
+      }
+      row++;
+    }
+    left = left - lastidx;
+    row = 0;
+    if(cfg->line_space > cfg->font->height){
+      feed_pitch1(cfg->line_space - cfg->font->height,cfg->orient);
+    }
+    
+  }
+  
+}
+
 
 uint8_t print_lines8(CONFIG*cfg) {
   uint8_t i,j,k;
@@ -481,7 +601,7 @@ uint8_t print_lines8(CONFIG*cfg) {
       //DEBUG("i",i)
       //DEBUG("ser_cache.idx",ser_cache.idx)
       while( i <ser_cache.idx){
-        addr = pad*ser_cache.data[i]*current_font.height;
+        addr = pad*(uint8_t)ser_cache.data[i]*current_font.height;
         for(j=0;j<pad;j++){
           data[j] = current_font.data[addr+row*pad+j];
         }

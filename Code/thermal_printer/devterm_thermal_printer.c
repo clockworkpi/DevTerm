@@ -108,8 +108,8 @@ void init_printer(){
   ser_cache.utf8idx = 0;
   
   if( init_ft(current_font.file, &face,&ft,current_font.width,current_font.height,&error)) {
-    g_config.face = &face;
-    g_config.ft   = &ft;
+    g_config.face = face;
+    g_config.ft   = ft;
   }else {
     g_config.face = null;
     g_config.ft   = null;

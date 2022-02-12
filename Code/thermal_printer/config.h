@@ -227,8 +227,8 @@ typedef struct _CONFIG
   ImageCache *img;
   FILE*fp;
   
-  FT_Face *face;
-  FT_Library *ft;
+  FT_Face face;
+  FT_Library ft;
 
   int (*printf)(struct _CONFIG*, char*, ...);
 
@@ -239,7 +239,7 @@ typedef struct _SerialCache{
   uint8_t idx;
   uint8_t utf8idx;//0-4
   //  uint8_t data[77];//384/5, minium size font 5 pixel
-  uint32_t data[MAX_DOTS];//
+  uint32_t data[MAX_DOTS];//uint32_t for utf8 characters
 }SerialCache;
 
 typedef struct _TimeRec{
