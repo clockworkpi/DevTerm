@@ -712,7 +712,11 @@ void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
           a = (ser_cache.idx+1)*current_font.width+(ser_cache.idx)*0+ g_config.margin.width;          
           if( a >= MAX_DOTS)//got enough points to print
           {
-            print_lines8(cfg);
+            if(cfg->font->mode == FONT_MODE_1){
+                print_lines_ft(cfg);
+            }else {
+                print_lines8(cfg);
+            }
             reset_cmd();
           }
         break;  
