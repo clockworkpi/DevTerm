@@ -27,6 +27,7 @@
 #include "printer.h"
 
 #include "ftype.h"
+#include <math.h>
 
 SerialCache ser_cache;
 
@@ -264,7 +265,7 @@ NULL
   */
   
   for(i=0;i<6;i++){
-    printer_set_font_mode(FONT_MODE_0);
+    printer_set_font_mode(cfg,FONT_MODE_0);
     printer_set_font(cfg,1);
     reset_cmd();
     
@@ -280,7 +281,7 @@ NULL
 //---------------------------------------------     
 
   for(i=1;i<4;i++){
-    printer_set_font_mode(FONT_MODE_0);
+    printer_set_font_mode(cfg,FONT_MODE_0);
     printer_set_font(cfg,0);
     reset_cmd();
     for(j=0;j<strlen(font_names[i]);j++){
@@ -289,7 +290,7 @@ NULL
     }
     parse_serial_stream(cfg,10);
 
-    printer_set_font_mode(FONT_MODE_0);
+    printer_set_font_mode(cfg,FONT_MODE_0);
     printer_set_font(cfg,i);
     reset_cmd();
     for(ch = 33;ch<127;ch++){
@@ -301,7 +302,7 @@ NULL
     feed_pitch1(48,cfg->orient);
   }
 
-  printer_set_font_mode(FONT_MODE_0);
+  printer_set_font_mode(cfg,FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
   for(j=0;j<strlen(font_names[0]);j++){    
@@ -309,7 +310,7 @@ NULL
   }  
   parse_serial_stream(cfg,10);
 
-  printer_set_font_mode(FONT_MODE_0);
+  printer_set_font_mode(cfg,FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
   for(ch = 33;ch<127;ch++){
@@ -320,7 +321,7 @@ NULL
   //Serial.println();
   feed_pitch1(48,cfg->orient);
 
-  printer_set_font_mode(FONT_MODE_0);
+  printer_set_font_mode(cfg,FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
   for(j=0;j<strlen(font_names[0]);j++){    
@@ -328,7 +329,7 @@ NULL
   }  
   parse_serial_stream(cfg,10);
 
-  printer_set_font_mode(FONT_MODE_0);
+  printer_set_font_mode(cfg,FONT_MODE_0);
   printer_set_font(cfg,4);
   reset_cmd();
   for(ch = 33;ch<127;ch++){
@@ -360,7 +361,7 @@ NULL
     
   feed_pitch1(cfg->font->height,cfg->orient);
 //--------------------------------------------------------------
-  printer_set_font_mode(FONT_MODE_0);
+  printer_set_font_mode(cfg,FONT_MODE_0);
   printer_set_font(cfg,0);
   reset_cmd();
  
