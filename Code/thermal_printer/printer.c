@@ -426,6 +426,7 @@ int glob_file(char*av) {
 //print with freetype font dots glyph
 uint8_t print_lines_ft(CONFIG*cfg) {
   uint8_t i,j,k;
+  int8_t w;
   uint8_t dot_line_data[MAXPIXELS];
   uint8_t dot_line_idx=0;
   uint8_t dot_line_bitsidx=0;
