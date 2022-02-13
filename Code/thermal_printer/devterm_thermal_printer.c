@@ -111,8 +111,8 @@ void init_printer(){
     g_config.face = face;
     g_config.ft   = ft;
   }else {
-    g_config.face = null;
-    g_config.ft   = null;
+    g_config.face = NULL;
+    g_config.ft   = NULL;
   }
   
   g_config.line_space=0;
