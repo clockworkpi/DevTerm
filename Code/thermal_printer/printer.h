@@ -37,7 +37,7 @@ uint8_t invert_bit(uint8_t a);
 uint8_t print_image8(CONFIG*);
 void print_cut_line(CONFIG*);
 
-void printer_set_font_mode((CONFIG*cfg,int);
+void printer_set_font_mode(CONFIG*cfg,int);
 void printer_set_font(CONFIG*cfg,uint8_t fnbits);
 void parse_serial_stream(CONFIG*cfg,uint8_t input_ch);
 
