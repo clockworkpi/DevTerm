@@ -4,8 +4,6 @@
 
 static const UTF32 utf32_space[2] = {' ', 0};
 
-FT_Face face;
-FT_Library ft;
 
 bool init_ft (const char *ttf_file, FT_Face *face, FT_Library *ft,
               int req_size_w,int req_size_h, char **error)
