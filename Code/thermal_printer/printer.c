@@ -432,9 +432,11 @@ uint8_t print_lines_ft(CONFIG*cfg) {
   
   uint8_t lastidx,lastw,lastj;
   uint8_t row;
-  
+  uint16_t line_bits;
+    
   int8_t  left = ser_cache.idx;
-
+  uint8_t rv;
+  
   line_bits=cfg->margin.width;
   dot_line_idx = line_bits/8;
   dot_line_bitsidx = line_bits%8;
@@ -475,7 +477,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
           if(w > 0 && (w%8) == 0) j++;
           if(dot_line_bitsidx > 7 ){
             dot_line_idx++;
-            dot_line_bitxidx=0;
+            dot_line_bitsidx=0;
           }
           
           unsigned char p =
