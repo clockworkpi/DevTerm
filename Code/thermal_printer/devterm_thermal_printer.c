@@ -103,7 +103,7 @@ void init_printer(){
   current_font.height = 16;
   current_font.data= font_ttf_Px437_PS2thin1_8x16;
   current_font.file = "NotoSansCJK-Regular.ttf";
-  current_font.mode = 1;
+  current_font.mode = FONT_MODE_1;
   
   ser_cache.idx=0;
   ser_cache.utf8idx = 0;
@@ -112,6 +112,7 @@ void init_printer(){
     g_config.face = face;
     g_config.ft   = ft;
   }else {
+    printf("init_ft error %s\n",error);
     g_config.face = NULL;
     g_config.ft   = NULL;
   }
@@ -664,6 +665,7 @@ void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
           reset_cmd();
         break;
         case ASCII_FF:
+
           print_lines8(cfg);
           reset_cmd();
         break;

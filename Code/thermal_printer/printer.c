@@ -448,7 +448,8 @@ uint8_t print_lines_ft(CONFIG*cfg) {
 
   uint32_t codename;
   uint8_t *ch;
-  
+  printf("left = %d\n",left); 
+
   while( left>0 ) {
     i = lastidx;
     while(row<current_font.height){
@@ -457,10 +458,10 @@ uint8_t print_lines_ft(CONFIG*cfg) {
       dot_line_bitsidx = line_bits%8;
       memset(dot_line_data,0,MAXPIXELS);
       //line by line bitmap dots to print
+      i = lastidx;
       while( i <ser_cache.idx) {
         ch = (uint8_t*)&ser_cache.data[i];
         codename = utf8_to_utf32(ch);
-        
         FT_UInt gi = FT_Get_Char_Index ( cfg->face, codename);
         FT_Load_Glyph (cfg->face, gi, FT_LOAD_DEFAULT);
         int bbox_ymax = cfg->face->bbox.yMax / 64;
@@ -487,7 +488,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
           if(p) {
             dot_line_data[dot_line_idx ] |= 1<<(7-dot_line_bitsidx);
           }
-          
+
           dot_line_bitsidx++;
           w++;
           line_bits++;
@@ -548,6 +549,10 @@ uint8_t print_lines_ft(CONFIG*cfg) {
 
 
 uint8_t print_lines8(CONFIG*cfg) {
+
+  if(cfg->font->mode == FONT_MODE_1) {
+      return print_lines_ft(cfg);
+  }
   uint8_t i,j,k;
   int8_t w;
   uint8_t *data;
@@ -563,6 +568,7 @@ uint8_t print_lines8(CONFIG*cfg) {
   uint8_t lastidx,lastw,lastj;
   int8_t left;
   uint8_t rv;
+	
 
   pad = current_font.width %BITS8;
   
