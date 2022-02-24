@@ -30,21 +30,52 @@ static int wpimode = -1 ;
 
 #ifdef CONFIG_CLOCKWORKPI_A04
 
-int CPI_PIN_MASK[12][32] =  //[BANK]  [INDEX]
+int bcmToGpioCPi[64] =
 {
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PA
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PB
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PC
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,15,16,-1,18,-1,-1,21,22,23,24,25,26,-1,-1,-1,-1,-1,},//PD
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PE
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PF
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PG
-	{-1,-1,-1, 3, 4, 5, 6,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PH
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PI
-	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PJ
-    {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PK
-    {-1,-1, 2, 3,-1,-1,-1,-1, 8,-1,10,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PL
+	58,  57,      // 0, 1
+	167, 0,      // 2, 3
+	1, 2,      // 4  5
+	3,  4,      // 6, 7
+	5,  6,      // 8, 9
+	7,  8,      //10,11
+	15,  54,      //12,13
+	134,  135,      //14,15
+
+	137, 136,      //16,17
+	139,  138,      //18,19
+	141,  140,      //20,21
+	128,  129,      //22,23
+	130,  131,      //24,25
+	132, 133,      //26,27
+	9,  201,    //28,29
+	196,   199,    //30,31
+
+	161,  160,      //32,33
+	227,  198,      //34,35
+	163, 166,      //36,37
+	165,  164,      //38,39
+	228,  224,      //40,41
+	225, 226,      //42,43
+	56,  55,      //44,45
+	-1, -1,      //46,47
+
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,// ... 63
 };
+
+int CPI_PIN_MASK[8][32] =  //[BANK]  [INDEX]
+{
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,},//PC	0
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1,},//PD	32
+	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PE		64
+	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PF		96
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,},//PG	128
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,},//PH	160
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,},//PL	192
+	{ 1, 1, 1, 1, 1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,},//PM	224
+};
+
+volatile uint32_t *gpio_base;
+volatile uint32_t *gpioL_base;
 
 #endif
 
@@ -84,11 +115,11 @@ int bcmToGpioCPi[64] =
 
   int CPI_PIN_MASK[5][32] =  //[BANK]	[INDEX]
   {
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//PA
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//PB
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//PC
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//PD
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//PD
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO0
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO1
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO2
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO3
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO4
   };
 
 volatile uint32_t *cru_base;
@@ -132,8 +163,17 @@ static unsigned int readR(unsigned int addr)
 	return val;
 
 #elif (defined CONFIG_CLOCKWORKPI_A04)
+
 	uint32_t val = 0;
+	uint32_t mmap_base = (addr & ~MAP_MASK);
+	uint32_t mmap_seek = ((addr - mmap_base) >> 2);
+
+	if (addr >= GPIOL_BASE)
+		val = *(gpioL_base + mmap_seek);
+	else
+		val = *(gpio_base + mmap_seek);
 	return val;
+
 #endif
 }
 
@@ -165,6 +205,14 @@ static void writeR(unsigned int val, unsigned int addr)
 
 #elif (defined CONFIG_CLOCKWORKPI_A04)
 
+	unsigned int mmap_base = (addr & ~MAP_MASK);
+	unsigned int mmap_seek = ((addr - mmap_base) >> 2);
+
+	if (addr >= GPIOL_BASE)
+		*(gpioL_base + mmap_seek) = val;
+	else
+		*(gpio_base + mmap_seek) = val;
+
 #endif
 }
 
@@ -175,6 +223,9 @@ int CPi_get_gpio_mode(int pin)
 	unsigned int index  = pin - (bank << 5);
 	unsigned int phyaddr = 0;
 	unsigned char mode = -1;
+
+	if (CPI_PIN_MASK[bank][index] < 0)
+		return -1;
 	
 #ifdef CONFIG_CLOCKWORKPI_A06
 
@@ -202,31 +253,29 @@ int CPi_get_gpio_mode(int pin)
 		ddr_phyaddr = GPIO4_BASE + GPIO_SWPORTA_DDR_OFFSET;
 	}
 
-	if (CPI_PIN_MASK[bank][index] != -1) {
-		regval = readR(grf_phyaddr);
-		mode = (regval >> (offset << 1)) & 0x3;
-		if(mode == 0){
-			regval = readR(ddr_phyaddr);
-			return (regval >> index) & 1;
-		}
-		return mode + 1;
+	regval = readR(grf_phyaddr);
+	mode = (regval >> (offset << 1)) & 0x3;
+
+	if(mode == 0){
+		regval = readR(ddr_phyaddr);
+		return (regval >> index) & 1;
 	}
+
+	return mode + 1;
 
 #elif (defined CONFIG_CLOCKWORKPI_A04)
 
 	int offset = ((index - ((index >> 3) << 3)) << 2);
 
-	if (bank == 11) {
-		phyaddr = GPIOL_BASE + ((index >> 3) << 2);
+	if (bank >= 6) {
+		phyaddr = GPIOL_BASE + (bank -6) * 0x24 + ((index >> 3) << 2);
 	}
-	else
-		phyaddr = GPIO_BASE_MAP + (bank * 36) + ((index >> 3) << 2);
+	else {
+		phyaddr = GPIO_BASE_MAP + (bank * 0x24) + ((index >> 3) << 2);
+	}
 
-	/* Ignore unused gpio */
-	if (CPI_PIN_MASK[bank][index] != -1) {
-		regval = readR(phyaddr);
-		mode = (regval >> offset) & 7;
-	}
+	regval = readR(phyaddr);
+	mode = (regval >> offset) & 7;
 
 	return mode;
 
@@ -243,20 +292,22 @@ int CPi_set_gpio_mode(int pin, int mode)
     unsigned int index  = pin - (bank << 5);
     unsigned int phyaddr = 0;
 
-#ifdef CONFIG_CLOCKWORKPI_A06
-	int offset = ((index - ((index >> 3) << 3)));
-	unsigned int cru_phyaddr, grf_phyaddr, gpio_phyaddr;
-#elif (defined CONFIG_CLOCKWORKPI_A04)
+#ifdef CONFIG_CLOCKWORKPI_A04
+
 	int offset = ((index - ((index >> 3) << 3)) << 2);
 
-	if (bank == 11) {
-		phyaddr = GPIOL_BASE + ((index >> 3) << 2);
+	if (bank >= 6) {
+		phyaddr = GPIOL_BASE + (bank -6) * 0x24 + ((index >> 3) << 2);
 	} else {
-		phyaddr = GPIO_BASE_MAP + (bank * 36) + ((index >> 3) << 2);
+		phyaddr = GPIO_BASE_MAP + (bank * 0x24) + ((index >> 3) << 2);
 	}
+
 #endif
 
 #ifdef CONFIG_CLOCKWORKPI_A06
+
+	int offset = ((index - ((index >> 3) << 3)));
+	unsigned int cru_phyaddr, grf_phyaddr, gpio_phyaddr;
 
 	if(bank == 0){
 		cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
@@ -286,38 +337,37 @@ int CPi_set_gpio_mode(int pin, int mode)
 
 #endif
 
-    if (CPI_PIN_MASK[bank][index] != -1) {
+	if (CPI_PIN_MASK[bank][index] != -1) {
 #ifdef CONFIG_CLOCKWORKPI_A04
 		regval = readR(phyaddr);
-			if (wiringPiDebug)
-				printf("Before read reg val: 0x%x offset:%d\n",regval,offset);
+		if (wiringPiDebug)
+			printf("Before read reg val: 0x%x offset:%d\n",regval,offset);
 #endif
-        if (wiringPiDebug)
-            printf("Register[%#x]: %#x index:%d\n", phyaddr, regval, index);
+		if (wiringPiDebug)
+		    printf("Register[%#x]: %#x index:%d\n", phyaddr, regval, index);
 
-        /* Set Input */
-        if (INPUT == mode) {
+		if (INPUT == mode) {
 #ifdef CONFIG_CLOCKWORKPI_A06
-		writeR(0xffff0180, cru_phyaddr);
-		regval = readR(grf_phyaddr);
-		regval |= 0x3 << ((offset << 1) | 0x10);
-		regval &= ~(0x3 << (offset << 1));
-		writeR(regval, grf_phyaddr);
-		regval = readR(gpio_phyaddr);
-		regval &= ~(1 << index);
-		writeR(regval, gpio_phyaddr);
-		if (wiringPiDebug){
+			writeR(0xffff0180, cru_phyaddr);
+			regval = readR(grf_phyaddr);
+			regval |= 0x3 << ((offset << 1) | 0x10);
+			regval &= ~(0x3 << (offset << 1));
+			writeR(regval, grf_phyaddr);
 			regval = readR(gpio_phyaddr);
-			printf("Input mode set over reg val: %#x\n",regval);
-		}
+			regval &= ~(1 << index);
+			writeR(regval, gpio_phyaddr);
+			if (wiringPiDebug){
+				regval = readR(gpio_phyaddr);
+				printf("Input mode set over reg val: %#x\n",regval);
+			}
 #else
-		regval &= ~(7 << offset);
-		writeR(regval, phyaddr);
-	            regval = readR(phyaddr);
-            if (wiringPiDebug)
-                printf("Input mode set over reg val: %#x\n",regval);
+			regval &= ~(7 << offset);
+			writeR(regval, phyaddr);
+			regval = readR(phyaddr);
+			if (wiringPiDebug)
+				printf("Input mode set over reg val: %#x\n",regval);
 #endif
-        } else if (OUTPUT == mode) { /* Set Output */
+		} else if (OUTPUT == mode) {
 #ifdef CONFIG_CLOCKWORKPI_A06
 			writeR(0xffff0180, cru_phyaddr);
 			regval = readR(grf_phyaddr);
@@ -332,19 +382,19 @@ int CPi_set_gpio_mode(int pin, int mode)
 				printf("Out mode get value: 0x%x\n",regval);
 			}
 #else
-		regval &= ~(7 << offset);
-		regval |=  (1 << offset);
-		if (wiringPiDebug)
-			printf("Out mode ready set val: 0x%x\n",regval);
-		writeR(regval, phyaddr);
-            regval = readR(phyaddr);
-            if (wiringPiDebug)
-                printf("Out mode get value: 0x%x\n",regval);
+			regval &= ~(7 << offset);
+			regval |=  (1 << offset);
+			if (wiringPiDebug)
+				printf("Out mode ready set val: 0x%x\n",regval);
+			writeR(regval, phyaddr);
+			regval = readR(phyaddr);
+			if (wiringPiDebug)
+				printf("Out mode get value: 0x%x\n",regval);
 #endif
-        }else 
-            printf("Unknow mode\n");
-    } else
-        printf("unused pin\n");
+		} else 
+			printf("Unknow mode\n");
+	} else
+		printf("unused pin\n");
 }
 
 int CPi_set_gpio_alt(int pin, int mode)
@@ -356,10 +406,10 @@ int CPi_set_gpio_alt(int pin, int mode)
 	unsigned int phyaddr = 0;
 	int offset = ((index - ((index >> 3) << 3)) << 2);
 
-	if (bank == 11) {
+	if (bank >= 6) {
 		phyaddr = GPIOL_BASE + ((index >> 3) << 2);
 	}else
-		phyaddr = GPIO_BASE_MAP + (bank * 36) + ((index >> 3) << 2);
+		phyaddr = GPIO_BASE_MAP + (bank * 0x24) + ((index >> 3) << 2);
 
 	/* Ignore unused gpio */
 	if (CPI_PIN_MASK[bank][index] != -1) {
@@ -382,56 +432,56 @@ int CPi_set_gpio_alt(int pin, int mode)
  */
 void CPi_digitalWrite(int pin, int value)
 {
-    unsigned int bank   = pin >> 5;
-    unsigned int index  = pin - (bank << 5);
-    unsigned int phyaddr = 0;
-#ifdef CONFIG_CLOCKWORKPI_A06
+	unsigned int bank   = pin >> 5;
+	unsigned int index  = pin - (bank << 5);
+	unsigned int phyaddr = 0;
 	unsigned int regval = 0;
+
+#ifdef CONFIG_CLOCKWORKPI_A04
+	
+	if (bank >= 6) {
+		phyaddr = GPIOL_BASE + (bank -6) * 0x24 + 0x10;
+	} else {
+		phyaddr = GPIO_BASE_MAP + (bank * 0x24) + 0x10;
+	}
+
+#endif
+
+#ifdef CONFIG_CLOCKWORKPI_A06
+
 	unsigned int cru_phyaddr = 0;
 
-#else
-    unsigned int regval = 0;
-	
-	if (bank == 11) {
-		phyaddr = GPIOL_BASE + 0x10;
+	if(bank == 0){
+		phyaddr = GPIO0_BASE + GPIO_SWPORTA_DR_OFFSET;
+		cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
 	}
-	else
-		phyaddr = GPIO_BASE_MAP + (bank * 36) + 0x10;
+	else if(bank == 1){
+		phyaddr = GPIO1_BASE + GPIO_SWPORTA_DR_OFFSET;
+		cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
+	}
+	else if(bank == 2){
+		phyaddr = GPIO2_BASE + GPIO_SWPORTA_DR_OFFSET;			
+		cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
+	}
+	else if(bank == 3){
+		phyaddr = GPIO3_BASE + GPIO_SWPORTA_DR_OFFSET;
+		cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
+	}
+	else if(bank == 4){
+		phyaddr = GPIO4_BASE + GPIO_SWPORTA_DR_OFFSET;			
+		cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
+	}
+
 #endif
+
+	if (CPI_PIN_MASK[bank][index] != -1) {
 
 #ifdef CONFIG_CLOCKWORKPI_A06
-
-		if(bank == 0){
-			phyaddr = GPIO0_BASE + GPIO_SWPORTA_DR_OFFSET;
-			cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
-		}
-		else if(bank == 1){
-			phyaddr = GPIO1_BASE + GPIO_SWPORTA_DR_OFFSET;
-			cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
-		}
-		else if(bank == 2){
-			phyaddr = GPIO2_BASE + GPIO_SWPORTA_DR_OFFSET;			
-			cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
-		}
-		else if(bank == 3){
-			phyaddr = GPIO3_BASE + GPIO_SWPORTA_DR_OFFSET;
-			cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
-		}
-		else if(bank == 4){
-			phyaddr = GPIO4_BASE + GPIO_SWPORTA_DR_OFFSET;			
-			cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
-		}
-
+		writeR(0xffff0180, cru_phyaddr);
 #endif
 
-    if (CPI_PIN_MASK[bank][index] != -1) {
-
-	#ifdef CONFIG_CLOCKWORKPI_A06
-		writeR(0xffff0180, cru_phyaddr);
-	#endif
-
-	if (wiringPiDebug)
-		printf("pin: %d, bank: %d, index: %d, phyaddr: 0x%x\n", pin, bank, index, phyaddr);
+		if (wiringPiDebug)
+			printf("pin: %d, bank: %d, index: %d, phyaddr: 0x%x\n", pin, bank, index, phyaddr);
 
 		regval = readR(phyaddr);
 		if (wiringPiDebug)
@@ -450,9 +500,7 @@ void CPi_digitalWrite(int pin, int value)
 				printf("HIGH val set over reg val: 0x%x\n", regval);
 		}
 
-    } else
-        printf("unused pin\n");
-
+	} 
 }
 
 /*
@@ -463,19 +511,20 @@ int CPi_digitalRead(int pin)
 	int bank = pin >> 5;
 	int index = pin - (bank << 5);
 	int val;
+	unsigned int phyaddr;
+
 #ifdef CONFIG_CLOCKWORKPI_A04
 
-	unsigned int phyaddr;
-	
-	if (bank == 11) {
-		phyaddr = GPIOL_BASE + 0x10;
+	if (bank >= 6) {
+		phyaddr = GPIOL_BASE + (bank -6) * 0x24 + 0x10;
 	} else {
-		phyaddr = GPIO_BASE_MAP + (bank * 36) + 0x10;
+		phyaddr = GPIO_BASE_MAP + (bank * 0x24) + 0x10;
 	}
+
 #endif
 
 #ifdef CONFIG_CLOCKWORKPI_A06
-	unsigned int phyaddr;
+
 	if(bank == 0)
 		phyaddr = GPIO0_BASE + GPIO_EXT_PORTA_OFFSET;
 	else if(bank == 1)
@@ -486,6 +535,7 @@ int CPi_digitalRead(int pin)
 		phyaddr = GPIO3_BASE + GPIO_EXT_PORTA_OFFSET;
 	else if(bank == 4)
 		phyaddr = GPIO4_BASE + GPIO_EXT_PORTA_OFFSET;
+
 #endif
 
 	if (CPI_PIN_MASK[bank][index] != -1) {
@@ -493,7 +543,7 @@ int CPi_digitalRead(int pin)
 		val = val >> index;
 		val &= 1;
 		if (wiringPiDebug)
-			printf("Read reg val: 0x%#x, bank:%d, index:%d\n", val, bank, index);
+			printf("Read reg val: 0x%#x, bank:%d, index:%d phyaddr: 0x%x\n", val, bank, index, phyaddr);
 		return val;
 	}
 	return 0;
@@ -504,9 +554,15 @@ int CPiSetup(int fd)
 {
 #ifdef CONFIG_CLOCKWORKPI_A04
 
-
+	gpio_base = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIOA_BASE);
+	if ((int32_t)(unsigned long)gpio_base == -1)
+		return wiringPiFailure(WPI_ALMOST, "wiringPiSetup: mmap (GPIO) failed: %s\n", strerror(errno));
+	gpioL_base = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIOL_BASE);
+	if ((int32_t)(unsigned long)gpioL_base == -1)
+		return wiringPiFailure(WPI_ALMOST, "wiringPiSetup: mmap (GPIO) failed: %s\n", strerror(errno));
 
 #elif defined(CONFIG_CLOCKWORKPI_A06)
+
 	gpio0_base = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, GPIO0_BASE);
 	if ((int32_t)(unsigned long)gpio0_base == -1)
 		return wiringPiFailure(WPI_ALMOST, "wiringPiSetup: mmap (GPIO0_BASE) failed: %s\n", strerror(errno));
@@ -535,6 +591,7 @@ int CPiSetup(int fd)
 	pmugrf_base = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, PMUGRF_BASE);
 	if ((int32_t)(unsigned long)pmugrf_base == -1)
 		return wiringPiFailure(WPI_ALMOST, "wiringPiSetup: mmap (PMUGRF_BASE) failed: %s\n", strerror(errno));
+
 #endif
 	wpimode = WPI_MODE_BCM;
 }
@@ -620,12 +677,12 @@ void CPiBoardId (int *model, int *rev, int *mem, int *maker, int *warranty)
 #ifdef CONFIG_CLOCKWORKPI_A04
 	*model = CPI_MODEL_A04; 
 	*rev = PI_VERSION_1; 
-	*mem = 3; 
+	*mem = 3;
 	*maker = 3;
 #elif defined(CONFIG_CLOCKWORKPI_A06)
 	*model = CPI_MODEL_A06; 
 	*rev = PI_VERSION_1; 
-	*mem = 4; 
+	*mem = 4;
 	*maker = 3;
 #endif
 }

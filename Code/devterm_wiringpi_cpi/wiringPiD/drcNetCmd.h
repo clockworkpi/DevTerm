@@ -35,7 +35,7 @@
 #define	DRCN_ANALOG_READ	9
 
 
-struct drcNetComStruct
+typedef struct drcNetComStruct
 {
   uint32_t pin ;
   uint32_t cmd ;

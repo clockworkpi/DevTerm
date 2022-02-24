@@ -109,7 +109,7 @@ int wiringPiSPISetupMode (int channel, int speed, int mode)
 // Channel can be anything - lets hope for the best
 //  channel &= 1 ;	// Channel is 0 or 1
 
-#ifdef CONFIG_CLOCKWORKPI
+#ifdef CONFIG_CLOCKWORKPI_A06
   snprintf (spiDev, 31, "/dev/spidev2.%d", channel) ;
 #else
   snprintf (spiDev, 31, "/dev/spidev0.%d", channel) ;
