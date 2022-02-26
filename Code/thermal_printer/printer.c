@@ -470,7 +470,8 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         int glyph_height = cfg->face->glyph->metrics.height / 64;
         int advance = cfg->face->glyph->metrics.horiAdvance / 64;
         int x_off = (advance - glyph_width) / 2;
-        FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
+        //FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
+        FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_MONO); //disable AA
         
         j = 0; w= 0;
         if(lastj !=0){j= lastj;}
