@@ -432,7 +432,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
   uint8_t dot_line_bitsidx=0;
   
   uint8_t lastidx,lastw,lastj;
-  uint8_t row;
+  uint8_t row,row_offset,row_cnt;
   uint16_t line_bits;
     
   int8_t  left = ser_cache.idx;
@@ -452,6 +452,8 @@ uint8_t print_lines_ft(CONFIG*cfg) {
 
   while( left>0 ) {
     i = lastidx;
+    row_cnt = 0;
+    row_offset = 0;
     while(row<current_font.height){
       line_bits=cfg->margin.width;
       dot_line_idx = line_bits/8;
@@ -459,6 +461,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
       memset(dot_line_data,0,MAXPIXELS);
       //line by line bitmap dots to print
       i = lastidx;
+      
       while( i <ser_cache.idx) {
         ch = (uint8_t*)&ser_cache.data[i];
         codename = utf8_to_utf32(ch);
@@ -470,9 +473,14 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         int glyph_height = cfg->face->glyph->metrics.height / 64;
         int advance = cfg->face->glyph->metrics.horiAdvance / 64;
         int x_off = (advance - glyph_width) / 2;
+	int bitmap_rows = cfg->face->glyph->bitmap.rows;
+        int bitmap_top  = cfg->face->glyph->bitmap_top;
+	int bitmap_left = cfg->face->glyph->bitmap_left;	
         //FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
         FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_MONO); //disable AA
-        
+
+       	row_offset = (current_font.height - bitmap_rows)/2;
+	
         j = 0; w= 0;
         if(lastj !=0){j= lastj;}
         if(lastw !=0) { w = lastw;}
@@ -483,12 +491,22 @@ uint8_t print_lines_ft(CONFIG*cfg) {
             dot_line_bitsidx=0;
           }
           
-          unsigned char p =
-            cfg->face->glyph->bitmap.buffer[row * cfg->face->glyph->bitmap.pitch + w];
-          
+          //unsigned char p = cfg->face->glyph->bitmap.buffer[row * cfg->face->glyph->bitmap.pitch + w];
+          unsigned char p = 0;
+
+	  if( row >= row_offset ) {
+	        row_cnt = row-row_offset;
+		if(row_cnt <= bitmap_rows) {
+	  		p = (cfg->face->glyph->bitmap.buffer[row_cnt*cfg->face->glyph->bitmap.pitch+j] >> (7-w%8)) & 1;//disable AA
+		}
+	  }
+
           if(p) {
+            printf("#");
             dot_line_data[dot_line_idx ] |= 1<<(7-dot_line_bitsidx);
-          }
+          }else {
+	    printf("0");
+	   }
 
           dot_line_bitsidx++;
           w++;
@@ -537,11 +555,16 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         print_dots_8bit_split(cfg,dot_line_data,dot_line_idx+1);
       }
       row++;
+      printf("\n");
     }
     left = left - lastidx;
     row = 0;
+    printf("current font line space: %d\n",face_get_line_spacing(cfg->face));
     if(cfg->line_space > cfg->font->height){
       feed_pitch1(cfg->line_space - cfg->font->height,cfg->orient);
+    }
+    if(face_get_line_spacing(cfg->face) > cfg->font->height) {
+      feed_pitch1(face_get_line_spacing(cfg->face) - cfg->font->height,cfg->orient);
     }
     
   }
