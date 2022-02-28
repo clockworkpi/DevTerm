@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS  = -g -Wall
+CFLAGS  = -O0 -g -Wall
 LDFLAGS = 
 INCLUDES =  -I /usr/include/freetype2
 LIBS = -lwiringPi -lm -lcrypt -lpthread -lfreetype -lrt

@@ -454,6 +454,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
     i = lastidx;
     row_cnt = 0;
     row_offset = 0;
+    row = 0;
     while(row<current_font.height){
       line_bits=cfg->margin.width;
       dot_line_idx = line_bits/8;
@@ -475,7 +476,8 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         int x_off = (advance - glyph_width) / 2;
 	int bitmap_rows = cfg->face->glyph->bitmap.rows;
         int bitmap_top  = cfg->face->glyph->bitmap_top;
-	int bitmap_left = cfg->face->glyph->bitmap_left;	
+	int bitmap_left = cfg->face->glyph->bitmap_left;
+	int bitmap_width = cfg->face->glyph->bitmap.width;	
         //FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
         FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_MONO); //disable AA
 
@@ -484,8 +486,9 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         j = 0; w= 0;
         if(lastj !=0){j= lastj;}
         if(lastw !=0) { w = lastw;}
-        while(w < glyph_width) {
-          if(w > 0 && (w%8) == 0) j++;
+        while(w < bitmap_width ) {
+          //if(w > 0 && (w%8) == 0) j++;
+	  j = w/8;
           if(dot_line_bitsidx > 7 ){
             dot_line_idx++;
             dot_line_bitsidx=0;
@@ -493,11 +496,13 @@ uint8_t print_lines_ft(CONFIG*cfg) {
           
           //unsigned char p = cfg->face->glyph->bitmap.buffer[row * cfg->face->glyph->bitmap.pitch + w];
           unsigned char p = 0;
-
+	  int pitch = abs(cfg->face->glyph->bitmap.pitch);
 	  if( row >= row_offset ) {
 	        row_cnt = row-row_offset;
-		if(row_cnt <= bitmap_rows) {
-	  		p = (cfg->face->glyph->bitmap.buffer[row_cnt*cfg->face->glyph->bitmap.pitch+j] >> (7-w%8)) & 1;//disable AA
+		if(row_cnt < bitmap_rows) {
+	  		//p = (cfg->face->glyph->bitmap.buffer[row_cnt*cfg->face->glyph->bitmap.pitch+j] >> (7-w%8)) & 1;//disable AA
+			p = cfg->face->glyph->bitmap.buffer[row_cnt*pitch+j];
+			p = p & (128 >> (w&7));
 		}
 	  }
 
@@ -533,7 +538,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         if(line_bits >= MAX_DOTS || i >=ser_cache.idx){
           
           if(row == (current_font.height-1)) {// last of the row loop         
-            if(w >= current_font.width){
+            if(w >= bitmap_width){
               lastidx = i+1;
               lastw =0;
               lastj =0;
