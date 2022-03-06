@@ -449,12 +449,15 @@ uint8_t print_lines_ft(CONFIG*cfg) {
   uint32_t codename;
   uint8_t *ch;
   printf("left = %d\n",left); 
+  int bbox_ymax = cfg->face->bbox.yMax / 64;
+  int bbox_ymin = cfg->face->bbox.yMin / 64;
+  int bbox_height = abs(bbox_ymax) + abs(bbox_ymin);
 
   while( left>0 ) {
     i = lastidx;
     row_cnt = 0;
     row = 0;
-    while(row<current_font.height){
+    while(row< bbox_height ){
       line_bits=cfg->margin.width;
       dot_line_idx = line_bits/8;
       dot_line_bitsidx = line_bits%8;
@@ -467,34 +470,23 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         codename = utf8_to_utf32(ch);
         FT_UInt gi = FT_Get_Char_Index ( cfg->face, codename);
         FT_Load_Glyph (cfg->face, gi, FT_LOAD_DEFAULT);
-        int bbox_ymax = cfg->face->bbox.yMax / 64;
-        int y_off = current_font.height - cfg->face->glyph->metrics.horiBearingY / 64;
+        int y_off =  bbox_ymax  - cfg->face->glyph->metrics.horiBearingY / 64;
         int glyph_width  = cfg->face->glyph->metrics.width / 64;
         int glyph_height = cfg->face->glyph->metrics.height / 64;
         int advance = cfg->face->glyph->metrics.horiAdvance / 64;
-        int x_off = (advance - glyph_width) / 2;
+
+  	int x_off = (advance - glyph_width) / 2;
+
 	int bitmap_rows = cfg->face->glyph->bitmap.rows;
-        int bitmap_top  = cfg->face->glyph->bitmap_top;
-	int bitmap_left = cfg->face->glyph->bitmap_left;
 	int bitmap_width = cfg->face->glyph->bitmap.width;	
-        int diffY = glyph_height - cfg->face->glyph->metrics.horiBearingY / 64;
-        if(diffY > 0) {
-            y_off = y_off - diffY;
-        }
         //FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
         FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_MONO); //disable AA
         
-	while( (y_off+glyph_height) > current_font.height) {
-    	  y_off--;
-    	  if(y_off <=0) { y_off = 0; break; }
-  	}
-	
         j = 0; w= 0;
         if(lastj !=0){j= lastj;}
         if(lastw !=0) { w = lastw;}
-        while(w < bitmap_width ) {
+        while(w < advance ) {
           //if(w > 0 && (w%8) == 0) j++;
-	  j = w/8;
           if(dot_line_bitsidx > 7 ){
             dot_line_idx++;
             dot_line_bitsidx=0;
@@ -503,21 +495,23 @@ uint8_t print_lines_ft(CONFIG*cfg) {
           //unsigned char p = cfg->face->glyph->bitmap.buffer[row * cfg->face->glyph->bitmap.pitch + w];
           unsigned char p = 0;
 	  int pitch = abs(cfg->face->glyph->bitmap.pitch);
-	  if( row >= y_off ) {
+          
+	  if( w>= x_off && row >= y_off ) {
 	        row_cnt = row-y_off;
 		if(row_cnt < bitmap_rows) {
 	  		//p = (cfg->face->glyph->bitmap.buffer[row_cnt*cfg->face->glyph->bitmap.pitch+j] >> (7-w%8)) & 1;//disable AA
+			j = (w-x_off)/8;
 			p = cfg->face->glyph->bitmap.buffer[row_cnt*pitch+j];
-			p = p & (128 >> (w&7));
+			p = p & (128 >> ((w-x_off)&7));
 		}
 	  }
 
           if(p) {
-            printf("#");
-            dot_line_data[dot_line_idx ] |= 1<<(7-dot_line_bitsidx);
-          }else {
-	    printf("0");
-	   }
+              printf("#");
+              dot_line_data[dot_line_idx ] |= 1<<(7-dot_line_bitsidx);
+           }else {
+	      printf("0");
+	  }
 
           dot_line_bitsidx++;
           w++;
@@ -543,8 +537,8 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         
         if(line_bits >= MAX_DOTS || i >=ser_cache.idx){
           
-          if(row == (current_font.height-1)) {// last of the row loop         
-            if(w >= bitmap_width){
+          if(row == (bbox_height-1)) {// last of the row loop         
+            if(w >= advance ){
               lastidx = i+1;
               lastw =0;
               lastj =0;
@@ -570,14 +564,11 @@ uint8_t print_lines_ft(CONFIG*cfg) {
     }
     left = left - lastidx;
     row = 0;
-    printf("current font line space: %d\n",face_get_line_spacing(cfg->face));
+    /*
     if(cfg->line_space > cfg->font->height){
       feed_pitch1(cfg->line_space - cfg->font->height,cfg->orient);
     }
-    if(face_get_line_spacing(cfg->face) > cfg->font->height) {
-      feed_pitch1(face_get_line_spacing(cfg->face) - cfg->font->height,cfg->orient);
-    }
-    
+    */
   }
   
 }
