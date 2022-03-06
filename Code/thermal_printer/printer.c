@@ -432,7 +432,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
   uint8_t dot_line_bitsidx=0;
   
   uint8_t lastidx,lastw,lastj;
-  uint8_t row,row_offset,row_cnt;
+  uint8_t row,row_cnt;
   uint16_t line_bits;
     
   int8_t  left = ser_cache.idx;
@@ -453,7 +453,6 @@ uint8_t print_lines_ft(CONFIG*cfg) {
   while( left>0 ) {
     i = lastidx;
     row_cnt = 0;
-    row_offset = 0;
     row = 0;
     while(row<current_font.height){
       line_bits=cfg->margin.width;
@@ -469,7 +468,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         FT_UInt gi = FT_Get_Char_Index ( cfg->face, codename);
         FT_Load_Glyph (cfg->face, gi, FT_LOAD_DEFAULT);
         int bbox_ymax = cfg->face->bbox.yMax / 64;
-        int y_off = bbox_ymax - cfg->face->glyph->metrics.horiBearingY / 64;
+        int y_off = current_font.height - cfg->face->glyph->metrics.horiBearingY / 64;
         int glyph_width  = cfg->face->glyph->metrics.width / 64;
         int glyph_height = cfg->face->glyph->metrics.height / 64;
         int advance = cfg->face->glyph->metrics.horiAdvance / 64;
@@ -478,10 +477,17 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         int bitmap_top  = cfg->face->glyph->bitmap_top;
 	int bitmap_left = cfg->face->glyph->bitmap_left;
 	int bitmap_width = cfg->face->glyph->bitmap.width;	
+        int diffY = glyph_height - cfg->face->glyph->metrics.horiBearingY / 64;
+        if(diffY > 0) {
+            y_off = y_off - diffY;
+        }
         //FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_NORMAL);
         FT_Render_Glyph(cfg->face->glyph, FT_RENDER_MODE_MONO); //disable AA
-
-       	row_offset = (current_font.height - bitmap_rows)/2;
+        
+	while( (y_off+glyph_height) > current_font.height) {
+    	  y_off--;
+    	  if(y_off <=0) { y_off = 0; break; }
+  	}
 	
         j = 0; w= 0;
         if(lastj !=0){j= lastj;}
@@ -497,8 +503,8 @@ uint8_t print_lines_ft(CONFIG*cfg) {
           //unsigned char p = cfg->face->glyph->bitmap.buffer[row * cfg->face->glyph->bitmap.pitch + w];
           unsigned char p = 0;
 	  int pitch = abs(cfg->face->glyph->bitmap.pitch);
-	  if( row >= row_offset ) {
-	        row_cnt = row-row_offset;
+	  if( row >= y_off ) {
+	        row_cnt = row-y_off;
 		if(row_cnt < bitmap_rows) {
 	  		//p = (cfg->face->glyph->bitmap.buffer[row_cnt*cfg->face->glyph->bitmap.pitch+j] >> (7-w%8)) & 1;//disable AA
 			p = cfg->face->glyph->bitmap.buffer[row_cnt*pitch+j];
