@@ -449,15 +449,14 @@ uint8_t print_lines_ft(CONFIG*cfg) {
   uint32_t codename;
   uint8_t *ch;
   printf("left = %d\n",left); 
-  int bbox_ymax = cfg->face->bbox.yMax / 64;
-  int bbox_ymin = cfg->face->bbox.yMin / 64;
-  int bbox_height = abs(bbox_ymax) + abs(bbox_ymin);
-
+  int line_height = (cfg->face->size->metrics.ascender - cfg->face->size->metrics.descender) >> 6;
+  int baseline_height = abs(cfg->face->descender) * current_font.height / cfg->face->units_per_EM;
+  int dpx = 64; 
   while( left>0 ) {
     i = lastidx;
     row_cnt = 0;
     row = 0;
-    while(row< bbox_height ){
+    while(row< line_height ){
       line_bits=cfg->margin.width;
       dot_line_idx = line_bits/8;
       dot_line_bitsidx = line_bits%8;
@@ -470,10 +469,10 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         codename = utf8_to_utf32(ch);
         FT_UInt gi = FT_Get_Char_Index ( cfg->face, codename);
         FT_Load_Glyph (cfg->face, gi, FT_LOAD_DEFAULT);
-        int y_off =  bbox_ymax  - cfg->face->glyph->metrics.horiBearingY / 64;
-        int glyph_width  = cfg->face->glyph->metrics.width / 64;
-        int glyph_height = cfg->face->glyph->metrics.height / 64;
-        int advance = cfg->face->glyph->metrics.horiAdvance / 64;
+        int y_off =  line_height - baseline_height - cfg->face->glyph->metrics.horiBearingY / dpx;
+        int glyph_width  = cfg->face->glyph->metrics.width / dpx;
+        int glyph_height = cfg->face->glyph->metrics.height / dpx;
+        int advance = cfg->face->glyph->metrics.horiAdvance / dpx;
 
   	int x_off = (advance - glyph_width) / 2;
 
@@ -537,7 +536,7 @@ uint8_t print_lines_ft(CONFIG*cfg) {
         
         if(line_bits >= MAX_DOTS || i >=ser_cache.idx){
           
-          if(row == (bbox_height-1)) {// last of the row loop         
+          if(row == (line_height-1)) {// last of the row loop         
             if(w >= advance ){
               lastidx = i+1;
               lastw =0;
