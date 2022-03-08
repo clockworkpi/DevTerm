@@ -422,6 +422,24 @@ int glob_file(char*av) {
 }
 
 #endif
+uint16_t get_serial_cache_font_width(CONFIG*cfg) {
+	
+  int i;
+  uint8_t *ch;
+  uint32_t codename;
+  int w;
+  w = 0;
+  i = 0;
+  while( i <ser_cache.idx) {
+      ch = (uint8_t*)&ser_cache.data[i];
+      codename = utf8_to_utf32(ch);
+      FT_UInt gi = FT_Get_Char_Index ( cfg->face, codename);
+      FT_Load_Glyph ( cfg->face, gi, FT_LOAD_NO_BITMAP);
+      w +=  cfg->face->glyph->metrics.horiAdvance / 64;
+      i++;
+  }
+  return w+cfg->font->width;
+}
 
 //print with freetype font dots glyph
 uint8_t print_lines_ft(CONFIG*cfg) {
@@ -550,7 +568,6 @@ uint8_t print_lines_ft(CONFIG*cfg) {
           
           break;
         }
-        
       }
       rv = IsPaper();
       if( rv == IS_PAPER) {

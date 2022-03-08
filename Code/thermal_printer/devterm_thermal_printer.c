@@ -711,7 +711,15 @@ void parse_serial_stream(CONFIG*cfg,uint8_t input_ch){
           }
           //read utf8 codename
           //
-          a = (ser_cache.idx+1)*current_font.width+(ser_cache.idx)*0+ g_config.margin.width;          
+          if(cfg->font->mode == FONT_MODE_1) {
+              
+              a = get_serial_cache_font_width(&g_config);
+              a+= (ser_cache.idx)*0+ g_config.margin.width;
+
+          }else {
+              a = (ser_cache.idx+1)*current_font.width+(ser_cache.idx)*0+ g_config.margin.width;
+
+          }
           if( a >= MAX_DOTS)//got enough points to print
           {
             if(cfg->font->mode == FONT_MODE_1){
