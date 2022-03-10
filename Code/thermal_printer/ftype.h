@@ -1,6 +1,6 @@
 #ifndef FTYPE_H
 #define FTYPE_H
-
+// clang-format off
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -8,7 +8,7 @@
 #include <freetype2/ft2build.h>
 
 #include <freetype/freetype.h>
-
+// clang-format on
 #ifndef UTF8
 typedef unsigned char UTF8;
 #endif
