@@ -4,6 +4,7 @@ After=devterm-socat
 
 [Service]
 Type=simple
+EnvironmentFile=/usr/local/etc/devterm-printer
 StandardOutput=file:/tmp/devterm_printer.log
 StandardError=file:/tmp/devterm_printer.err.log
 ExecStart=/usr/local/bin/devterm_thermal_printer.elf
