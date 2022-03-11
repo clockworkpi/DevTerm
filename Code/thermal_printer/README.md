@@ -35,14 +35,15 @@ print the test page
 
 
 ### UNICODE
-edit `/usr/local/etc/devterm-printer` ,pointer to an existed ttf file,eg: 
+Edit `/usr/local/etc/devterm-printer` ,point to an existed ttf file,eg: 
 `TTF=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc`
 
 then restart devterm-printer.service with
 ```
 sudo systemctl restart devterm-printer
 ```
-devterm-printer daemon will auto detect if the ttf file existed,if exists, devterm-printer will use the ttf as default font
+devterm-printer daemon will auto detect if the ttf file existed,if exists, devterm-printer will use the ttf as default font  
+if ttf file not existed, devterm-printer will fallback to ascii mode  
 
 use above  set printer font index,n:0-4 command to set font size, 
 1. 0 = 12x12
