@@ -34,7 +34,7 @@ print the test page
 `echo -en "\x12\x54" >  /tmp/DEVTERM_PRINTER_IN`
 
 
-### CJK
+### UNICODE
 edit `/usr/local/etc/devterm-printer` ,pointer to an existed ttf file,eg: 
 `TTF=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc`
 
@@ -56,11 +56,12 @@ then
 ```
 echo "鉴于对人类家庭所有成员的固有尊严及其平等的和不移的权利的承认,乃是世界自由、正义与和平的基础" > /tmp/DEVTERM_PRINTER_IN
 ```
-to print cjk characters
+to print unicode characters
 
-#### ESC V n rotation command,cjk mode only
+#### ESC V n rotation command,unicode mode only
 
-`echo -en "\x1b\x56\x0" >/tmp/DEVTERM_PRINTER_IN`  disable rotation
+`echo -en "\x1b\x56\x0" >/tmp/DEVTERM_PRINTER_IN`  disable rotation  
+
 `echo -en "\x1b\x56\x1" >/tmp/DEVTERM_PRINTER_IN`  90 degree   
 `echo -en "\x1b\x56\x2" >/tmp/DEVTERM_PRINTER_IN`  180 degree  
 `echo -en "\x1b\x56\x3" >/tmp/DEVTERM_PRINTER_IN`  270 degree  
