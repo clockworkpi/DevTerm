@@ -89,6 +89,9 @@ void init_printer() {
   img_cache.need_print = 0;
   img_cache.revert_bits = 0;
 
+  ser_cache.idx = 0;
+  ser_cache.utf8idx = 0;
+
   /*
     current_font.width=5; current_font.height=7; current_font.data =
     font_pcf_5x7_ISO8859_1_5x7; current_font.width=6;current_font.height=12;
@@ -103,23 +106,29 @@ void init_printer() {
     current_font.width=8;current_font.height=16; current_font.data=
     font_ttf_Px437_PS2thin2_8x16;
   */
-  current_font.width = 16;
-  current_font.height = 16;
-  current_font.data = font_ttf_Px437_PS2thin1_8x16;
-  current_font.file = "NotoSansCJK-Regular.ttf";
-  current_font.mode = FONT_MODE_1;
+  // auto detect TTF ,switch to FONT_MODE_1
+  if (getenv("TTF") && access(getenv("TTF"), F_OK) != -1) {
+    printf("TTF=%s\n", getenv("TTF"));
+    current_font.width = 12;
+    current_font.height = 12;
+    current_font.data = NULL;
+    current_font.file = getenv("TTF");
+    current_font.mode = FONT_MODE_1;
 
-  ser_cache.idx = 0;
-  ser_cache.utf8idx = 0;
-
-  if (init_ft(current_font.file, &face, &ft, current_font.width,
-              current_font.height, &error)) {
-    g_config.face = face;
-    g_config.ft = ft;
+    if (init_ft(current_font.file, &face, &ft, current_font.width,
+                current_font.height, &error)) {
+      g_config.face = face;
+      g_config.ft = ft;
+    } else {
+      printf("init_ft error %s\n", error);
+      g_config.face = NULL;
+      g_config.ft = NULL;
+    }
   } else {
-    printf("init_ft error %s\n", error);
-    g_config.face = NULL;
-    g_config.ft = NULL;
+    current_font.mode = FONT_MODE_0;
+    current_font.width = 8;
+    current_font.height = 16;
+    current_font.data = font_ttf_Px437_PS2thin2_8x16;
   }
 
   g_config.line_space = 0;
@@ -404,7 +413,7 @@ void printer_set_font(CONFIG *cfg, uint8_t fnbits) {
   uint8_t ret;
   ret = MID(fnbits, 0, 3);
 
-  if (cfg->font->mode == 0) {
+  if (cfg->font->mode == FONT_MODE_0) {
     if (ret == 0) {
       cfg->font->width = 8;
       cfg->font->height = 16;
@@ -436,9 +445,29 @@ void printer_set_font(CONFIG *cfg, uint8_t fnbits) {
     }
   }
 
-  if (cfg->font->mode == 1) {
-    cfg->font->width = 16;
-    cfg->font->height = 16;
+  if (cfg->font->mode == FONT_MODE_1) {
+    if (ret == 0) {
+      cfg->font->width = 12;
+      cfg->font->height = 12;
+    }
+    if (ret == 1) {
+      cfg->font->width = 14;
+      cfg->font->height = 14;
+    }
+    if (ret == 2) {
+      cfg->font->width = 16;
+      cfg->font->height = 16;
+    }
+    if (ret == 3) {
+      cfg->font->width = 18;
+      cfg->font->height = 18;
+    }
+
+    if (ret == 4) {
+      cfg->font->width = 20;
+      cfg->font->height = 20;
+    }
+    change_ft_size(cfg->face, cfg->font->width, cfg->font->height);
   }
 }
 

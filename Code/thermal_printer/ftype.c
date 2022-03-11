@@ -31,6 +31,16 @@ bool init_ft(const char *ttf_file, FT_Face *face, FT_Library *ft,
   return ret;
 }
 
+bool change_ft_size(FT_Face face, int req_size_w, int req_size_h) {
+  bool ret = false;
+  if (FT_Set_Pixel_Sizes(face, req_size_w, req_size_h) == 0) {
+    ret = true;
+  } else {
+    printf("Can't set font size");
+  }
+
+  return ret;
+}
 /*===========================================================================
   done_ft
   Clean up after we've finished wih the FreeType librar

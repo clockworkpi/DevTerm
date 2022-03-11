@@ -1,9 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <freetype/freetype.h>
+// clang-format off
 #include <freetype2/ft2build.h>
-
+#include <freetype/freetype.h>
+// clang-format on
 /// raspberry pi CM3
 
 #define BCM_GPIO_28 28
