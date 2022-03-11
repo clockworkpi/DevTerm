@@ -1,13 +1,13 @@
 CC = gcc
 
-CFLAGS  = -g -Wall
-LDFLAUS = 
-INCLUDES = 
-LIBS = -lwiringPi -lm -lcrypt -lpthread -lrt
+CFLAGS  = -O0 -g -Wall
+LDFLAGS = 
+INCLUDES =  -I /usr/include/freetype2
+LIBS = -lwiringPi -lm -lcrypt -lpthread -lfreetype -lrt
 
 MAIN = devterm_thermal_printer.elf
 
-SRCS = printer.c  devterm_thermal_printer.c  utils.c
+SRCS = printer.c  devterm_thermal_printer.c  utils.c ftype.c utf8-utils.c
 OBJS = $(SRCS:.c=.o)
 
 .PHONY: depend clean
