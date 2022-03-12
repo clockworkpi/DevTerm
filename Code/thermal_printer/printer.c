@@ -438,7 +438,7 @@ uint8_t print_lines_ft(CONFIG *cfg) {
 
   uint32_t codename;
   uint8_t *ch;
-  printf("left = %d\n", left);
+  //printf("left = %d\n", left);
   int line_height = (cfg->face->size->metrics.ascender -
                      cfg->face->size->metrics.descender) >>
                     6;
@@ -521,10 +521,10 @@ uint8_t print_lines_ft(CONFIG *cfg) {
           }
 
           if (p) {
-            printf("#");
+            //printf("#");
             dot_line_data[dot_line_idx] |= 1 << (7 - dot_line_bitsidx);
           } else {
-            printf("0");
+            //printf("0");
           }
 
           dot_line_bitsidx++;
@@ -575,7 +575,7 @@ uint8_t print_lines_ft(CONFIG *cfg) {
         print_dots_8bit_split(cfg, dot_line_data, dot_line_idx + 1);
       }
       row++;
-      printf("\n");
+      //printf("\n");
     }
     left = left - lastidx;
     row = 0;
