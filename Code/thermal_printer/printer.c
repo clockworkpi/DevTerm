@@ -589,7 +589,7 @@ uint8_t print_lines_ft(CONFIG *cfg) {
 
 uint8_t print_lines8(CONFIG *cfg) {
 
-  if (cfg->font->mode == FONT_MODE_1) {
+  if (cfg->font->mode == FONT_MODE_1 && cfg->face!=NULL) {
     return print_lines_ft(cfg);
   }
   uint8_t i, j, k;

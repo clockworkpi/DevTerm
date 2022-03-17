@@ -33,6 +33,8 @@ bool init_ft(const char *ttf_file, FT_Face *face, FT_Library *ft,
 
 bool change_ft_size(FT_Face face, int req_size_w, int req_size_h) {
   bool ret = false;
+  if(face == NULL) return ret;
+
   if (FT_Set_Pixel_Sizes(face, req_size_w, req_size_h) == 0) {
     ret = true;
   } else {

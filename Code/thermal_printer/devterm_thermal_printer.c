@@ -124,13 +124,14 @@ void init_printer() {
       g_config.face = NULL;
       g_config.ft = NULL;
     }
-  } else {
-    current_font.mode = FONT_MODE_0;
-    current_font.width = 8;
-    current_font.height = 16;
-    current_font.data = font_ttf_Px437_PS2thin2_8x16;
   }
 
+  //default still FONT_MODE_0
+  current_font.mode = FONT_MODE_0;
+  current_font.width = 8;
+  current_font.height = 16;
+  current_font.data = font_ttf_Px437_PS2thin2_8x16;
+  
   g_config.line_space = 0;
   g_config.align = ALIGN_LEFT;
   g_config.reverse = 0;
@@ -511,10 +512,25 @@ void parse_cmd(CONFIG *cfg, uint8_t *cmd, uint8_t cmdidx) {
       }
       reset_cmd();
     }
+
     // ESC ! n
     if (cmd[0] == ASCII_ESC && cmd[1] == 0x21) {
-      printer_set_font(cfg, cmd[2]);
+      ret = cmd[2];
+      if(ret == 0) {
+         printer_set_font_mode(cfg,FONT_MODE_0);
+         printer_set_font(cfg,0);
+      }else if(ret == 1) {
+         printer_set_font_mode(cfg,FONT_MODE_1);
+         printer_set_font(cfg,0);
+      }
+      
       reset_cmd();
+    }
+
+    //GS ! n
+    if(cmd[0] == ASCII_GS && cmd[1] == 0x21) {
+       printer_set_font(cfg,cmd[2]);
+       reset_cmd();
     }
 
     // ESC 3 n
@@ -749,7 +765,7 @@ void parse_serial_stream(CONFIG *cfg, uint8_t input_ch) {
       }
       // read utf8 codename
       //
-      if (cfg->font->mode == FONT_MODE_1) {
+      if (cfg->font->mode == FONT_MODE_1 && cfg->face != NULL) {
 
         a = get_serial_cache_font_width(&g_config);
         a += (ser_cache.idx) * 0 + g_config.margin.width;
@@ -760,7 +776,7 @@ void parse_serial_stream(CONFIG *cfg, uint8_t input_ch) {
       }
       if (a >= MAX_DOTS) // got enough points to print
       {
-        if (cfg->font->mode == FONT_MODE_1) {
+        if (cfg->font->mode == FONT_MODE_1 && cfg->face != NULL ) {
           print_lines_ft(cfg);
         } else {
           print_lines8(cfg);
