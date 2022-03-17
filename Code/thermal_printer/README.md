@@ -73,7 +73,7 @@ echo -en "\x1b\x21\x0" > /tmp/DEVTERM_PRINTER_IN
 then
 
 ```
-echo "鉴于对人类家庭所有成员的固有尊严及其平等的和不移的权利的承认,乃是世界自由、正义与和平的基础" > /tmp/DEVTERM_PRINTER_IN
+echo "日月火水木金土" > /tmp/DEVTERM_PRINTER_IN
 ```
 to print unicode characters
 
