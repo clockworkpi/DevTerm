@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-
+import argparse
 import glob
 import os
-import sys,getopt
 import subprocess
+import sys
+from typing import Any, NoReturn
 
 # The gearings below were picked based on various tests by the ClockworkPi devs.
 # The maximum-performance maximum-power gearing is present for completeness, but
@@ -18,48 +19,48 @@ import subprocess
 #
 # Gears are numbered in-order, starting from 1.
 # It's up to you to ensure that they are sorted by performance :)
-def gears():
-    return [
-        gear(
-            little=(600000,),
-            use="simple writing tasks with long battery life"),
-        gear(
-            little=(800000,) * 2,
-            use="browsing most websites with long battery life"),
-        gear(
-            little=(1008000,) * 4,
-            gpu_freq=400000000,
-            use="most 2D games and emulators"),
-        gear(
-            big=(1008000,) * 2,
-            gpu_freq=400000000,
-            use="playing videos and 3D games"),
-        gear(
-            big=(1200000,) * 2,
-            gpu_freq=400000000,
-            use="performance-first tasks"),
-        gear(
-            little=(1416000,) * 4,
-            big=(1800000,) * 2,
-            gpu_freq=800000000,
-            use="max performance, max power (usage)"),
-    ]
+
 
 GPU_GOV_SIMPLE = "simple_ondemand"
 GPU_GOV_PERF = "performance"
 
-# Helper to convert the concise gear format above into a full description.
-#
-# `little` and `big` define the number of A53 and A72 CPU cores to enable, and
-# their maximum frequencies (in kHZ). Cores that are omitted or set to zero are
-# disabled.
+
+def gears() -> list[dict[str, Any]]:
+    return [
+        gear(little=(600000,), use="simple writing tasks with long battery life"),
+        gear(little=(800000,) * 2, use="browsing most websites with long battery life"),
+        gear(little=(1008000,) * 4, gpu_freq=400000000, use="most 2D games and emulators"),
+        gear(big=(1008000,) * 2, gpu_freq=400000000, use="playing videos and 3D games"),
+        gear(big=(1200000,) * 2, gpu_freq=400000000, use="performance-first tasks"),
+        gear(
+            little=(1416000,) * 4,
+            big=(1800000,) * 2,
+            gpu_freq=800000000,
+            use="max performance, max power (usage)",
+        ),
+    ]
+
+
 def gear(
     little=(0, 0, 0, 0),
     big=(0, 0),
     gpu_freq=200000000,
     gpu_gov=GPU_GOV_SIMPLE,
     use="",
-):
+) -> dict[str, Any]:
+    """Helper to convert the concise gear format above into a full description.
+
+    `little` and `big` define the number of A53 and A72 CPU cores to enable, and
+    their maximum frequencies (in kHz). Cores that are omitted or set to zero are
+
+
+    :param little: A53 Core.
+    :param big: A72 Core
+    :param gpu_freq: Gpu frequency in kHz
+    :param gpu_gov: Gpu Governor
+    :param use: Description of the gear.
+    :return: A dictionary of the parameters.
+    """
     # Extend to 4 little and 2 big cores (matching the A06).
     assert len(little) <= 4
     assert len(big) <= 2
@@ -74,144 +75,166 @@ def gear(
         "use": use,
     }
 
+
 # We placed gears() at the top of the file to make it easier to find and edit.
 # Now that we've defined the helpers it needs, evaluate the gears.
 gears = gears()
 
-def load_gear(gear):
+
+def load_gear(gear: int) -> dict[str, Any]:
     return gears[gear - 1]
 
 
-
-cur_stat = []
-cur_stat.append("+-----------------------------------+-----------------+-----------+")
-cur_stat.append("|            Cortex-A53             |   Cortex-A72    | Mali-T860 |")
-cur_stat.append("+--------+--------+--------+--------+--------+--------+-----------+")
-cur_stat.append("| CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |    GPU    |")
-cur_stat.append("+--------+--------+--------+--------+--------+--------+-----------+")
-cur_stat.append("| 600MHz | OFF    | OFF    | OFF    | OFF    | OFF    | 400MHz    |") #5
-cur_stat.append("+--------+--------+--------+--------+--------+--------+-----------+")
-
-
-def isDigit(x):
-    try:
-        float(x)
-        return True
-    except ValueError:
-        return False
+cur_stat = [
+    "+-----------------------------------+-----------------+-----------+",
+    "|            Cortex-A53             |   Cortex-A72    | Mali-T860 |",
+    "+--------+--------+--------+--------+--------+--------+-----------+",
+    "| CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |    GPU    |",
+    "+--------+--------+--------+--------+--------+--------+-----------+",
+    "| 600 MHz| OFF    | OFF    | OFF    | OFF    | OFF    | 400 MHz   |",
+    "+--------+--------+--------+--------+--------+--------+-----------+",
+]
 
 
 class A06:
+    """A06 Module class."""
+
     cpus = []
-    cpu_scaling_governor= "schedutil"
-    gear       = load_gear(1) # 1-5
-    null_out = "2>/dev/null"
+    cpu_scaling_governor: str = "schedutil"
+    gear = load_gear(1)  # 1-5
+    null_out: str = "2>/dev/null"
+
     def __init__(self):
-      self.cpus = []
-      self.init_cpu_infos()
-      self.cpu_total_count = len(self.cpus)
+        self.cpus = []
+        self.init_cpu_infos()
+        self.cpu_total_count = len(self.cpus)
 
     def init_cpu_infos(self):
-        self.cpus = glob.glob('/sys/devices/system/cpu/cpu[0-9]')
+        self.cpus = glob.glob("/sys/devices/system/cpu/cpu[0-9]")
         self.cpus.sort()
-    
-    def get_cpu_gov(self):
+
+    @property
+    def cpu_gov(self) -> str:
         if self.gear["cpu"][0] > 0:
             cpu_gov_path = "/sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
         else:
             cpu_gov_path = "/sys/devices/system/cpu/cpufreq/policy4/scaling_governor"
-        gov = ""
-        with open(cpu_gov_path,"r") as f: gov = f.read().strip()
-        return gov
+        with open(cpu_gov_path, "r") as f:
+            return f.read().strip()
 
-    def set_cpu_gov0( self,gov):
+    @property
+    def gpu_gov(self) -> str:
+        with open(
+            "/sys/devices/platform/ff9a0000.gpu/devfreq/ff9a0000.gpu/governor", "r"
+        ) as gov_file:
+            return gov_file.read().strip()
+
+    def set_cpu_gov0(self, gov):
         cpu_gov_path = "/sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
         try:
-            subprocess.run( "echo %s | sudo tee  %s " %(gov,cpu_gov_path),shell=True,stdout=subprocess.DEVNULL)
-        except:
+            subprocess.run(
+                "echo %s | sudo tee  %s " % (gov, cpu_gov_path),
+                shell=True,
+                stdout=subprocess.DEVNULL,
+            )
+        except Exception:
             print("set cpu governor failed")
 
-    def set_cpu_gov4( self,gov):
+    def set_cpu_gov4(self, gov):
         cpu_gov_path = "/sys/devices/system/cpu/cpufreq/policy4/scaling_governor"
         try:
-            subprocess.run( "echo %s | sudo tee  %s" %(gov,cpu_gov_path),shell=True,stdout=subprocess.DEVNULL)
-        except:
+            subprocess.run(
+                "echo %s | sudo tee  %s" % (gov, cpu_gov_path),
+                shell=True,
+                stdout=subprocess.DEVNULL,
+            )
+        except Exception:
             print("set cpu governor failed")
 
-    
-    def get_cpu_on_off(self,cpu_num):
+    def get_cpu_on_off(self, cpu_num):
         cpu_onoff_file = "/sys/devices/system/cpu/cpu%d/online" % cpu_num
-        with open(cpu_onoff_file,"r") as f: onoff = f.read().strip()
+        with open(cpu_onoff_file, "r") as f:
+            onoff = f.read().strip()
         if onoff == "1":
             cpu_max_freq_file = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq" % cpu_num
-            with open(cpu_max_freq_file,"r") as f: max_freq = f.read().strip()
-            mhz = int(max_freq)/1000
-            return "%dMhz" % mhz
-        
+            with open(cpu_max_freq_file, "r") as f:
+                max_freq = f.read().strip()
+            mhz = int(max_freq) // 1000
+            return f"{mhz} MHz"
+
         return "OFF"
-            
-         
-    def set_cpu_on_off(self,cpu_num,onoff):
+
+    def set_cpu_on_off(self, cpu_num, onoff):
         cpu_onoff_file = "/sys/devices/system/cpu/cpu%d/online" % cpu_num
         try:
-            #print("echo %d | sudo tee  %s" %(onoff,cpu_onoff_file) )
-            subprocess.run( "echo %d | sudo tee  %s" %(onoff,cpu_onoff_file),shell=True,stdout=subprocess.DEVNULL)
-        except:
+            subprocess.run(
+                "echo %d | sudo tee  %s" % (onoff, cpu_onoff_file),
+                shell=True,
+                stdout=subprocess.DEVNULL,
+            )
+        except Exception:
             print("set cpu %d on off failed" % cpu_num)
 
-    def set_cpu_max_freq(self,cpu_num,max_freq):
+    def set_cpu_max_freq(self, cpu_num, max_freq):
         cpu_max_freq_file = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq" % cpu_num
         try:
-            subprocess.run( "echo %d | sudo tee  %s" %(max_freq,cpu_max_freq_file),shell=True,stdout=subprocess.DEVNULL)
-        except:
+            subprocess.run(
+                "echo %d | sudo tee  %s" % (max_freq, cpu_max_freq_file),
+                shell=True,
+                stdout=subprocess.DEVNULL,
+            )
+        except Exception:
             print("set cpu %d max freq failed" % cpu_num)
 
     def get_gpu_freq(self):
         gpu_sys_path = "/sys/devices/platform/ff9a0000.gpu/devfreq/ff9a0000.gpu"
-        gpu_freq_path = os.path.join(gpu_sys_path,"max_freq")
-        freq = ""
-        with open(gpu_freq_path,"r") as f: freq = f.read().strip()
-        mhz = int(freq)/1000000
-        return "%dMHz" % mhz
+        gpu_freq_path = os.path.join(gpu_sys_path, "max_freq")
+        with open(gpu_freq_path, "r") as f:
+            freq = f.read().strip()
+        mhz = int(freq) // 1000000
+        return f"{mhz} MHz"
 
-    def set_gpu(self,gov,hz):
+    def set_gpu(self, gov, hz):
         gpu_sys_path = "/sys/devices/platform/ff9a0000.gpu/devfreq/ff9a0000.gpu"
-        gpu_gov_path = os.path.join(gpu_sys_path,"governor")
-        gpu_freq_path = os.path.join(gpu_sys_path,"max_freq")
+        gpu_gov_path = os.path.join(gpu_sys_path, "governor")
+        gpu_freq_path = os.path.join(gpu_sys_path, "max_freq")
         try:
-            subprocess.run("echo %s | sudo tee %s" %(gov,gpu_gov_path),shell=True,stdout=subprocess.DEVNULL)
-            subprocess.run("echo %d | sudo tee %s" %(hz, gpu_freq_path),shell=True,stdout=subprocess.DEVNULL)
-        except:
+            subprocess.run(
+                "echo %s | sudo tee %s" % (gov, gpu_gov_path), shell=True, stdout=subprocess.DEVNULL
+            )
+            subprocess.run(
+                "echo %d | sudo tee %s" % (hz, gpu_freq_path), shell=True, stdout=subprocess.DEVNULL
+            )
+        except Exception:
             print("set gpu failed")
 
-
     def print_cpu_gpu_gov(self):
-        print("CPU Governor: %s    GPU Governor: %s" % (self.get_cpu_gov(), self.gear["gpu_gov"]))
-    
+        print(f"CPU Governor: {self.cpu_gov}    GPU Governor: {self.gpu_gov}")
+
     def print_cur_status(self):
-        global  cur_stat
-        
+        global cur_stat
+
         stat_str = "|%s|%s|%s|%s|%s|%s|%s|"
- 
+
         cpu0 = self.get_cpu_on_off(0).center(8)[:8]
         cpu1 = self.get_cpu_on_off(1).center(8)[:8]
         cpu2 = self.get_cpu_on_off(2).center(8)[:8]
         cpu3 = self.get_cpu_on_off(3).center(8)[:8]
         cpu4 = self.get_cpu_on_off(4).center(8)[:8]
         cpu5 = self.get_cpu_on_off(5).center(8)[:8]
-        gpu  = self.get_gpu_freq().center(11)[:11]
-        
-        table_str = stat_str %(cpu0,cpu1,cpu2,cpu3,cpu4,cpu5,gpu)
-        print("\nCurrent Status:") 
-        for idx,val in enumerate(cur_stat):
+        gpu = self.get_gpu_freq().center(11)[:11]
+
+        table_str = stat_str % (cpu0, cpu1, cpu2, cpu3, cpu4, cpu5, gpu)
+        print("\nCurrent Status:")
+        for idx, val in enumerate(cur_stat):
             if idx == 5:
                 print(table_str)
             else:
                 print(val)
-        
+
         self.print_cpu_gpu_gov()
-         
-    def set_gear(self,g):
+
+    def set_gear(self, g):
         self.gear = load_gear(g)
 
         if g > 3:
@@ -236,40 +259,45 @@ class A06:
             self.set_cpu_gov4(self.cpu_scaling_governor)
 
 
+def print_gear_map(gear: int) -> NoReturn:
+    print(
+        "    +-----------------------------------+-----------------+-----------+\n"
+        "    |            Cortex-A53             |   Cortex-A72    | Mali-T860 |\n"
+        "    +--------+--------+--------+--------+--------+--------+-----------+\n"
+        "    | CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |   GPU     |\n"
+        "+---+--------+--------+--------+--------+--------+--------+-----------+"
+    )
 
-def print_gear_map(gear):
-    print("    +-----------------------------------+-----------------+-----------+")
-    print("    |            Cortex-A53             |   Cortex-A72    | Mali-T860 |")
-    print("    +--------+--------+--------+--------+--------+--------+-----------+")
-    print("    | CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |   GPU     |")
-    div = "+---+--------+--------+--------+--------+--------+--------+-----------+"
-    print(div)
-
-    def freq(khz):
-        mhz = khz/1000
+    def freq(khz: int) -> str:
+        mhz = khz // 1000
         if mhz >= 1000:
-            return "%d MHz" % mhz
+            return f"{mhz} MHz"
         elif mhz > 0:
-            return " %d MHz" % mhz
+            return f" {mhz} MHz"
         else:
             return "  OFF   "
 
     for idx, val in enumerate(gears):
         g = idx + 1
         selected = g == gear
-        print("|%s|%s| %s  |%s" % (
-            ("*%s*" if selected else " %s ") % g,
-            "|".join([freq(cpu) for cpu in val["cpu"]]),
-            freq(val["gpu_freq"]/1000),
-            " <===" if selected else "",
-        ))
-        print(div)
+        print(
+            "|%s|%s| %s  |%s"
+            % (
+                ("*%s*" if selected else " %s ") % g,
+                "|".join([freq(cpu) for cpu in val["cpu"]]),
+                freq(val["gpu_freq"] // 1000),
+                " <===" if selected else "",
+            )
+        )
+        print("+---+--------+--------+--------+--------+--------+--------+-----------+")
 
-def print_help_msg():
+
+def print_help_msg() -> NoReturn:
     print("Usage: devterm-a06-gearbox [OPTION]...")
-    print("Show or set the CPU operating frequency,online status and GPU operating frequency for DevTerm A06.")
-    print()
-    print(" -s, --set [n] set a speed mode between the number 1-%d:" % len(gears))
+    print(
+        "Show or set the CPU operating frequency,online status and GPU operating frequency for DevTerm A06.\n"
+    )
+    print(f" -s, --set [n] set a speed mode between the number 1-{len(gears)}:")
     for (i, _) in enumerate(gears):
         print("               %d for %s." % (i + 1, gears[i]["use"]))
     print()
@@ -278,43 +306,38 @@ def print_help_msg():
     print("Set to mode 1, single LITTLE core @600MHz(max), GPU@200MHz.")
     print("   $ devterm-a06-gearbox -s 1")
 
-def is_root():
+
+def is_root() -> bool:
     return os.geteuid() == 0
 
-def main(argv):
-    gear   = 1
-    try:
-        opts, args = getopt.getopt(argv,"hs:",["set="])
-    except getopt.GetoptError:
-        print_help_msg()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print_help_msg()
-            sys.exit()
-        elif opt in ("-s","--set"):
-            if(isDigit(arg)):
-                gear = int(arg)
-                if gear not in range(1, len(gears) + 1):
-                    print("illegal input: mode range 1-%d" % len(gears))
-                    sys.exit(-1)
-           
-    
-    DT = A06()
- 
-    if len(argv) == 0:
-        DT.print_cur_status()
-        sys.exit(0)
 
-    DT = A06()
-    if is_root():
-        DT.set_gear(gear)
-        print_gear_map(gear)
-        DT.print_cpu_gpu_gov()
+def main() -> SystemExit:
+    devterm = A06()
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("-s", "--set", type=int)
+    parser.add_argument("-h", "--help", action="store_true")
+    args = parser.parse_args()
+    if args.set:
+        gear = args.set
+        if gear not in range(1, len(gears) + 1):
+            print(f"Illegal input: mode range 1-{len(gears)}")
+            sys.exit(-1)
+        if is_root():
+            devterm.set_gear(gear)
+            print_gear_map(gear)
+            devterm.print_cpu_gpu_gov()
+        else:
+            print("Requires super user privilege to set mode, try running it with sudo.")
+            sys.exit(1)
+    elif args.help:
+        print_help_msg()
+        sys.exit()
     else:
-        print("Require super user privilege to set mode,try run it with sudo")
-        sys.exit(1)
+        if len(sys.argv) == 1:
+            devterm.print_cur_status()
+            sys.exit()
+
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
-    
+    main()
