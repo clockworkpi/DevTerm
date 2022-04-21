@@ -1,0 +1,27 @@
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index ff43e32a3..180e372e7 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -671,7 +671,7 @@ static int sunxi_mmc_finalize_request(struct sunxi_mmc_host *host)
+ 	bool cont_dat_cmd = false;
+ 
+ 	if (host->int_sum & SDXC_INTERRUPT_ERROR_BIT) {
+-		sunxi_mmc_dump_errinfo(host);
++//		sunxi_mmc_dump_errinfo(host);
+ 		if (((host->ctl_spec_cap & SUNXI_SC_EN_RETRY) && data)\
+ 			|| ((host->ctl_spec_cap & SUNXI_SC_EN_RETRY_CMD) && !data)) {
+ 			host->mrq_retry = mrq;
+diff --git a/drivers/pinctrl/sunxi/pinctrl-sunxi.c b/drivers/pinctrl/sunxi/pinctrl-sunxi.c
+index de0629d6d..43dfd8914 100644
+--- a/drivers/pinctrl/sunxi/pinctrl-sunxi.c
++++ b/drivers/pinctrl/sunxi/pinctrl-sunxi.c
+@@ -545,7 +545,8 @@ static int sunxi_pinctrl_set_io_bias_cfg(struct sunxi_pinctrl *pctl,
+ 		raw_spin_lock_irqsave(&pctl->lock, flags);
+ 		reg = readl(pctl->membase + PIO_POW_MOD_SEL_REG);
+ 		reg &= ~(1 << bank);
+-		writel(reg | val << bank, pctl->membase + PIO_POW_MOD_SEL_REG);
++		//writel(reg | val << bank, pctl->membase + PIO_POW_MOD_SEL_REG);
++		writel(0x00000040, pctl->membase + PIO_POW_MOD_SEL_REG);
+ 		raw_spin_unlock_irqrestore(&pctl->lock, flags);
+ 
+ 		if (pctl->desc->io_bias_cfg_variant ==

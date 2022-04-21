@@ -1,0 +1,13 @@
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/dev_fb.c b/drivers/video/fbdev/sunxi/disp2/disp/dev_fb.c
+index 25d29c353..b2da2c6bc 100644
+--- a/drivers/video/fbdev/sunxi/disp2/disp/dev_fb.c
++++ b/drivers/video/fbdev/sunxi/disp2/disp/dev_fb.c
+@@ -2095,7 +2095,7 @@ static s32 display_fb_request(u32 fb_id, struct disp_fb_create_info *fb_para)
+ 
+ 			config.info.mode = LAYER_MODE_BUFFER;
+ 			config.info.zorder = 16;
+-			config.info.alpha_mode = 0;
++			config.info.alpha_mode = 1;
+ 			config.info.alpha_value = 0xff;
+ 			config.info.fb.crop.x = (0LL) << 32;
+ 			config.info.fb.crop.y = ((long long)y_offset) << 32;

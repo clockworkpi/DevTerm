@@ -1,0 +1,91 @@
+diff --git a/sound/soc/sunxi/sun20iw1-codec.c b/sound/soc/sunxi/sun20iw1-codec.c
+index 84f92e5ee..f5015d1e9 100755
+--- a/sound/soc/sunxi/sun20iw1-codec.c
++++ b/sound/soc/sunxi/sun20iw1-codec.c
+@@ -46,7 +46,7 @@
+ 
+ #define LOG_ERR(fmt, arg...)	pr_err("[AUDIOCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
+ #define LOG_WARN(fmt, arg...)	pr_warn("[AUDIOCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
+-#define LOG_INFO(fmt, arg...)	pr_info("[AUDIOCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
++#define LOG_INFO(fmt, arg...)	{}	//pr_info("[AUDIOCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
+ 
+ /* digital audio process function */
+ enum sunxi_hw_dap {
+@@ -797,8 +797,8 @@ static int sunxi_codec_playback_event(struct snd_soc_dapm_widget *w,
+ 				(0x1<<EN_DAC), (0x0<<EN_DAC));
+ 		/* DACL to left channel LINEOUT Mute control 0:mute 1: not mute */
+ 		snd_soc_component_update_bits(component, SUNXI_DAC_REG,
+-				(0x1 << DACLMUTE) | (0x1 << DACRMUTE),
+-				(0x0 << DACLMUTE) | (0x0 << DACRMUTE));
++				(0x1 << DACLMUTE) | (0x0 << DACRMUTE),
++				(0x1 << DACLMUTE) | (0x0 << DACRMUTE));
+ 		break;
+ 	default:
+ 		break;
+@@ -1004,7 +1004,7 @@ static const struct snd_kcontrol_new sunxi_codec_controls[] = {
+ 		       LINEOUT_VOL, 0x1F, 0, lineout_tlv),
+ 	/* Headphone Gain */
+ 	SOC_SINGLE_TLV("Headphone Volume", SUNXI_HP2_REG,
+-		       HEADPHONE_GAIN, 0x7, 0, headphone_gain_tlv),
++		       HEADPHONE_GAIN, 0x7, 1, headphone_gain_tlv),
+ };
+ 
+ /* lineout controls */
+@@ -1063,6 +1063,7 @@ static const struct snd_kcontrol_new adc3_input_mixer[] = {
+ 
+ /*audio dapm widget */
+ static const struct snd_soc_dapm_widget sunxi_codec_dapm_widgets[] = {
++#if 0
+ 	SND_SOC_DAPM_AIF_IN_E("DACL", "Playback", 0, SUNXI_DAC_REG,
+ 				DACLEN, 0,
+ 				sunxi_codec_playback_event,
+@@ -1072,7 +1073,7 @@ static const struct snd_soc_dapm_widget sunxi_codec_dapm_widgets[] = {
+ 				DACREN, 0,
+ 				sunxi_codec_playback_event,
+ 				SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMD),
+-
++#endif
+ 	SND_SOC_DAPM_AIF_OUT_E("ADC1", "Capture", 0, SND_SOC_NOPM, 0, 0,
+ 			       sunxi_codec_adc1_event,
+ 			       SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_POST_PMD),
+@@ -1263,6 +1264,19 @@ static void sunxi_codec_init(struct snd_soc_component *component)
+ 	if (sunxi_codec->hw_config.dachpf_cfg)
+ 		dachpf_config(component);
+ #endif
++
++	snd_soc_component_update_bits(component, SUNXI_DAC_DPC,
++			(0x1<<EN_DAC), (0x1<<EN_DAC));
++	snd_soc_component_update_bits(component, SUNXI_DAC_REG,
++			(0x1 << DACLEN) | (0x1 << DACREN) | (0x1 << DACLMUTE) | (0x1 << DACRMUTE),
++			(0x1 << DACLEN) | (0x1 << DACREN) | (0x1 << DACLMUTE) | (0x1 << DACRMUTE));
++	snd_soc_component_update_bits(component, SUNXI_RAMP_REG,
++			(0x1 << RMC_EN), (0x1 << RMC_EN));
++	snd_soc_component_update_bits(component, SUNXI_HP2_REG,
++			(0x1 << HP_DRVEN) | (0x1 << HP_DRVOUTEN) | (0x1 << RAMP_OUT_EN),
++			(0x1 << HP_DRVEN) | (0x1 << HP_DRVOUTEN) | (0x1 << RAMP_OUT_EN));
++	snd_soc_component_update_bits(component, SUNXI_POWER_REG,
++			0x1 << HPLDO_EN, 0x1 << HPLDO_EN);
+ }
+ 
+ static int sunxi_codec_startup(struct snd_pcm_substream *substream,
+@@ -1843,6 +1857,7 @@ static struct attribute_group audio_debug_attr_group = {
+ 
+ /* regmap configuration */
+ static const struct regmap_config sunxi_codec_regmap_config = {
++	.name = "sunxi_codec",
+ 	.reg_bits = 32,
+ 	.reg_stride = 4,
+ 	.val_bits = 32,
+diff --git a/sound/soc/sunxi/sun20iw1-sndcodec.c b/sound/soc/sunxi/sun20iw1-sndcodec.c
+index 949b46d1c..d5d7e6fa3 100644
+--- a/sound/soc/sunxi/sun20iw1-sndcodec.c
++++ b/sound/soc/sunxi/sun20iw1-sndcodec.c
+@@ -33,7 +33,7 @@
+ 
+ #define LOG_ERR(fmt, arg...)	pr_err("[SNDCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
+ #define LOG_WARN(fmt, arg...)	pr_warn("[SNDCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
+-#define LOG_INFO(fmt, arg...)	pr_info("[SNDCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
++#define LOG_INFO(fmt, arg...)	{}	//pr_info("[SNDCODEC][%s][%d]:" fmt "\n", __func__, __LINE__, ##arg)
+ 
+ static int mdata_threshold = 0x10;
+ module_param(mdata_threshold, int, 0644);
