@@ -1,4 +1,6 @@
 cd ~
+mkdir devterm-build
+
 git clone https://github.com/armbian/build.git
 git clone https://github.com/clockworkpi/DevTerm.git
 
@@ -6,14 +8,22 @@ cd build
 
 git reset --hard 43d179914ae9e1ebb5d72315d9f9f68f5fb3e330
 
-git apply ~/DevTerm/Code/patch/armbian_build_a06/patch/armbian.patch
-git apply ~/DevTerm/Code/patch/armbian_build_a06/patch/armbian_mirror.patch
+git apply ../DevTerm/Code/patch/armbian_build_a06/patch/armbian.patch
+git apply ../DevTerm/Code/patch/armbian_build_a06/patch/armbian_mirror.patch
 
-cp ~/DevTerm/Code/patch/armbian_build_a06/patch/kernel*.patch userpatches/kernel/rockchip64-current/
-cp ~/DevTerm/Code/patch/armbian_build_a06/patch/uboot*.patch userpatches/u-boot/u-boot-rockchip64-mainline/
+mkdir -p userpatches/kernel/rockchip64-current/lib.config 
+mkdir -p userpatches/u-boot/u-boot-rockchip64-mainline/
 
-cp ~/DevTerm/Code/patch/armbian_build_a06/patch/config-example.conf userpatches/
+cp -f ../DevTerm/Code/patch/armbian_build_a06/patch/kernel*.patch userpatches/kernel/rockchip64-current/
+cp -f ../DevTerm/Code/patch/armbian_build_a06/patch/uboot*.patch userpatches/u-boot/u-boot-rockchip64-mainline/
+cp -f ../DevTerm/Code/patch/armbian_build_a06/patch/lib.config userpatches/
+cp -f ../DevTerm/Code/patch/armbian_build_a06/patch/clockworkpi-a06.conf config/boards/
 
-#Then exec ./compile.sh under armbian build
-cd ~/build && ./compile.sh 
+
+# Compile on a compatible ubuntu linux system:
+./compile.sh BOARD=clockworkpi-a06 BRANCH=current RELEASE=hirsute BUILD_MINIMAL=no BUILD_DESKTOP=yes KERNEL_ONLY=no KERNEL_CONFIGURE=no DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base COMPRESS_OUTPUTIMAGE=sha,gpg,img
+
+# Compile on any system that user has docker commandline access.
+./compile.sh docker BOARD=clockworkpi-a06 BRANCH=current RELEASE=hirsute BUILD_MINIMAL=no BUILD_DESKTOP=yes KERNEL_ONLY=no KERNEL_CONFIGURE=no DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base COMPRESS_OUTPUTIMAGE=sha,gpg,img
+
 
