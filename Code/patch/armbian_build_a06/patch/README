@@ -1,5 +1,5 @@
-cd ~
 mkdir devterm-build
+cd devterm-build
 
 git clone https://github.com/armbian/build.git
 git clone https://github.com/clockworkpi/DevTerm.git
