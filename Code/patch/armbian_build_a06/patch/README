@@ -11,7 +11,6 @@ git reset --hard 43d179914ae9e1ebb5d72315d9f9f68f5fb3e330
 git apply ../DevTerm/Code/patch/armbian_build_a06/patch/armbian.patch
 git apply ../DevTerm/Code/patch/armbian_build_a06/patch/armbian_mirror.patch
 
-mkdir -p userpatches/kernel/rockchip64-current/lib.config 
 mkdir -p userpatches/u-boot/u-boot-rockchip64-mainline/
 
 cp -f ../DevTerm/Code/patch/armbian_build_a06/patch/kernel*.patch userpatches/kernel/rockchip64-current/
