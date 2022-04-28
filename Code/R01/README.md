@@ -15,6 +15,6 @@ devterm R01
 readme
 ```
 
-`tar cpjfv d1\_twm.tar.bz2 -C /home/cpi`  
+`tar xpjfv d1\_twm.tar.bz2 -C /home/cpi`  
  
 
