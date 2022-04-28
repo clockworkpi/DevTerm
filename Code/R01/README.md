@@ -1,4 +1,4 @@
-![scr](Code/R01/scr.png?raw=true "Screenshot")
+![scr](scr.png?raw=true "Screenshot")
 
 Devterm R01
 
