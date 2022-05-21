@@ -126,7 +126,7 @@ void init_printer() {
     }
   }
 
-  //default still FONT_MODE_0
+  //default still FONT_MODE_0, comment out below 4 lines to enable unicode printing
   current_font.mode = FONT_MODE_0;
   current_font.width = 8;
   current_font.height = 16;

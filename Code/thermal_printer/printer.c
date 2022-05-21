@@ -454,7 +454,7 @@ uint8_t print_lines_ft(CONFIG *cfg,int lines,int bf) {
       abs(cfg->face->descender) * current_font.height / cfg->face->units_per_EM;
   int dpx = 64;
   FT_Matrix matrix;
-
+  ENABLE_VH;
   while (left > 0) {
     i = lastidx;
     row_cnt = 0;
@@ -593,6 +593,8 @@ uint8_t print_lines_ft(CONFIG *cfg,int lines,int bf) {
     }
     */
   }
+  DISABLE_VH;
+
 }
 
 uint8_t print_lines8(CONFIG *cfg,int lines,int backforward) {
@@ -604,8 +606,9 @@ uint8_t print_lines8(CONFIG *cfg,int lines,int backforward) {
 	  DISABLE_VH;
         return 0;
    }
-
+  
   if (cfg->font->mode == FONT_MODE_1 && cfg->face!=NULL) {
+    
     return print_lines_ft(cfg,0,0);
   }
   uint8_t i, j, k;
