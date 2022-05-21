@@ -53,7 +53,6 @@ void clear_printer_buffer() {
 uint8_t IsPaper() {
   uint8_t status;
   uint8_t tmp;
-  return IS_PAPER;
 
   if (millis() - printer_vps_time > 10) {
     ENABLE_PEM;
@@ -63,6 +62,7 @@ uint8_t IsPaper() {
     } else {
       status = NO_PAPER;
       PRINTF("Error:NO PAPER\n");
+      DISABLE_VH;
     }
     DISABLE_PEM;
 
@@ -72,6 +72,7 @@ uint8_t IsPaper() {
       if (tmp >= HOT) {
         PRINTF("Printer too Hot\n");
         status |= HOT_PRINTER;
+	DISABLE_VH;
       }
 
       printer_temp_check = 0;
@@ -132,7 +133,7 @@ uint8_t header_init() {
   */
 
   printer_vps_time = 0;
-  printer_vps_last_status = IS_PAPER;
+  printer_vps_last_status = NO_PAPER;
   printer_temp_check = 0;
 
   glob_file(ADC_FILE_PAT);
