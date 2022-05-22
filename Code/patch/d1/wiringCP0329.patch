@@ -696,10 +696,10 @@ index 287fa58..dec500b 100644
  .PHONY:	clean
 diff --git a/wiringPi/wiringCPi.c b/wiringPi/wiringCPi.c
 new file mode 100755
-index 0000000..f5f1303
+index 0000000..8e2cb85
 --- /dev/null
 +++ b/wiringPi/wiringCPi.c
-@@ -0,0 +1,819 @@
+@@ -0,0 +1,834 @@
 +#include "wiringPi.h"
 +#include <stdio.h>
 +#include <stdint.h>
@@ -1147,8 +1147,14 @@ index 0000000..f5f1303
 +				regval = readR(gpio_phyaddr);
 +				printf("Input mode set over reg val: %#x\n",regval);
 +			}
++#elif defined(CONFIG_CLOCKWORKPI_A04)
++			regval &= ~(0x7 << offset);
++			writeR(regval, phyaddr);
++			regval = readR(phyaddr);
++			if (wiringPiDebug)
++				printf("Input mode set over reg val: %#x\n",regval);
 +#else
-+			regval &= ~(7 << offset);
++			regval &= ~(0xf << offset);
 +			writeR(regval, phyaddr);
 +			regval = readR(phyaddr);
 +			if (wiringPiDebug)
@@ -1168,8 +1174,17 @@ index 0000000..f5f1303
 +				regval = readR(gpio_phyaddr);
 +				printf("Out mode get value: 0x%x\n",regval);
 +			}
++#elif defined(CONFIG_CLOCKWORKPI_A04)
++			regval &= ~(0x7 << offset);
++			regval |=  (1 << offset);
++			if (wiringPiDebug)
++				printf("Out mode ready set val: 0x%x\n",regval);
++			writeR(regval, phyaddr);
++			regval = readR(phyaddr);
++			if (wiringPiDebug)
++				printf("Out mode get value: 0x%x\n",regval);
 +#else
-+			regval &= ~(7 << offset);
++			regval &= ~(0xf << offset);
 +			regval |=  (1 << offset);
 +			if (wiringPiDebug)
 +				printf("Out mode ready set val: 0x%x\n",regval);
