@@ -92,6 +92,7 @@
 
 #define ENABLE_VH digitalWrite(VH_PIN, HIGH)
 #define DISABLE_VH digitalWrite(VH_PIN, LOW)
+#define READ_VH digitalRead(VH_PIN)
 
 #define LATCH_ENABLE digitalWrite(LATCH_PIN, LOW)
 #define LATCH_DISABLE digitalWrite(LATCH_PIN, HIGH)
