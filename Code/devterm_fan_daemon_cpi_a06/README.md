@@ -8,7 +8,7 @@
 wget -O - https://raw.githubusercontent.com/clockworkpi/apt/main/debian/KEY.gpg | sudo apt-key add -
 echo "deb https://raw.githubusercontent.com/clockworkpi/apt/main/debian/ stable main" | sudo tee -a /etc/apt/sources.list.d/clockworkpi.list
 
-sudo apt update && apt install -y devterm-fan-daemon-cpi-a06
+sudo apt update && apt install -y devterm-fan-daemon-cpi-a06 devterm-wiringpi-cpi
 ```
 
 ## Change the threshold temperature
