@@ -26,6 +26,10 @@ static uint8_t printer_temp_check;
 
 static char adc_file_path[128];
 
+static unsigned int printer_last_pitch_time;
+static uint8_t acc_time_idx;
+static uint16_t acc_time[] = {5459,3459,2762,2314,2028,1828,1675,1553,1456,1374,1302,1242,1191,1144,1103,1065,1031,1000,970,940,910,880};
+#define ACCMAX 22
 void printer_send_data8(uint8_t w) {
   /*
   digitalWrite(SPI1_NSS_PIN, LOW); // manually take CSN low for SPI_1
@@ -53,7 +57,6 @@ void clear_printer_buffer() {
 uint8_t IsPaper() {
   uint8_t status;
   uint8_t tmp;
-  return IS_PAPER;
 
   if (millis() - printer_vps_time > 10) {
     ENABLE_PEM;
@@ -63,6 +66,7 @@ uint8_t IsPaper() {
     } else {
       status = NO_PAPER;
       PRINTF("Error:NO PAPER\n");
+      DISABLE_VH;
     }
     DISABLE_PEM;
 
@@ -72,6 +76,7 @@ uint8_t IsPaper() {
       if (tmp >= HOT) {
         PRINTF("Printer too Hot\n");
         status |= HOT_PRINTER;
+	DISABLE_VH;
       }
 
       printer_temp_check = 0;
@@ -132,8 +137,10 @@ uint8_t header_init() {
   */
 
   printer_vps_time = 0;
-  printer_vps_last_status = IS_PAPER;
+  printer_vps_last_status = NO_PAPER;
   printer_temp_check = 0;
+  printer_last_pitch_time = 0;
+  acc_time_idx  = 0;
 
   glob_file(ADC_FILE_PAT);
 }
@@ -158,7 +165,29 @@ void motor_stepper_pos2(uint8_t position) // forward
 {
   //  position = 9 - position;
   //  position = (position+1)/2;
-  delayMicroseconds(6700);
+  if(printer_last_pitch_time == 0) {
+  	acc_time_idx = 0;
+  }else {
+      if( millis() - printer_last_pitch_time > 100 ) {
+       
+       if(READ_VH == LOW) {       
+         acc_time_idx = 0; 
+       }else{
+         acc_time_idx ++;
+         if(acc_time_idx > ACCMAX-1) {
+           acc_time_idx = ACCMAX-1;
+         }
+       }
+     } else {
+       acc_time_idx ++;
+       if(acc_time_idx > ACCMAX-1) {
+         acc_time_idx = ACCMAX-1;
+       }
+     }
+  }
+
+  printer_last_pitch_time = millis();
+  delayMicroseconds(acc_time[acc_time_idx]);
   switch (position) {
   case 0:
     digitalWrite(PA_PIN, LOW);
@@ -200,9 +229,10 @@ uint8_t feed_pitch1(uint64_t lines, uint8_t forward_backward) {
   restor &= 0x01;
 
   if (lines > 0) {
+    /*
     MOTOR_ENABLE1;
     MOTOR_ENABLE2;
-    ENABLE_VH;
+    */
     while (lines > 0) {
       motor_stepper_pos2(pos); /* 0.0625mm */
 
@@ -213,10 +243,10 @@ uint8_t feed_pitch1(uint64_t lines, uint8_t forward_backward) {
 
       lines--;
     }
+    /*
     MOTOR_DISABLE1;
     MOTOR_DISABLE2;
-    DISABLE_VH;
-
+    */
   } else {
     return ERROR_FEED_PITCH;
   }
@@ -268,7 +298,6 @@ void print_dots_8bit(CONFIG *cfg, uint8_t *Array, uint8_t characters,
   uint8_t i = 0, y = 0, MAX = MAXPIXELS;
   uint8_t blank;
 
-  ENABLE_VH;
 
   if (cfg->align == 0) {
     while ((i < characters) && (i < MAX)) {
@@ -325,7 +354,6 @@ void print_dots_8bit(CONFIG *cfg, uint8_t *Array, uint8_t characters,
 
   feed_pitch1(feed_num, cfg->orient);
 
-  DISABLE_VH;
 
   return;
 }
@@ -414,7 +442,8 @@ uint16_t get_serial_cache_font_width(CONFIG *cfg) {
 }
 
 // print with freetype font dots glyph
-uint8_t print_lines_ft(CONFIG *cfg) {
+uint8_t print_lines_ft(CONFIG *cfg,int lines,int bf) {
+
   uint8_t i, j, k;
   int8_t w;
   uint8_t dot_line_data[MAXPIXELS];
@@ -427,7 +456,13 @@ uint8_t print_lines_ft(CONFIG *cfg) {
 
   int8_t left = ser_cache.idx;
   uint8_t rv;
-
+ 
+  if(cfg == NULL && lines > 0) {
+	ENABLE_VH;
+	feed_pitch1(lines,bf);
+	DISABLE_VH;
+	return 0;
+  }
   line_bits = cfg->margin.width;
   dot_line_idx = line_bits / 8;
   dot_line_bitsidx = line_bits % 8;
@@ -446,7 +481,7 @@ uint8_t print_lines_ft(CONFIG *cfg) {
       abs(cfg->face->descender) * current_font.height / cfg->face->units_per_EM;
   int dpx = 64;
   FT_Matrix matrix;
-
+  ENABLE_VH;
   while (left > 0) {
     i = lastidx;
     row_cnt = 0;
@@ -585,12 +620,23 @@ uint8_t print_lines_ft(CONFIG *cfg) {
     }
     */
   }
+  DISABLE_VH;
+
 }
 
-uint8_t print_lines8(CONFIG *cfg) {
+uint8_t print_lines8(CONFIG *cfg,int lines,int backforward) {
+  
 
+  if(lines > 0 && cfg == NULL ){
+	  ENABLE_VH;
+	feed_pitch1(lines,backforward);
+	  DISABLE_VH;
+        return 0;
+   }
+  
   if (cfg->font->mode == FONT_MODE_1 && cfg->face!=NULL) {
-    return print_lines_ft(cfg);
+    
+    return print_lines_ft(cfg,0,0);
   }
   uint8_t i, j, k;
   int8_t w;
@@ -635,6 +681,7 @@ uint8_t print_lines8(CONFIG *cfg) {
   lastj = 0;
 
   // DEBUG("left",left);
+  ENABLE_VH;
   while (left > 0) {
     i = lastidx;
     while (row < current_font.height) {
@@ -737,7 +784,7 @@ uint8_t print_lines8(CONFIG *cfg) {
   // Serial.println("print ever");
 
   free(data);
-
+  DISABLE_VH;
   return rv;
 }
 
@@ -755,7 +802,7 @@ uint8_t print_image8(CONFIG *cfg) {
   addr = 0;
 
   rv = IsPaper();
-
+  ENABLE_VH;
   while (y < height) {
     x = 0;
     while (x < cfg->img->width) {
@@ -782,6 +829,7 @@ uint8_t print_image8(CONFIG *cfg) {
   cfg->img->num = 0;
   cfg->img->idx = 0;
   cfg->img->width = 0;
+  DISABLE_VH;
 
   return rv;
 }

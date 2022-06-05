@@ -31,8 +31,8 @@ uint16_t read_adc(char *);
 uint16_t temperature();
 int glob_file(char *);
 uint16_t get_serial_cache_font_width(CONFIG *);
-uint8_t print_lines_ft(CONFIG *);
-uint8_t print_lines8(CONFIG *);
+uint8_t print_lines_ft(CONFIG *,int ,int);
+uint8_t print_lines8(CONFIG *,int,int);
 
 uint8_t invert_bit(uint8_t a);
 

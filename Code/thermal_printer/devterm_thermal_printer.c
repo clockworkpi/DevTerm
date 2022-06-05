@@ -126,7 +126,7 @@ void init_printer() {
     }
   }
 
-  //default still FONT_MODE_0
+  //default still FONT_MODE_0, comment out below 4 lines to enable unicode printing
   current_font.mode = FONT_MODE_0;
   current_font.width = 8;
   current_font.height = 16;
@@ -259,7 +259,7 @@ NULL
 
   cfg->img->revert_bits = 0;
   cfg->align = ALIGN_LEFT;
-  feed_pitch1(15, cfg->orient);
+  print_lines8(NULL,15, cfg->orient);
 
   cfg->align = ALIGN_CENTER;
   /* //selftest1
@@ -285,7 +285,7 @@ NULL
   }
   cfg->align = ALIGN_LEFT;
 
-  feed_pitch1(32, cfg->orient);
+  print_lines8(NULL,32, cfg->orient);
 
   //---------------------------------------------
 
@@ -308,7 +308,7 @@ NULL
     }
     parse_serial_stream(cfg, 10);
     // Serial.println();
-    feed_pitch1(48, cfg->orient);
+    print_lines8(NULL,48, cfg->orient);
   }
 
   printer_set_font_mode(cfg, FONT_MODE_0);
@@ -328,7 +328,7 @@ NULL
   }
   parse_serial_stream(cfg, 10);
   // Serial.println();
-  feed_pitch1(48, cfg->orient);
+  print_lines8(NULL,48, cfg->orient);
 
   printer_set_font_mode(cfg, FONT_MODE_0);
   printer_set_font(cfg, 0);
@@ -347,7 +347,7 @@ NULL
   }
   parse_serial_stream(cfg, 10);
   // Serial.println();
-  feed_pitch1(28, cfg->orient);
+  print_lines8(NULL,28, cfg->orient);
 
   //-------------------------------------------
 
@@ -368,7 +368,7 @@ NULL
   //------------------------------------------
   label_print_f(cfg, "Firmware version:", 0.1, "");
 
-  feed_pitch1(cfg->font->height, cfg->orient);
+  print_lines8(NULL,cfg->font->height, cfg->orient);
   //--------------------------------------------------------------
   printer_set_font_mode(cfg, FONT_MODE_0);
   printer_set_font(cfg, 0);
@@ -383,7 +383,7 @@ NULL
 
   //-----------------------------------
   // grid
-  /*
+    ENABLE_VH;  
     for(ch = 0;ch <16;ch++){
       if(ch%2==0)
         j = 0xff;
@@ -401,9 +401,9 @@ NULL
         print_dots_8bit_split(cfg,(uint8_t*)buf,48);
       }
     }
-  */
+   DISABLE_VH;
   //--------------------------------------------------------
-  feed_pitch1(cfg->font->height * 2, cfg->orient);
+  print_lines8(NULL,cfg->font->height * 2, cfg->orient);
 }
 
 void printer_set_font_mode(CONFIG *cfg, int mode) {
@@ -499,16 +499,16 @@ void parse_cmd(CONFIG *cfg, uint8_t *cmd, uint8_t cmdidx) {
     // ESC j n
     if (cmd[0] == ASCII_ESC && cmd[1] == 0x4a) {
 
-      if (print_lines8(cfg) == 0) {
-        feed_pitch1(cmd[2], cfg->orient);
+      if (print_lines8(cfg,0,0) == 0) {
+         print_lines8(NULL,cmd[2], cfg->orient);
       }
       reset_cmd();
     }
     // ESC d n
     if (cmd[0] == ASCII_ESC && cmd[1] == 0x64) {
 
-      if (print_lines8(cfg) == 0) {
-        feed_pitch1(cmd[2] * cfg->font->height, cfg->orient);
+      if (print_lines8(cfg,0,0) == 0) {
+        print_lines8(NULL,cmd[2] * cfg->font->height, cfg->orient);
       }
       reset_cmd();
     }
@@ -712,14 +712,14 @@ void parse_serial_stream(CONFIG *cfg, uint8_t input_ch) {
     switch (input_ch) {
     case ASCII_LF:
       if (ser_cache.idx == 0) {
-        feed_pitch1(cfg->font->height, cfg->orient);
+       print_lines8(NULL,cfg->font->height, cfg->orient);
       }
-      print_lines8(cfg);
+      print_lines8(cfg,0,0);
       reset_cmd();
       break;
     case ASCII_FF:
 
-      print_lines8(cfg);
+      print_lines8(cfg,0,0);
       reset_cmd();
       break;
     case ASCII_DC2:
@@ -777,9 +777,9 @@ void parse_serial_stream(CONFIG *cfg, uint8_t input_ch) {
       if (a >= MAX_DOTS) // got enough points to print
       {
         if (cfg->font->mode == FONT_MODE_1 && cfg->face != NULL ) {
-          print_lines_ft(cfg);
+          print_lines_ft(cfg,0,0);
         } else {
-          print_lines8(cfg);
+          print_lines8(cfg,0,0);
         }
         reset_cmd();
       }
@@ -840,7 +840,7 @@ void print_lowpower(CONFIG *cfg) {
   parse_serial_stream(cfg, 10);
   reset_cmd();
 
-  feed_pitch1(128, cfg->orient);
+  print_lines8(NULL,128, cfg->orient);
   printer_set_font(cfg, 0);
 
   PRINTF("%s\n", msg);
