@@ -26,6 +26,10 @@ static uint8_t printer_temp_check;
 
 static char adc_file_path[128];
 
+static unsigned int printer_last_pitch_time;
+static uint8_t acc_time_idx;
+static uint16_t acc_time[] = {5459,3459,2762,2314,2028,1828,1675,1553,1456,1374,1302,1242,1191,1144,1103,1065,1031,1000,970,940,910,880};
+#define ACCMAX 22
 void printer_send_data8(uint8_t w) {
   /*
   digitalWrite(SPI1_NSS_PIN, LOW); // manually take CSN low for SPI_1
@@ -135,6 +139,8 @@ uint8_t header_init() {
   printer_vps_time = 0;
   printer_vps_last_status = NO_PAPER;
   printer_temp_check = 0;
+  printer_last_pitch_time = 0;
+  acc_time_idx  = 0;
 
   glob_file(ADC_FILE_PAT);
 }
@@ -159,7 +165,29 @@ void motor_stepper_pos2(uint8_t position) // forward
 {
   //  position = 9 - position;
   //  position = (position+1)/2;
-  delayMicroseconds(6700);
+  if(printer_last_pitch_time == 0) {
+  	acc_time_idx = 0;
+  }else {
+      if( millis() - printer_last_pitch_time > 100 ) {
+       
+       if(READ_VH == LOW) {       
+         acc_time_idx = 0; 
+       }else{
+         acc_time_idx ++;
+         if(acc_time_idx > ACCMAX-1) {
+           acc_time_idx = ACCMAX-1;
+         }
+       }
+     } else {
+       acc_time_idx ++;
+       if(acc_time_idx > ACCMAX-1) {
+         acc_time_idx = ACCMAX-1;
+       }
+     }
+  }
+
+  printer_last_pitch_time = millis();
+  delayMicroseconds(acc_time[acc_time_idx]);
   switch (position) {
   case 0:
     digitalWrite(PA_PIN, LOW);
@@ -204,7 +232,6 @@ uint8_t feed_pitch1(uint64_t lines, uint8_t forward_backward) {
     /*
     MOTOR_ENABLE1;
     MOTOR_ENABLE2;
-    ENABLE_VH;
     */
     while (lines > 0) {
       motor_stepper_pos2(pos); /* 0.0625mm */
@@ -219,7 +246,6 @@ uint8_t feed_pitch1(uint64_t lines, uint8_t forward_backward) {
     /*
     MOTOR_DISABLE1;
     MOTOR_DISABLE2;
-    DISABLE_VH;
     */
   } else {
     return ERROR_FEED_PITCH;
