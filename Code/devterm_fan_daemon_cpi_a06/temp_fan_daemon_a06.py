@@ -13,18 +13,21 @@ max_freq = 0
 MAX_TEMP=70000
 ONCE_TIME=30
 
+gpiopath="/sys/class/gpio"
+gpiopin=96
 def init_fan_gpio():
-    os.popen("gpio mode 41 out")
+    if not os.path.exists("%s/gpio%i" % (gpiopath,gpiopin)):
+        open("%s/export" % (gpiopath),"w").write(str(gpiopin))
+    open("%s/gpio%i/direction" % (gpiopath,gpiopin),"w").write("out")
 
 def fan_on():
     init_fan_gpio()
-    os.popen("gpio write 41 1")
+    open("%s/gpio%i/value" % (gpiopath,gpiopin),"w").write("1")
     time.sleep(ONCE_TIME)
 
 def fan_off():
     init_fan_gpio()
-    os.popen("gpio write 41 0")
-
+    open("%s/gpio%i/value" % (gpiopath,gpiopin),"w").write("0")
 
 def isDigit(x):
     try:
