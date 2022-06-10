@@ -10,8 +10,10 @@ cpus = []
 mid_freq = 0
 max_freq = 0
 
-MAX_TEMP=70000
+MAX_TEMP=60000
 ONCE_TIME=30
+
+lastTemp = 0
 
 gpiopath="/sys/class/gpio"
 gpiopin=96
@@ -82,8 +84,8 @@ def set_performance(scale):
         #print(_f)
         subprocess.run( "echo %s | sudo tee  %s" %(freq,_f),shell=True)
   
-
 def fan_loop():
+    global lastTemp
     while True:
         temps = glob.glob('/sys/class/thermal/thermal_zone[0-9]/')
         temps.sort()
@@ -93,11 +95,17 @@ def fan_loop():
             _t = open(_f).read().strip("\n")
             if isDigit(_t):
                 if int(_t) > MAX_TEMP:
+                    if lastTemp <= MAX_TEMP:
+                        sys.stderr.write("Temp: " + str(_t) + "  Fan on.\n")
                     fan_on()
-                    fan_off()
-        
+                else:
+                    #Don't turn it off right at the threshold
+                    if int(_t) + 2000 < MAX_TEMP:
+                        if lastTemp +  2000 >= MAX_TEMP:
+                            sys.stderr.write("Temp: " + str(_t) + "  Fan off.\n")
+                        fan_off()
+            lastTemp = int(_t)
         time.sleep(5)
-
 
 def main(argv):
     global cpus
