@@ -16,7 +16,7 @@ MAX_TEMP=60000
 TEMP_THRESH=2000
 ONCE_TIME=30
 
-lastTemp = 0
+lastTemp = {}
 
 gpiopath="/sys/class/gpio"
 gpiopin=96
@@ -33,6 +33,9 @@ def fan_on():
 def fan_off():
     init_fan_gpio()
     open("%s/gpio%i/value" % (gpiopath,gpiopin),"w").write("0")
+
+def  fan_state():
+    return int(open("%s/gpio%i/value" % (gpiopath,gpiopin),"r").read()) == 1
 
 def isDigit(x):
     try:
@@ -90,30 +93,44 @@ def set_performance(scale):
 def fan_loop():
     global lastTemp
     statechange = False
+    hotcount = 0
+    coolcount = 0
     while True:
         temps = glob.glob('/sys/class/thermal/thermal_zone[0-9]/')
         temps.sort()
-        statechange = False
+        hotcount = 0
+        coolcount = 0
         for var in temps:
+            #Initial check
+            if not var in lastTemp:
+                sys.stderr.write("Found zone: " + var + "\n")
+                lastTemp[var] = 0
             _f = os.path.join(var,"temp")
             #print( open(_f).read().strip("\n") )
             _t = open(_f).read().strip("\n")
             if isDigit(_t):
                 if int(_t) > MAX_TEMP:
-                    if lastTemp <= MAX_TEMP:
-                        sys.stderr.write("Temp: " + str(_t) + "  Fan on.\n")
-                    fan_on()
-                    statechange = True
+                    if lastTemp[var] <= MAX_TEMP:
+                        sys.stderr.write("Temp(" + var +"): " + _t + "; hot.\n")
+                    hotcount += 1
                 else:
                     #Don't turn it off right at the threshold
-                    if int(_t) + TEMP_THRESH < MAX_TEMP:
-                        if lastTemp +  TEMP_THRESH >= MAX_TEMP:
-                            sys.stderr.write("Temp: " + str(_t) + "  Fan off.\n")
-                        fan_off()
-                        statechange = True
-                lastTemp = int(_t)
-                if statechange: 
-                    break
+                    if (int(_t) + TEMP_THRESH) < MAX_TEMP:
+                        if (lastTemp[var] +  TEMP_THRESH) >= MAX_TEMP:
+                            sys.stderr.write("Temp(" + var + ": " + _t + "; cool.\n")
+                        coolcount += 1
+                lastTemp[var] = int(_t)
+        if hotcount > 0:
+            if not fan_state():
+                #sys.stderr.write("Temps: " + str(lastTemp) +"\n")
+                sys.stderr.write("Fan on, "  +  str(hotcount) + " zones hot.\n")
+            fan_on()
+        else:
+            if coolcount >  0:
+                if fan_state():
+                    #sys.stderr.write("Temps: " + str(lastTemp) +"\n")
+                    sys.stderr.write("Fan off, " + str(hotcount) + " zones hot.\n")
+                fan_off()
         time.sleep(5)
 
 def main(argv):
