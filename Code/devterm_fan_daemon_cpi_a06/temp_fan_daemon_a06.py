@@ -10,7 +10,10 @@ cpus = []
 mid_freq = 0
 max_freq = 0
 
+#Start the fan above this temperature
 MAX_TEMP=60000
+#Cool additionally this far past MAX_TEMP before turning the fan off
+TEMP_THRESH=2000
 ONCE_TIME=30
 
 lastTemp = 0
@@ -86,9 +89,11 @@ def set_performance(scale):
   
 def fan_loop():
     global lastTemp
+    statechange = False
     while True:
         temps = glob.glob('/sys/class/thermal/thermal_zone[0-9]/')
         temps.sort()
+        statechange = False
         for var in temps:
             _f = os.path.join(var,"temp")
             #print( open(_f).read().strip("\n") )
@@ -98,13 +103,17 @@ def fan_loop():
                     if lastTemp <= MAX_TEMP:
                         sys.stderr.write("Temp: " + str(_t) + "  Fan on.\n")
                     fan_on()
+                    statechange = True
                 else:
                     #Don't turn it off right at the threshold
-                    if int(_t) + 2000 < MAX_TEMP:
-                        if lastTemp +  2000 >= MAX_TEMP:
+                    if int(_t) + TEMP_THRESH < MAX_TEMP:
+                        if lastTemp +  TEMP_THRESH >= MAX_TEMP:
                             sys.stderr.write("Temp: " + str(_t) + "  Fan off.\n")
                         fan_off()
-            lastTemp = int(_t)
+                        statechange = True
+                lastTemp = int(_t)
+                if statechange: 
+                    break
         time.sleep(5)
 
 def main(argv):
