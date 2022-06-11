@@ -10,8 +10,13 @@ cpus = []
 mid_freq = 0
 max_freq = 0
 
-MAX_TEMP=70000
+#Start the fan above this temperature
+MAX_TEMP=60000
+#Cool additionally this far past MAX_TEMP before turning the fan off
+TEMP_THRESH=2000
 ONCE_TIME=30
+
+lastTemp = {}
 
 gpiopath="/sys/class/gpio"
 gpiopin=96
@@ -28,6 +33,9 @@ def fan_on():
 def fan_off():
     init_fan_gpio()
     open("%s/gpio%i/value" % (gpiopath,gpiopin),"w").write("0")
+
+def  fan_state():
+    return int(open("%s/gpio%i/value" % (gpiopath,gpiopin),"r").read()) == 1
 
 def isDigit(x):
     try:
@@ -82,22 +90,48 @@ def set_performance(scale):
         #print(_f)
         subprocess.run( "echo %s | sudo tee  %s" %(freq,_f),shell=True)
   
-
 def fan_loop():
+    global lastTemp
+    statechange = False
+    hotcount = 0
+    coolcount = 0
     while True:
         temps = glob.glob('/sys/class/thermal/thermal_zone[0-9]/')
         temps.sort()
+        hotcount = 0
+        coolcount = 0
         for var in temps:
+            #Initial check
+            if not var in lastTemp:
+                sys.stderr.write("Found zone: " + var + "\n")
+                lastTemp[var] = 0
             _f = os.path.join(var,"temp")
             #print( open(_f).read().strip("\n") )
             _t = open(_f).read().strip("\n")
             if isDigit(_t):
                 if int(_t) > MAX_TEMP:
-                    fan_on()
-                    fan_off()
-        
+                    if lastTemp[var] <= MAX_TEMP:
+                        sys.stderr.write("Temp(" + var +"): " + _t + "; hot.\n")
+                    hotcount += 1
+                else:
+                    #Don't turn it off right at the threshold
+                    if (int(_t) + TEMP_THRESH) < MAX_TEMP:
+                        if (lastTemp[var] +  TEMP_THRESH) >= MAX_TEMP:
+                            sys.stderr.write("Temp(" + var + ": " + _t + "; cool.\n")
+                        coolcount += 1
+                lastTemp[var] = int(_t)
+        if hotcount > 0:
+            if not fan_state():
+                #sys.stderr.write("Temps: " + str(lastTemp) +"\n")
+                sys.stderr.write("Fan on, "  +  str(hotcount) + " zones hot.\n")
+            fan_on()
+        else:
+            if coolcount >  0:
+                if fan_state():
+                    #sys.stderr.write("Temps: " + str(lastTemp) +"\n")
+                    sys.stderr.write("Fan off, " + str(hotcount) + " zones hot.\n")
+                fan_off()
         time.sleep(5)
-
 
 def main(argv):
     global cpus
