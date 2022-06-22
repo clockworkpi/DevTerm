@@ -625,12 +625,15 @@ uint8_t print_lines_ft(CONFIG *cfg,int lines,int bf) {
 }
 
 uint8_t print_lines8(CONFIG *cfg,int lines,int backforward) {
-  
+   
 
-  if(lines > 0 && cfg == NULL ){
+  if( cfg == NULL ){
+	if(lines > 0) {
 	  ENABLE_VH;
-	feed_pitch1(lines,backforward);
+	  feed_pitch1(lines,backforward);
 	  DISABLE_VH;
+	}
+
         return 0;
    }
   
