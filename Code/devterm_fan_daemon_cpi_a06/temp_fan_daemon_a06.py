@@ -92,7 +92,6 @@ def set_performance(scale):
   
 def fan_loop():
     global lastTemp
-    statechange = False
     hotcount = 0
     coolcount = 0
     while True:
