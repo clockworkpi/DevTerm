@@ -6,7 +6,24 @@
 #include <freetype/freetype.h>
 // clang-format on
 /// raspberry pi CM3
-
+#ifdef CM4
+// make CFLAGS=-DCM4=1
+#define BCM_GPIO_28 18
+#define BCM_GPIO_29 19
+#define BCM_GPIO_30 20
+#define BCM_GPIO_31 21
+#define BCM_GPIO_32 14
+#define BCM_GPIO_33 15
+#define BCM_GPIO_34 24
+#define BCM_GPIO_35 25
+#define BCM_GPIO_36 26
+#define BCM_GPIO_37 27
+#define BCM_GPIO_38 6
+#define BCM_GPIO_39 7
+#define BCM_GPIO_40 16
+#define BCM_GPIO_41 17
+#define BCM_GPIO_43 23
+#else
 #define BCM_GPIO_28 28
 #define BCM_GPIO_29 29
 #define BCM_GPIO_30 30
@@ -25,7 +42,7 @@
 #define BCM_GPIO_43 43
 #define BCM_GPIO_44 44
 #define BCM_GPIO_45 45
-
+#endif
 // PA8-12 UART1
 //#define SPI1_NSS_PIN PA4    //SPI_1 Chip Select pin is PA4. //no use in
 //DevTerm
