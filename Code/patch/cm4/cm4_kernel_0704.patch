@@ -1,0 +1,1135 @@
+diff --git a/arch/arm/boot/dts/overlays/Makefile b/arch/arm/boot/dts/overlays/Makefile
+index ef0a0cc3da99..8c3431aca11d 100644
+--- a/arch/arm/boot/dts/overlays/Makefile
++++ b/arch/arm/boot/dts/overlays/Makefile
+@@ -31,6 +31,11 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
+ 	audremap.dtbo \
+ 	balena-fin.dtbo \
+ 	cma.dtbo \
++	devterm-bt.dtbo \
++	devterm-misc.dtbo \
++	devterm-panel.dtbo \
++	devterm-pmu.dtbo \
++	devterm-wifi.dtbo \
+ 	dht11.dtbo \
+ 	dionaudio-loco.dtbo \
+ 	dionaudio-loco-v2.dtbo \
+diff --git a/arch/arm/boot/dts/overlays/devterm-bt-overlay.dts b/arch/arm/boot/dts/overlays/devterm-bt-overlay.dts
+new file mode 100755
+index 000000000000..4b634fdd3bda
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/devterm-bt-overlay.dts
+@@ -0,0 +1,40 @@
++/dts-v1/;
++/plugin/;
++
++/{
++	compatible = "brcm,bcm2835";
++
++	fragment@0 {
++		target = <&uart0>;
++		__overlay__ {
++			pinctrl-names = "default";
++			pinctrl-0 = <&uart0_pins &bt_pins>;
++			status = "okay";
++		};
++	};
++
++	fragment@1 {
++		target = <&gpio>;
++		__overlay__ {
++			uart0_pins: uart0_pins {
++				brcm,pins = <14 15 16 17>;
++				brcm,function = <4 4 7 7>;
++				brcm,pull = <0 2 0 2>;
++			};
++
++			bt_pins: bt_pins {
++				brcm,pins = <5 6 7>;
++				brcm,function = <1 0 1>;
++				brcm,pull = <0 2 0>;
++			};
++		};
++	};
++
++	fragment@2 {
++		target-path = "/aliases";
++		__overlay__ {
++			serial1 = "/soc/serial@7e201000";
++			serial0 = "/soc/serial@7e215040";
++		};
++	};
++};
+diff --git a/arch/arm/boot/dts/overlays/devterm-misc-overlay.dts b/arch/arm/boot/dts/overlays/devterm-misc-overlay.dts
+new file mode 100644
+index 000000000000..c080c835abfb
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/devterm-misc-overlay.dts
+@@ -0,0 +1,87 @@
++/dts-v1/;
++/plugin/;
++
++/{
++	compatible = "brcm,bcm2835";
++
++	fragment@0 {
++		target = <&i2c1>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&i2c1_pins>;
++			status = "okay";
++
++			adc101c: adc@54 {
++				reg = <0x54>;
++				compatible = "ti,adc101c";
++				status = "okay";
++			};
++		};
++	};
++
++	fragment@1 {
++		target = <&spi4>;
++		__overlay__ {
++			pinctrl-names = "default";
++			pinctrl-0 = <&spi4_pins &spi4_cs_pins>;
++			cs-gpios = <&gpio 4 1>;
++			status = "okay";
++
++			spidev4_0: spidev@0 {
++				compatible = "spidev";
++				reg = <0>;      /* CE0 */
++				#address-cells = <1>;
++				#size-cells = <0>;
++				spi-max-frequency = <125000000>;
++				status = "okay";
++			};
++		};
++	};
++
++	fragment@2 {
++		target = <&uart1>;
++		__overlay__ {
++			pinctrl-names = "default";
++			pinctrl-0 = <&uart1_pins>;
++			status = "okay";
++		};
++	};
++
++	fragment@3 {
++		target = <&gpio>;
++		__overlay__ {
++
++			i2c1_pins: i2c1 {
++				brcm,pins = <44 45>;
++				brcm,function = <6>;
++			};
++
++			spi4_pins: spi4_pins {
++				brcm,pins = <6 7>;
++				brcm,function = <7>;
++			};
++
++			spi4_cs_pins: spi0_cs_pins {
++				brcm,pins = <4>;
++				brcm,function = <1>;
++			};
++
++			uart1_pins: uart1_pins {
++				brcm,pins = <14 15>;
++				brcm,function = <2>;
++				brcm,pull = <0 2>;
++			};
++
++		};
++	};
++
++	fragment@4 {
++		target-path = "/chosen";
++		__overlay__ {
++			bootargs = "8250.nr_uarts=1";
++		};
++	};
++	
++};
+diff --git a/arch/arm/boot/dts/overlays/devterm-panel-overlay.dts b/arch/arm/boot/dts/overlays/devterm-panel-overlay.dts
+new file mode 100644
+index 000000000000..7d9ff963f309
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/devterm-panel-overlay.dts
+@@ -0,0 +1,46 @@
++/dts-v1/;
++/plugin/;
++
++/ {
++	compatible = "brcm,bcm2835";
++
++	fragment@0 {
++		target=<&dsi1>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "okay";
++
++			port {
++				dsi_out_port: endpoint {
++					remote-endpoint = <&panel_dsi_port>;
++				};
++			};
++
++			panel_cwd686: panel@0 {
++				compatible = "cw,cwd686";
++				reg = <0>;
++				reset-gpio = <&gpio 8 1>;
++				backlight = <&ocp8178_backlight>;
++
++				port {
++					panel_dsi_port: endpoint {
++						remote-endpoint = <&dsi_out_port>;
++					};
++				};
++			};
++		};
++	};
++
++	fragment@1 {
++		target-path = "/";
++		__overlay__  {
++			ocp8178_backlight: backlight@0 {
++				compatible = "ocp8178-backlight";
++				backlight-control-gpios = <&gpio 9 0>;
++				default-brightness = <5>;
++			};
++		};
++	};
++
++};
+diff --git a/arch/arm/boot/dts/overlays/devterm-pmu-overlay.dts b/arch/arm/boot/dts/overlays/devterm-pmu-overlay.dts
+new file mode 100644
+index 000000000000..3ffc51b8fc2d
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/devterm-pmu-overlay.dts
+@@ -0,0 +1,104 @@
++/dts-v1/;
++/plugin/;
++
++/ {
++	compatible = "brcm,bcm2835";
++
++	fragment@0 {
++		target = <&i2c0if>;
++		__overlay__ {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			pinctrl-0 = <&i2c0_pins>;
++			pinctrl-names = "default";
++			status = "okay";
++
++			axp22x: pmic@34 {
++				interrupt-controller;
++				#interrupt-cells = <1>;
++				compatible = "x-powers,axp223";
++				reg = <0x34>; /* i2c address */
++				interrupt-parent = <&gpio>;
++				interrupts = <2 8>;  /* IRQ_TYPE_EDGE_FALLING */
++				irq-gpios = <&gpio 2 0>;
++
++				regulators {
++
++					x-powers,dcdc-freq = <3000>;
++
++					reg_aldo1: aldo1 {
++						regulator-always-on;
++						regulator-min-microvolt = <3300000>;
++						regulator-max-microvolt = <3300000>;
++						regulator-name = "audio-vdd";
++					};
++
++					reg_aldo2: aldo2 {
++						regulator-always-on;
++						regulator-min-microvolt = <3300000>;
++						regulator-max-microvolt = <3300000>;
++						regulator-name = "display-vcc";
++					};
++
++					reg_dldo2: dldo2 {
++						regulator-always-on;
++						regulator-min-microvolt = <3300000>;
++						regulator-max-microvolt = <3300000>;
++						regulator-name = "dldo2";
++					};
++
++					reg_dldo3: dldo3 {
++						regulator-always-on;
++						regulator-min-microvolt = <3300000>;
++						regulator-max-microvolt = <3300000>;
++						regulator-name = "dldo3";
++					};
++
++					reg_dldo4: dldo4 {
++						regulator-always-on;
++						regulator-min-microvolt = <3300000>;
++						regulator-max-microvolt = <3300000>;
++						regulator-name = "dldo4";
++					};
++
++				};
++
++				battery_power_supply: battery-power-supply {
++					compatible = "x-powers,axp221-battery-power-supply";
++					monitored-battery = <&battery>;
++				};
++
++				ac_power_supply: ac_power_supply {
++					compatible = "x-powers,axp221-ac-power-supply";
++				};
++
++			};
++		};
++	};
++
++	fragment@1 {
++		target = <&i2c0if>;
++		__overlay__ {
++			compatible = "brcm,bcm2708-i2c";
++		};
++	};
++
++	fragment@2 {
++		target-path = "/aliases";
++		__overlay__ {
++			i2c0 = "/soc/i2c@7e205000";
++		};
++	};
++
++	fragment@3 {
++		target-path = "/";
++		__overlay__  {
++			battery: battery@0 {
++				compatible = "simple-battery";
++				constant_charge_current_max_microamp = <2100000>;
++				voltage-min-design-microvolt = <3300000>;
++			};
++		};
++	};
++
++};
+diff --git a/arch/arm/boot/dts/overlays/devterm-wifi-overlay.dts b/arch/arm/boot/dts/overlays/devterm-wifi-overlay.dts
+new file mode 100644
+index 000000000000..d5da786dc445
+--- /dev/null
++++ b/arch/arm/boot/dts/overlays/devterm-wifi-overlay.dts
+@@ -0,0 +1,41 @@
++/dts-v1/;
++/plugin/;
++
++/* Enable SDIO from MMC interface via various GPIO groups */
++
++/{
++	compatible = "brcm,bcm2835";
++
++	fragment@0 {
++		target = <&mmc>;
++		sdio_ovl: __overlay__ {
++			pinctrl-0 = <&sdio_ovl_pins>;
++			pinctrl-names = "default";
++			non-removable;
++			bus-width = <4>;
++			status = "okay";
++		};
++	};
++
++	fragment@1 {
++		target = <&gpio>;
++		__overlay__ {
++			sdio_ovl_pins: sdio_ovl_pins {
++				brcm,pins = <22 23 24 25 26 27>;
++				brcm,function = <7>; /* ALT3 = SD1 */
++				brcm,pull = <0 2 2 2 2 2>;
++			};
++		};
++	};
++
++	fragment@2 {
++		target-path = "/";
++		__overlay__  {
++			wifi_pwrseq: wifi-pwrseq {
++				compatible = "mmc-pwrseq-simple";
++				reset-gpios = <&gpio 3 0>;
++			};
++		};
++	};
++
++};
+diff --git a/arch/arm/configs/bcm2711_defconfig b/arch/arm/configs/bcm2711_defconfig
+index b0e58d871a60..fc6d75f028e6 100644
+--- a/arch/arm/configs/bcm2711_defconfig
++++ b/arch/arm/configs/bcm2711_defconfig
+@@ -680,7 +680,7 @@ CONFIG_I2C_MUX_GPMUX=m
+ CONFIG_I2C_MUX_PCA954x=m
+ CONFIG_I2C_MUX_PINCTRL=m
+ CONFIG_I2C_BCM2708=m
+-CONFIG_I2C_BCM2835=m
++CONFIG_I2C_BCM2835=y
+ CONFIG_I2C_BRCMSTB=m
+ CONFIG_I2C_GPIO=m
+ CONFIG_I2C_ROBOTFUZZ_OSIF=m
+@@ -1524,3 +1524,15 @@ CONFIG_IRQSOFF_TRACER=y
+ CONFIG_SCHED_TRACER=y
+ CONFIG_BLK_DEV_IO_TRACE=y
+ # CONFIG_UPROBE_EVENTS is not set
++
++CONFIG_AXP20X_ADC=m
++CONFIG_AXP20X_POWER=m
++CONFIG_BATTERY_AXP20X=m
++CONFIG_CHARGER_AXP20X=m
++CONFIG_INPUT_AXP20X_PEK=y
++CONFIG_MFD_AXP20X=y
++CONFIG_MFD_AXP20X_I2C=y
++CONFIG_REGULATOR_AXP20X=y
++CONFIG_BACKLIGHT_OCP8178=y
++CONFIG_DRM_PANEL_CWD686=m
++CONFIG_TI_ADC081C=m
+diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
+index b9dbedf8f15e..9a18418d8287 100644
+--- a/drivers/gpu/drm/panel/Kconfig
++++ b/drivers/gpu/drm/panel/Kconfig
+@@ -499,4 +499,17 @@ config DRM_PANEL_XINPENG_XPP055C272
+ 	  Say Y here if you want to enable support for the Xinpeng
+ 	  XPP055C272 controller for 720x1280 LCD panels with MIPI/RGB/SPI
+ 	  system interfaces.
++
++config DRM_PANEL_CWD686
++	tristate "CWD686 panel"
++	depends on OF
++	depends on DRM_MIPI_DSI
++	depends on BACKLIGHT_CLASS_DEVICE
++	help
++	  Say Y here if you want to enable support for CWD686 panel.
++	  The panel has a 480x1280 resolution and uses 24 bit RGB per pixel.
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called panel-cwd686.
++
+ endmenu
+diff --git a/drivers/gpu/drm/panel/Makefile b/drivers/gpu/drm/panel/Makefile
+index 2ba560bca61d..865cca7f69c6 100644
+--- a/drivers/gpu/drm/panel/Makefile
++++ b/drivers/gpu/drm/panel/Makefile
+@@ -53,3 +53,4 @@ obj-$(CONFIG_DRM_PANEL_TPO_TPG110) += panel-tpo-tpg110.o
+ obj-$(CONFIG_DRM_PANEL_TRULY_NT35597_WQXGA) += panel-truly-nt35597.o
+ obj-$(CONFIG_DRM_PANEL_VISIONOX_RM69299) += panel-visionox-rm69299.o
+ obj-$(CONFIG_DRM_PANEL_XINPENG_XPP055C272) += panel-xinpeng-xpp055c272.o
++obj-$(CONFIG_DRM_PANEL_CWD686) += panel-cwd686.o
+diff --git a/drivers/gpu/drm/panel/panel-cwd686.c b/drivers/gpu/drm/panel/panel-cwd686.c
+new file mode 100644
+index 000000000000..09dd9424fa4e
+--- /dev/null
++++ b/drivers/gpu/drm/panel/panel-cwd686.c
+@@ -0,0 +1,284 @@
++// SPDX-License-Identifier: GPL-2.0+
++
++#include <drm/drm_modes.h>
++#include <drm/drm_mipi_dsi.h>
++#include <drm/drm_panel.h>
++#include <linux/backlight.h>
++#include <linux/gpio/consumer.h>
++#include <linux/regulator/consumer.h>
++#include <linux/delay.h>
++#include <linux/of_device.h>
++#include <linux/module.h>
++
++struct cwd686 {
++	struct device *dev;
++	struct drm_panel panel;
++	struct regulator *supply;
++	struct gpio_desc *reset_gpio;
++	struct backlight_device *backlight;
++	bool prepared;
++	bool enabled;
++};
++
++static const struct drm_display_mode default_mode = {
++	.clock = 54465,
++	.hdisplay = 480,
++	.hsync_start = 480 + 150,
++	.hsync_end = 480 + 150 + 24,
++	.htotal = 480 + 150 + 24 + 40,
++	.vdisplay = 1280,
++	.vsync_start = 1280 + 12,
++	.vsync_end = 1280 + 12+ 6,
++	.vtotal = 1280 + 12 + 6 + 10,
++};
++
++static inline struct cwd686 *panel_to_cwd686(struct drm_panel *panel)
++{
++	return container_of(panel, struct cwd686, panel);
++}
++
++#define dcs_write_seq(seq...)                              \
++({                                                              \
++	static const u8 d[] = { seq };                          \
++	mipi_dsi_dcs_write_buffer(dsi, d, ARRAY_SIZE(d));	 \
++})
++
++static void cwd686_init_sequence(struct cwd686 *ctx) 
++{
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
++
++	dcs_write_seq(0xF0,0x5A,0x59);
++	dcs_write_seq(0xF1,0xA5,0xA6);
++	dcs_write_seq(0xB0,0x54,0x32,0x23,0x45,0x44,0x44,0x44,0x44,0x9F,0x00,0x01,0x9F,0x00,0x01);
++	dcs_write_seq(0xB1,0x32,0x84,0x02,0x83,0x29,0x06,0x06,0x72,0x06,0x06);
++	dcs_write_seq(0xB2,0x73);
++	dcs_write_seq(0xB3,0x0B,0x09,0x13,0x11,0x0F,0x0D,0x00,0x00,0x00,0x03,0x00,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x05,0x07);
++	dcs_write_seq(0xB4,0x0A,0x08,0x12,0x10,0x0E,0x0C,0x00,0x00,0x00,0x03,0x00,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x04,0x06);
++	dcs_write_seq(0xB6,0x13,0x13);
++	dcs_write_seq(0xB8,0xB4,0x43,0x02,0xCC);
++	dcs_write_seq(0xB9,0xA5,0x20,0xFF,0xC8);
++	dcs_write_seq(0xBA,0x88,0x23);
++	dcs_write_seq(0xBD,0x43,0x0E,0x0E,0x50,0x50,0x29,0x10,0x03,0x44,0x03);
++	dcs_write_seq(0xC1,0x00,0x0C,0x16,0x04,0x00,0x30,0x10,0x04);
++	dcs_write_seq(0xC2,0x21,0x81);
++	dcs_write_seq(0xC3,0x02,0x30);
++	dcs_write_seq(0xC7,0x25,0x6A);
++	dcs_write_seq(0xC8,0x7C,0x68,0x59,0x4E,0x4B,0x3C,0x41,0x2B,0x44,0x43,0x43,0x60,0x4E,0x55,0x47,0x44,0x38,0x27,0x06,0x7C,0x68,0x59,0x4E,0x4B,0x3C,0x41,0x2B,0x44,0x43,0x43,0x60,0x4E,0x55,0x47,0x44,0x38,0x27,0x06);//GAMMA2.2
++	//dcs_write_seq(0xC8,0x7C,0x66,0x56,0x4A,0x46,0x37,0x3B,0x24,0x3D,0x3C,0x3A,0x56,0x42,0x48,0x39,0x38,0x2C,0x17,0x06,0x7C,0x66,0x56,0x4A,0x46,0x37,0x3B,0x24,0x3D,0x3C,0x3A,0x56,0x42,0x48,0x39,0x38,0x2C,0x17,0x06);//GAMMA2.5
++	//dcs_write_seq(0xC8,0x7C,0x69,0x5B,0x50,0x4E,0x40,0x46,0x31,0x4A,0x49,0x49,0x67,0x56,0x5E,0x51,0x4E,0x41,0x2F,0x06,0x7C,0x69,0x5B,0x50,0x4E,0x40,0x46,0x31,0x4A,0x49,0x49,0x67,0x56,0x5E,0x51,0x4E,0x41,0x2F,0x06);//GAMMA2.0
++	//dcs_write_seq(0xC8,0x7C,0x6D,0x60,0x56,0x54,0x47,0x4c,0x37,0x50,0x4e,0x4e,0x6d,0x5c,0x66,0x59,0x56,0x4A,0x36,0x06,0x7C,0x6D,0x60,0x56,0x54,0x47,0x4c,0x37,0x50,0x4e,0x4e,0x6d,0x5c,0x66,0x59,0x56,0x4A,0x36,0x06);//GAMMA1.8
++	//dcs_write_seq(0xC8,0x7C,0x6e,0x62,0x59,0x58,0x4b,0x52,0x3d,0x57,0x56,0x56,0x75,0x66,0x71,0x66,0x64,0x55,0x44,0x06,0x7C,0x6e,0x62,0x59,0x58,0x4b,0x52,0x3d,0x57,0x56,0x56,0x75,0x66,0x71,0x66,0x64,0x55,0x44,0x06);//GAMMA1.6
++	dcs_write_seq(0xD4,0x00,0x00,0x00,0x32,0x04,0x51);
++	dcs_write_seq(0xF1,0x5A,0x59);
++	dcs_write_seq(0xF0,0xA5,0xA6);
++	dcs_write_seq(0x36,0x14);
++	dcs_write_seq(0x35,0x00);
++	dcs_write_seq(0x11);
++	msleep(120);
++	dcs_write_seq(0x29);
++	msleep(20);
++}
++
++static int cwd686_disable(struct drm_panel *panel)
++{
++	struct cwd686 *ctx = panel_to_cwd686(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
++	int ret;
++
++	if (!ctx->enabled)
++		return 0;
++
++	backlight_disable(ctx->backlight);
++
++	ctx->enabled = false;
++
++	return 0;
++}
++
++static int cwd686_unprepare(struct drm_panel *panel)
++{
++	struct cwd686 *ctx = panel_to_cwd686(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
++	int ret;
++
++#if 0
++	if (!ctx->prepared)
++		return 0;
++
++	ret = mipi_dsi_dcs_set_display_off(dsi);
++	if (ret) {
++		dev_err(ctx->dev, "failed to turn display off (%d)\n", ret);
++		return ret;
++	}
++	ret = mipi_dsi_dcs_enter_sleep_mode(dsi);
++	if (ret) {
++		dev_err(ctx->dev, "failed to enter sleep mode (%d)\n", ret);
++		return ret;
++	}
++
++	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
++
++	ctx->prepared = false;
++#endif
++
++	return 0;
++}
++
++static int cwd686_prepare(struct drm_panel *panel)
++{
++	struct cwd686 *ctx = panel_to_cwd686(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
++	int ret;
++
++	if (ctx->prepared)
++		return 0;
++
++	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
++	msleep(10);
++	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
++	msleep(120);
++
++	/* Enabe tearing mode: send TE (tearing effect) at VBLANK */
++	ret = mipi_dsi_dcs_set_tear_on(dsi, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
++	if (ret) {
++		dev_err(ctx->dev, "failed to enable vblank TE (%d)\n", ret);
++		return ret;
++	}
++	/* Exit sleep mode and power on */
++
++	cwd686_init_sequence(ctx);
++
++	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
++	if (ret) {
++		dev_err(ctx->dev, "failed to exit sleep mode (%d)\n", ret);
++		return ret;
++	}
++	msleep(120);
++
++	ret = mipi_dsi_dcs_set_display_on(dsi);
++	if (ret) {
++		dev_err(ctx->dev, "failed to turn display on (%d)\n", ret);
++		return ret;
++	}
++	msleep(20);
++
++	ctx->prepared = true;
++
++	return 0;
++}
++
++static int cwd686_enable(struct drm_panel *panel)
++{
++	struct cwd686 *ctx = panel_to_cwd686(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
++	int ret;
++
++	if (ctx->enabled)
++		return 0;
++
++	backlight_enable(ctx->backlight);
++
++	ctx->enabled = true;
++
++	return 0;
++}
++
++static int cwd686_get_modes(struct drm_panel *panel, struct drm_connector *connector)
++{
++	struct drm_display_mode *mode;
++
++	mode = drm_mode_duplicate(connector->dev, &default_mode);
++	if (!mode) {
++		dev_err(panel->dev, "bad mode or failed to add mode\n");
++		return -EINVAL;
++	}
++	drm_mode_set_name(mode);
++	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
++
++	connector->display_info.width_mm = mode->width_mm;
++	connector->display_info.height_mm = mode->height_mm;
++
++	drm_mode_probed_add(connector, mode);
++
++	return 1; /* Number of modes */
++}
++
++static const struct drm_panel_funcs cwd686_drm_funcs = {
++	.disable = cwd686_disable,
++	.unprepare = cwd686_unprepare,
++	.prepare = cwd686_prepare,
++	.enable = cwd686_enable,
++	.get_modes = cwd686_get_modes,
++};
++
++static int cwd686_probe(struct mipi_dsi_device *dsi)
++{
++	struct device *dev = &dsi->dev;
++	struct cwd686 *ctx;
++	int ret;
++
++	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return -ENOMEM;
++
++	mipi_dsi_set_drvdata(dsi, ctx);
++	ctx->dev = dev;
++
++	dsi->lanes = 4;
++	dsi->format = MIPI_DSI_FMT_RGB888;
++	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE | MIPI_DSI_MODE_LPM;
++
++	ctx->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
++	if (IS_ERR(ctx->reset_gpio)) {
++		ret = PTR_ERR(ctx->reset_gpio);
++		if (ret != -EPROBE_DEFER)
++			dev_err(dev, "failed to request GPIO (%d)\n", ret);
++		return ret;
++	}
++
++	ctx->backlight = devm_of_find_backlight(dev);
++	if (IS_ERR(ctx->backlight))
++		return PTR_ERR(ctx->backlight);
++
++	drm_panel_init(&ctx->panel, dev, &cwd686_drm_funcs, DRM_MODE_CONNECTOR_DSI);
++
++	drm_panel_add(&ctx->panel);
++
++	ret = mipi_dsi_attach(dsi);
++	if (ret < 0) {
++		dev_err(dev, "mipi_dsi_attach() failed: %d\n", ret);
++		drm_panel_remove(&ctx->panel);
++		return ret;
++	}
++
++	return 0;
++}
++
++static int cwd686_remove(struct mipi_dsi_device *dsi)
++{
++	struct cwd686 *ctx = mipi_dsi_get_drvdata(dsi);
++
++	mipi_dsi_detach(dsi);
++	drm_panel_remove(&ctx->panel);
++
++	return 0;
++}
++
++static const struct of_device_id cwd686_of_match[] = {
++	{ .compatible = "cw,cwd686" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, cwd686_of_match);
++
++static struct mipi_dsi_driver cwd686_driver = {
++	.probe = cwd686_probe,
++	.remove = cwd686_remove,
++	.driver = {
++		.name = "panel-cwd686",
++		.of_match_table = cwd686_of_match,
++	},
++};
++module_mipi_dsi_driver(cwd686_driver);
++
++MODULE_DESCRIPTION("DRM Driver for cwd686 MIPI DSI panel");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/mfd/axp20x.c b/drivers/mfd/axp20x.c
+index aa59496e4376..45b09ce38bb3 100644
+--- a/drivers/mfd/axp20x.c
++++ b/drivers/mfd/axp20x.c
+@@ -976,6 +976,7 @@ int axp20x_device_probe(struct axp20x_dev *axp20x)
+ 		return ret;
+ 	}
+ 
++	pm_power_off = 0;
+ 	if (!pm_power_off) {
+ 		axp20x_pm_power_off = axp20x;
+ 		pm_power_off = axp20x_power_off;
+diff --git a/drivers/power/supply/axp20x_ac_power.c b/drivers/power/supply/axp20x_ac_power.c
+index ac360016b08a..c11024f3c6a1 100644
+--- a/drivers/power/supply/axp20x_ac_power.c
++++ b/drivers/power/supply/axp20x_ac_power.c
+@@ -53,6 +53,9 @@ static irqreturn_t axp20x_ac_power_irq(int irq, void *devid)
+ {
+ 	struct axp20x_ac_power *power = devid;
+ 
++	regmap_update_bits(power->regmap, AXP20X_VBUS_IPSOUT_MGMT, 0x03, 0x00);
++	regmap_update_bits(power->regmap, AXP20X_VBUS_IPSOUT_MGMT, 0x03, 0x03);
++
+ 	power_supply_changed(power->supply);
+ 
+ 	return IRQ_HANDLED;
+diff --git a/drivers/power/supply/axp20x_battery.c b/drivers/power/supply/axp20x_battery.c
+index e84b6e4da14a..b62c361e2589 100644
+--- a/drivers/power/supply/axp20x_battery.c
++++ b/drivers/power/supply/axp20x_battery.c
+@@ -326,6 +326,42 @@ static int axp20x_battery_get_prop(struct power_supply *psy,
+ 		val->intval *= 1000;
+ 		break;
+ 
++	case POWER_SUPPLY_PROP_ENERGY_FULL:
++	case POWER_SUPPLY_PROP_ENERGY_NOW:
++		/* When no battery is present, return 0 */
++		ret = regmap_read(axp20x_batt->regmap, AXP20X_PWR_OP_MODE,
++				  &reg);
++		if (ret)
++			return ret;
++
++		if (!(reg & AXP20X_PWR_OP_BATT_PRESENT)) {
++			val->intval = 0;
++			return 0;
++		}
++
++		if(psp == POWER_SUPPLY_PROP_ENERGY_FULL) {
++			val->intval = 8000000;
++			return 0;
++		}
++
++		ret = regmap_read(axp20x_batt->regmap, AXP20X_FG_RES, &reg);
++		if (ret)
++			return ret;
++
++		if (axp20x_batt->data->has_fg_valid && !(reg & AXP22X_FG_VALID))
++			return -EINVAL;
++
++		val1 = reg & AXP209_FG_PERCENT;
++		if (val1 > 90)
++			val1= 80;
++		else if (val1 < 10)
++			val1 = 0;
++		else
++			val1 -= 10;
++
++		val->intval = val1 * 100000;
++		break;
++
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -486,6 +522,8 @@ static enum power_supply_property axp20x_battery_props[] = {
+ 	POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN,
+ 	POWER_SUPPLY_PROP_VOLTAGE_MIN_DESIGN,
+ 	POWER_SUPPLY_PROP_CAPACITY,
++	POWER_SUPPLY_PROP_ENERGY_FULL,
++	POWER_SUPPLY_PROP_ENERGY_NOW,
+ };
+ 
+ static int axp20x_battery_prop_writeable(struct power_supply *psy,
+@@ -630,6 +668,12 @@ static int axp20x_power_probe(struct platform_device *pdev)
+ 	axp20x_get_constant_charge_current(axp20x_batt,
+ 					   &axp20x_batt->max_ccc);
+ 
++	regmap_update_bits(axp20x_batt->regmap, AXP20X_VBUS_IPSOUT_MGMT, 0x03, 0x03);
++	regmap_update_bits(axp20x_batt->regmap, AXP20X_OFF_CTRL, 0x08, 0x08);
++	regmap_update_bits(axp20x_batt->regmap, AXP20X_CHRG_CTRL2, 0x30, 0x20);
++	regmap_update_bits(axp20x_batt->regmap, AXP20X_PEK_KEY, 0x0f, 0x0b);
++	regmap_update_bits(axp20x_batt->regmap, AXP20X_GPIO0_CTRL, 0x07, 0x00);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/staging/vc04_services/bcm2835-audio/bcm2835.c b/drivers/staging/vc04_services/bcm2835-audio/bcm2835.c
+index 092ccbfd5243..571fd4afb35b 100644
+--- a/drivers/staging/vc04_services/bcm2835-audio/bcm2835.c
++++ b/drivers/staging/vc04_services/bcm2835-audio/bcm2835.c
+@@ -11,9 +11,9 @@
+ #include "bcm2835.h"
+ #include <soc/bcm2835/raspberrypi-firmware.h>
+ 
+-static bool enable_hdmi, enable_hdmi0, enable_hdmi1;
+-static bool enable_headphones;
+-static bool enable_compat_alsa = true;
++static bool enable_hdmi = true, enable_hdmi0, enable_hdmi1;
++static bool enable_headphones = true;
++static bool enable_compat_alsa;
+ 
+ module_param(enable_hdmi, bool, 0444);
+ MODULE_PARM_DESC(enable_hdmi, "Enables HDMI virtual audio device");
+diff --git a/drivers/video/backlight/Kconfig b/drivers/video/backlight/Kconfig
+index ed22a119c992..81decd5e3f40 100644
+--- a/drivers/video/backlight/Kconfig
++++ b/drivers/video/backlight/Kconfig
+@@ -463,6 +463,12 @@ config BACKLIGHT_LED
+ 	  If you have a LCD backlight adjustable by LED class driver, say Y
+ 	  to enable this driver.
+ 
++config BACKLIGHT_OCP8178
++	tristate "OCP8178 Backlight Driver"
++	depends on GPIOLIB
++	help
++	  If you have an OCP8178, say Y to enable the backlight driver.
++
+ endif # BACKLIGHT_CLASS_DEVICE
+ 
+ endmenu
+diff --git a/drivers/video/backlight/Makefile b/drivers/video/backlight/Makefile
+index 836f0d0d1ca0..bf5b9f5c0141 100644
+--- a/drivers/video/backlight/Makefile
++++ b/drivers/video/backlight/Makefile
+@@ -58,3 +58,4 @@ obj-$(CONFIG_BACKLIGHT_WM831X)		+= wm831x_bl.o
+ obj-$(CONFIG_BACKLIGHT_ARCXCNN) 	+= arcxcnn_bl.o
+ obj-$(CONFIG_BACKLIGHT_RAVE_SP)		+= rave-sp-backlight.o
+ obj-$(CONFIG_BACKLIGHT_LED)		+= led_bl.o
++obj-$(CONFIG_BACKLIGHT_OCP8178)		+= ocp8178_bl.o
+diff --git a/drivers/video/backlight/ocp8178_bl.c b/drivers/video/backlight/ocp8178_bl.c
+new file mode 100644
+index 000000000000..db8db1771644
+--- /dev/null
++++ b/drivers/video/backlight/ocp8178_bl.c
+@@ -0,0 +1,277 @@
++/*
++ * ocp8178_bl.c - ocp8178 backlight driver
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/backlight.h>
++#include <linux/err.h>
++#include <linux/fb.h>
++#include <linux/gpio.h> /* Only for legacy support */
++#include <linux/gpio/consumer.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_gpio.h>
++#include <linux/platform_data/gpio_backlight.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/delay.h>
++#include <linux/timer.h>
++#include <linux/poll.h>
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
++#include <linux/sched.h>
++#include <linux/interrupt.h>
++#include <linux/irq.h>
++#include <linux/io.h>
++#include <linux/clk.h>
++
++struct ocp8178_backlight {
++	struct device *dev;
++	struct device *fbdev;
++
++	struct gpio_desc *gpiod;
++	int def_value;
++	int current_value;
++};
++
++#define DETECT_DELAY 200
++#define DETECT_TIME 500
++#define DETECT_WINDOW_TIME 1000
++#define START_TIME 10
++#define END_TIME 10
++#define SHUTDOWN_TIME 3000
++#define LOW_BIT_HIGH_TIME 10
++#define LOW_BIT_LOW_TIME 50
++#define HIGH_BIT_HIGH_TIME 50
++#define HIGH_BIT_LOW_TIME 10
++#define MAX_BRIGHTNESS_VALUE 9
++
++static void entry_1wire_mode(struct ocp8178_backlight *gbl)
++{
++	unsigned long flags = 0;
++	local_irq_save(flags);
++	gpiod_set_value(gbl->gpiod, 0);
++	mdelay(SHUTDOWN_TIME/1000);
++	gpiod_set_value(gbl->gpiod, 1);
++	udelay(DETECT_DELAY);
++	gpiod_set_value(gbl->gpiod, 0);
++	udelay(DETECT_TIME);
++	gpiod_set_value(gbl->gpiod, 1);
++	udelay(DETECT_WINDOW_TIME);
++	local_irq_restore(flags);
++}
++
++static inline void write_bit(struct ocp8178_backlight *gbl, int bit)
++{
++	if (bit) {
++		gpiod_set_value(gbl->gpiod, 0);
++		udelay(HIGH_BIT_LOW_TIME);
++		gpiod_set_value(gbl->gpiod, 1);
++		udelay(HIGH_BIT_HIGH_TIME);
++	} else {
++		gpiod_set_value(gbl->gpiod, 0);
++		udelay(LOW_BIT_LOW_TIME);
++		gpiod_set_value(gbl->gpiod, 1);
++		udelay(LOW_BIT_HIGH_TIME);
++	}
++}
++
++static void write_byte(struct ocp8178_backlight *gbl, int byte)
++{
++	unsigned long flags = 0;
++	unsigned char data = 0x72;
++	int i;
++
++	local_irq_save(flags);
++
++	gpiod_set_value(gbl->gpiod, 1);
++	udelay(START_TIME);
++	for(i = 0; i < 8; i++) {
++		if(data & 0x80) {
++			write_bit(gbl, 1);
++		} else {
++			write_bit(gbl, 0);
++		}
++		data <<= 1;
++	}
++	gpiod_set_value(gbl->gpiod, 0);
++	udelay(END_TIME);
++
++	data = byte & 0x1f;
++
++	gpiod_set_value(gbl->gpiod, 1);
++	udelay(START_TIME);
++	for(i = 0; i < 8; i++) {
++		if(data & 0x80) {
++			write_bit(gbl, 1);
++		} else {
++			write_bit(gbl, 0);
++		}
++		data <<= 1;
++	}
++	gpiod_set_value(gbl->gpiod, 0);
++	udelay(END_TIME);
++	gpiod_set_value(gbl->gpiod, 1);
++
++	local_irq_restore(flags);
++}
++
++unsigned char ocp8178_bl_table[MAX_BRIGHTNESS_VALUE+1] = {0, 1, 4, 8, 12, 16, 20, 24, 28, 31};
++
++static int ocp8178_update_status(struct backlight_device *bl)
++{
++	struct ocp8178_backlight *gbl = bl_get_data(bl);
++	int brightness = bl->props.brightness, i;
++
++	if (bl->props.power != FB_BLANK_UNBLANK ||
++	    bl->props.fb_blank != FB_BLANK_UNBLANK ||
++	    bl->props.state & (BL_CORE_SUSPENDED | BL_CORE_FBBLANK))
++		brightness = 0;
++
++	if(brightness > MAX_BRIGHTNESS_VALUE)
++		brightness = MAX_BRIGHTNESS_VALUE;
++
++	for(i = 0; i < 2; i++) {
++		entry_1wire_mode(gbl);
++		write_byte(gbl, ocp8178_bl_table[brightness]);
++	}
++	gbl->current_value = brightness;
++
++	return 0;
++}
++
++static int ocp8178_get_brightness(struct backlight_device *bl)
++{
++	struct ocp8178_backlight *gbl = bl_get_data(bl);
++	return gbl->current_value;
++}
++
++static int ocp8178_check_fb(struct backlight_device *bl,
++				   struct fb_info *info)
++{
++	struct ocp8178_backlight *gbl = bl_get_data(bl);
++	return gbl->fbdev == NULL || gbl->fbdev == info->dev;
++}
++
++static const struct backlight_ops ocp8178_backlight_ops = {
++	.options	= BL_CORE_SUSPENDRESUME,
++	.update_status	= ocp8178_update_status,
++	.get_brightness = ocp8178_get_brightness,
++	.check_fb	= ocp8178_check_fb,
++};
++
++static int ocp8178_probe_dt(struct platform_device *pdev,
++				   struct ocp8178_backlight *gbl)
++{
++	struct device *dev = &pdev->dev;
++	struct device_node *np = dev->of_node;
++	enum gpiod_flags flags;
++	int ret = 0;
++	u32 value32;
++
++	of_property_read_u32(np, "default-brightness", &value32);
++	if(value32 > MAX_BRIGHTNESS_VALUE)
++		gbl->def_value = MAX_BRIGHTNESS_VALUE;
++	else
++		gbl->def_value = value32;
++	flags = gbl->def_value ? GPIOD_OUT_HIGH : GPIOD_OUT_LOW;
++
++	gbl->gpiod = devm_gpiod_get(dev, "backlight-control", flags);
++	if (IS_ERR(gbl->gpiod)) {
++		ret = PTR_ERR(gbl->gpiod);
++
++		if (ret != -EPROBE_DEFER) {
++			dev_err(dev,
++				"Error: The gpios parameter is missing or invalid.\n");
++		}
++	}
++
++	return ret;
++}
++
++static struct backlight_device *backlight;
++
++static int ocp8178_probe(struct platform_device *pdev)
++{
++	struct backlight_properties props;
++	struct backlight_device *bl;
++	struct ocp8178_backlight *gbl;
++	struct device_node *np = pdev->dev.of_node;
++	int ret;
++
++	if ( !np) {
++		dev_err(&pdev->dev,
++			"failed to find platform data or device tree node.\n");
++		return -ENODEV;
++	}
++
++	gbl = devm_kzalloc(&pdev->dev, sizeof(*gbl), GFP_KERNEL);
++	if (gbl == NULL)
++		return -ENOMEM;
++
++	gbl->dev = &pdev->dev;
++
++	ret = ocp8178_probe_dt(pdev, gbl);
++	if (ret)
++		return ret;
++
++	gbl->current_value = gbl->def_value;
++
++	memset(&props, 0, sizeof(props));
++	props.type = BACKLIGHT_RAW;
++	props.max_brightness = MAX_BRIGHTNESS_VALUE;
++	bl = devm_backlight_device_register(&pdev->dev, dev_name(&pdev->dev),
++					&pdev->dev, gbl, &ocp8178_backlight_ops,
++					&props);
++	if (IS_ERR(bl)) {
++		dev_err(&pdev->dev, "failed to register backlight\n");
++		return PTR_ERR(bl);
++	}
++
++//	entry_1wire_mode(gbl);
++
++	bl->props.brightness = gbl->def_value;
++	backlight_update_status(bl);
++
++	platform_set_drvdata(pdev, bl);
++
++	backlight = bl;
++	return 0;
++}
++
++static int ocp8178_suspend(struct platform_device *pdev, pm_message_t state)
++{
++	return 0;
++}
++
++static int ocp8178_resume(struct platform_device *pdev)
++{
++	return 0;
++}
++
++static struct of_device_id ocp8178_of_match[] = {
++	{ .compatible = "ocp8178-backlight" },
++	{ /* sentinel */ }
++};
++
++MODULE_DEVICE_TABLE(of, ocp8178_of_match);
++
++static struct platform_driver ocp8178_driver = {
++	.driver		= {
++		.name		= "ocp8178-backlight",
++		.of_match_table = of_match_ptr(ocp8178_of_match),
++	},
++	.probe		= ocp8178_probe,
++	.suspend		= ocp8178_suspend,
++	.resume		= ocp8178_resume,
++};
++
++module_platform_driver(ocp8178_driver);
++
++MODULE_DESCRIPTION("OCP8178 Driver");
++MODULE_LICENSE("GPL");
