@@ -8,7 +8,8 @@ EnvironmentFile=/usr/local/etc/devterm-printer
 StandardOutput=file:/tmp/devterm_printer.log
 StandardError=file:/tmp/devterm_printer.err.log
 ExecStart=/usr/local/bin/devterm_thermal_printer.elf
-
+Restart=on-failure
+RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
