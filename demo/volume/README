@@ -1,0 +1,37 @@
+/*
+ * ALGO     : PROJ. : Volume(Demo)
+ * RESEARCH : File  : README
+ *          : Date  : 20100531.0725UTC
+ *          : Email : mail@algoresearch.net
+ */
+
+# Project structure:
+	.
+	├── README
+	├── CMakeLists.txt
+	├── bin/
+	├── build/
+	├── include/
+	│   ├── main.h
+	│   ├── observer.h
+	│   ├── space.h
+	│   ├── transform.h
+	│   └── x.h
+	└── src/
+	    ├── main.c
+	    ├── observer.c
+	    ├── space.c
+	    ├── transform.c
+	    └── x.c
+
+# How to compile:
+  At the project root directory, execute following commands:
+	cd bulid
+	cmake ..
+	make
+
+# How to run:
+  If compiled correctly, the executable file(s) will be generated in
+  the "./bin/" of the project root directory.
+
+EOF.
