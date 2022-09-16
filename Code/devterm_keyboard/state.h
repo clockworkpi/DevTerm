@@ -5,11 +5,49 @@
 #include <array>
 #include <USBComposite.h>
 
-#include "debouncer.h"
-
 enum class TrackballMode : uint8_t {
   Wheel,
   Mouse,
+};
+
+template <typename T, T millis>
+class Timeout
+{
+public:
+  Timeout()
+  {
+    timeout = 0;
+  }
+
+  void updateTime(uint8_t delta)
+  {
+    if (timeout > delta)
+    {
+      timeout -= delta;
+    }
+    else
+    {
+      timeout = 0;
+    }
+  }
+
+  void expire()
+  {
+    timeout = 0;
+  }
+
+  bool get() const
+  {
+    return timeout == 0;
+  }
+
+  void reset()
+  {
+    timeout = millis;
+  }
+
+private:
+  T timeout;
 };
 
 class State

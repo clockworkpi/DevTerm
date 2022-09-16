@@ -11,7 +11,7 @@ State::State()
 {
 }
 
-void State::tick(millis_t delta)
+void State::tick(uint8_t delta)
 {
   middleClickTimeout.updateTime(delta);
 }
