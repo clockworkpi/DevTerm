@@ -38,6 +38,12 @@ arduino-cli core install stm32duino:STM32F1
 arduino-cli board details --fqbn stm32duino:STM32F1:genericSTM32F103R
 ```
 
+Add the DSP library (for the trackball) to the Arduino Library folder:
+```bash
+cd ~/Arduino/libraries
+git clone https://github.com/dangpzanco/dsp
+```
+
 To compile, just run `build_bin.sh`. This script runs `arduino-cli compile` with the default options (change it according to your keyboard variant):
 
 ```bash
