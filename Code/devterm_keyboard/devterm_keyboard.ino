@@ -44,6 +44,9 @@ void setup() {
   
   HID.begin(*dev_term._Serial,reportDescription, sizeof(reportDescription));
 
+  pinMode(KEY3,OUTPUT);
+  digitalWrite(KEY3,HIGH);
+  
   while(!USBComposite);//wait until usb port been plugged in to PC
   
 
