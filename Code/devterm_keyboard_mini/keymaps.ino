@@ -48,6 +48,8 @@ enum SKEYS {
   _JOYSTICK_B,       //Joystick.button(2)
   _JOYSTICK_X,       //Joystick.button(3)
   _JOYSTICK_Y,       //Joystick.button(4)
+  _JOYSTICK_L,
+  _JOYSTICK_R,
   _FN_KEY,
   _MOUSE_LEFT,    // Mouse.press(1)
   _MOUSE_MID,     // Mouse.press(2)
@@ -104,11 +106,11 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
 
 static uint8_t fn_actions[MATRIX_KEYS]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-const uint16_t keys_maps[KEYS_NUM] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEFT, \
-                                      _JOYSTICK_RIGHT,_JOYSTICK_A,_JOYSTICK_B, \
-                                      _JOYSTICK_X,_JOYSTICK_Y,_LEFT_SHIFT_KEY,_FN_KEY,\
-                                      _LEFT_CTRL_KEY,_CMD_KEY , _LEFT_ALT,     \
-                                      _MOUSE_LEFT,_MOUSE_MID,_MOUSE_RIGHT,_TRACKBALL_BTN};
+const uint16_t keys_maps[KEYS_NUM] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEFT, _JOYSTICK_RIGHT, \
+                                      _JOYSTICK_A,_JOYSTICK_B, _JOYSTICK_X,_JOYSTICK_Y, \
+                                      _LEFT_SHIFT_KEY,KEY_RIGHT_SHIFT,_LEFT_CTRL_KEY, KEY_RIGHT_CTRL, \
+                                      _LEFT_ALT,  _MOUSE_LEFT,  KEY_RIGHT_ALT,_MOUSE_RIGHT,  \
+                                      _TRACKBALL_BTN };
 
 
 uint8_t check_pd2(){ // if swtich 2 in back is set to on(HIGH)
