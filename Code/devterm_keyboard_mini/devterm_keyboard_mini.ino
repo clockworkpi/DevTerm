@@ -21,6 +21,8 @@ const uint8_t reportDescription[] = {
 static const uint32_t LOOP_INTERVAL_MS = 0;
 static TickWaiter<LOOP_INTERVAL_MS> waiter;
 
+HardwareTimer timer(1);
+
 void setup() {
   USBComposite.setManufacturerString("ClockworkPI");
   USBComposite.setProductString("DevTerm");
@@ -39,6 +41,8 @@ void setup() {
   dev_term.Keyboard_state.prev_layer = 0;
   dev_term.Keyboard_state.fn_on = 0;
   dev_term.Keyboard_state.shift = 0;
+  dev_term.Keyboard_state.backlight = 0;
+  dev_term.Keyboard_state.lock = 0;
   
   dev_term._Serial = new  USBCompositeSerial;
   
@@ -54,6 +58,11 @@ void setup() {
   dev_term._Serial->println("setup done");
 
   pinMode(PD2,INPUT);// switch 2 in back 
+
+  timer.setPeriod(KEYBOARD_LED_PWM_PERIOD);
+  
+  pinMode(PA8,PWM);
+  pwmWrite(PA8,dev_term.Keyboard_state.backlight);
   
   delay(1000);
 }
