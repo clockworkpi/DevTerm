@@ -60,6 +60,7 @@ void setup() {
   pinMode(PD2,INPUT);// switch 2 in back 
 
   timer.setPeriod(KEYBOARD_LED_PWM_PERIOD);
+  timer.resume();
   
   pinMode(PA8,PWM);
   pwmWrite(PA8,dev_term.Keyboard_state.backlight);

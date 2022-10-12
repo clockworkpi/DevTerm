@@ -115,11 +115,10 @@ uint8_t matrix_scan(void) {
       matrix[row] = 0;
       for (int col = 0; col < MATRIX_COLS; col++) {
         matrix[row] |= ((matrix_debouncing[col] & (1 << row) ? 1 : 0) << col);
-        
       }
-      
      }
     keyboard_debouncing.deing = false;
+    
   }else{
     delay(1);
   }
@@ -165,7 +164,7 @@ void matrix_release(DEVTERM*dv,uint8_t row,uint8_t col) {
 
 void keyboard_task(DEVTERM*dv)
 {
-
+ char buff[128];
   uint8_t matrix_row = 0;
   uint8_t matrix_change = 0;
   uint8_t pressed = 0;
@@ -176,6 +175,8 @@ void keyboard_task(DEVTERM*dv)
     matrix_row = matrix_get_row(r);
     matrix_change = matrix_row ^ matrix_prev[r];
     if (matrix_change) { 
+      //sprintf(buff,"matrix_row: %d %d\n",matrix_row,matrix_prev[r]);
+      //dv->_Serial->print(buff);
       uint8_t col_mask = 1;
       for (uint8_t c = 0; c < MATRIX_COLS; c++, col_mask <<= 1) {
         if (matrix_change & col_mask) {

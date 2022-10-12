@@ -39,7 +39,7 @@ class DEVTERM {
     uint32_t delta;
 };
 
-#define KEYBOARD_PULL 1 // 1 for PULLUP, 0 FOR PULLDOWN
+#define KEYBOARD_PULL 0 // 1 for PULLUP, 0 FOR PULLDOWN
 #define KEYBOARD_LED_PWM_PERIOD 200
 
 #endif

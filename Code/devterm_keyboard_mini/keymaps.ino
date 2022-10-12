@@ -243,12 +243,22 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       }
     }break;
     case _FN_LOCK_KEYBOARD:{
-      dv->Keyboard_state.lock = dv->Keyboard_state.lock ^ 1;
-      
+      if(mode == KEY_PRESSED) {
+        dv->Keyboard_state.lock = dv->Keyboard_state.lock ^ 1;
+      }
     }break;
-     case  _FN_KEY:
+    case _FN_LIGHT_KEYBOARD: {
+      //dv->_Serial->println("light keyboard");
+      if(mode == KEY_PRESSED) {
+        dv->Keyboard_state.backlight = ( dv->Keyboard_state.backlight + 1) % 4;
+        pwmWrite(PA8,backlight[ dv->Keyboard_state.backlight ] );
+        //dv->_Serial->println("light keyboard");
+      }
+    }break;
+    case  _FN_KEY:
       if(mode == KEY_PRESSED){
         dv->Keyboard_state.fn_on = FN_LAYER;
+        //dv->_Serial->println("fn pressed");
 
       }else if(mode == KEY_RELEASED ) {
         //release all pressed fn keys if they still been pressing
@@ -263,10 +273,7 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
         dv->Keyboard_state.fn_on = 0;
       }
     break;
-    case _FN_LIGHT_KEYBOARD: {
-      dev_term.Keyboard_state.backlight = (dev_term.Keyboard_state.backlight + 1) % 4;
-      pwmWrite(PA8,backlight[ dev_term.Keyboard_state.backlight ] );
-    }break;
+    
     default:
       if(mode == KEY_PRESSED) {
         dv->Keyboard->press(k);
