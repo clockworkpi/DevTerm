@@ -251,7 +251,13 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       //dv->_Serial->println("light keyboard");
       if(mode == KEY_PRESSED) {
         dv->Keyboard_state.backlight = ( dv->Keyboard_state.backlight + 1) % 4;
+        
         pwmWrite(PA8,backlight[ dv->Keyboard_state.backlight ] );
+        if(backlight[ dv->Keyboard_state.backlight ]== 0){
+          timer.pause();
+        }else{
+          timer.resume();
+        }
         //dv->_Serial->println("light keyboard");
       }
     }break;

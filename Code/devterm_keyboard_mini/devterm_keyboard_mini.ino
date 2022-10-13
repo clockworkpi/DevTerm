@@ -63,7 +63,8 @@ void setup() {
   timer.resume();
   
   pinMode(PA8,PWM);
-  pwmWrite(PA8,dev_term.Keyboard_state.backlight);
+  pwmWrite(PA8,0);
+
   
   delay(1000);
 }
