@@ -20,6 +20,9 @@ typedef struct keyboard_state{
   uint8_t shift;
   uint8_t backlight;//0 1 2 3
   uint8_t lock;//0 1
+  uint16_t ctrl_lock;//
+  uint16_t ctrl_time;//
+  uint16_t ctrl_begin;//
   
 }KEYBOARD_STATE;
 

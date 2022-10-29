@@ -22,6 +22,7 @@ static const uint32_t LOOP_INTERVAL_MS = 0;
 static TickWaiter<LOOP_INTERVAL_MS> waiter;
 
 HardwareTimer timer(1);
+HardwareTimer ctrl_timer(4);
 
 void setup() {
   USBComposite.setManufacturerString("ClockworkPI");
@@ -43,6 +44,9 @@ void setup() {
   dev_term.Keyboard_state.shift = 0;
   dev_term.Keyboard_state.backlight = 0;
   dev_term.Keyboard_state.lock = 0;
+  dev_term.Keyboard_state.ctrl_lock = 0;
+  dev_term.Keyboard_state.ctrl_time = 0;
+  dev_term.Keyboard_state.ctrl_begin = 0;
   
   dev_term._Serial = new  USBCompositeSerial;
   
@@ -55,18 +59,43 @@ void setup() {
   keys_init(&dev_term);
   trackball_init(&dev_term);
   
-  dev_term._Serial->println("setup done");
+  //dev_term._Serial->println("setup done");
 
   pinMode(PD2,INPUT);// switch 2 in back 
 
   timer.setPeriod(KEYBOARD_LED_PWM_PERIOD);
   timer.resume();
+
+  ctrl_timer.setPeriod(20*1000);
+  ctrl_timer.attachInterrupt(1,ctrl_timer_handler);
+  ctrl_timer.refresh();
+  ctrl_timer.resume();
   
   pinMode(PA8,PWM);
   pwmWrite(PA8,0);
 
   
   delay(1000);
+}
+
+//DO NOT USE dev_term._Serial->println(""); in timer interrupt function,will block 
+#define LOCK_TIME 50
+void ctrl_timer_handler(void) {
+  
+  if( dev_term.Keyboard_state.ctrl_begin >0) {
+    dev_term.Keyboard_state.ctrl_time++;
+
+    if(dev_term.Keyboard_state.ctrl_time>=LOCK_TIME && dev_term.Keyboard_state.ctrl_time<200){
+      dev_term.Keyboard_state.ctrl_lock = 1;
+    }
+    
+    if(dev_term.Keyboard_state.ctrl_time > 200){
+      dev_term.Keyboard->release(dev_term.Keyboard_state.ctrl_begin);
+      dev_term.Keyboard_state.ctrl_time = 0;
+      dev_term.Keyboard_state.ctrl_lock = 0;
+      dev_term.Keyboard_state.ctrl_begin = 0;
+    }
+  }
 }
 
 void loop() {
