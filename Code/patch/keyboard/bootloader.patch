@@ -1,0 +1,16 @@
+diff --git a/bootloader_only_binaries/generic_boot20_pc13.bin b/bootloader_only_binaries/generic_boot20_pc13.bin
+index 33218e9..bae6437 100644
+Binary files a/bootloader_only_binaries/generic_boot20_pc13.bin and b/bootloader_only_binaries/generic_boot20_pc13.bin differ
+diff --git a/config.h b/config.h
+index b377f98..f8ce81a 100644
+--- a/config.h
++++ b/config.h
+@@ -156,7 +156,7 @@
+ // Use Boot1 PB2 as the button, as hardly anyone uses this pin as GPIO
+ // Need to set the button input mode to just CR_INPUT and not CR_INPUT_PU_PD because the external pullup on the jumplink is very weak
+ 	#define BUTTON_INPUT_MODE 	CR_INPUT
+-    #define BUTTON_BANK GPIOB
++    #define BUTTON_BANK GPIOD
+     #define BUTTON_PIN 2
+     #define BUTTON_PRESSED_STATE 1
+ 	
