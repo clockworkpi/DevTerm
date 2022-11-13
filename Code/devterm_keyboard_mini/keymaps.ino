@@ -167,14 +167,6 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
   }
 
   switch(k) {
-    case KEY_RIGHT_SHIFT:{
-      if(mode == KEY_PRESSED) {
-        dv->Keyboard->press(k);
-      }else {
-        dv->Keyboard->release(k);
-      }
-    }break;
-
     case  KEY_CAPS_LOCK:
     if(mode == KEY_PRESSED) {
       
@@ -264,10 +256,7 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     case  _FN_KEY:
       if(mode == KEY_PRESSED){
         dv->Keyboard_state.fn_on = FN_LAYER;
-        //dv->_Serial->println("fn pressed");
-
       }else if(mode == KEY_RELEASED ) {
-        //release all pressed fn keys if they still been pressing
         for(int i=0;i<64;i++) {
           if(fn_actions[i] !=0) {
             k = keyboard_maps[dv->Keyboard_state.fn_on][i];
@@ -317,29 +306,13 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
 
   switch(k) {
     case _LEFT_SHIFT_KEY:
+    case KEY_RIGHT_SHIFT:
       if(mode == KEY_PRESSED) {
         dv->Keyboard->press(k);
       }else if(mode == KEY_RELEASED) {
         dv->Keyboard->release(k);
       }
     break;    
-    case  _FN_KEY:
-      if(mode == KEY_PRESSED){
-        dv->Keyboard_state.fn_on = FN_LAYER;
-
-      }else if(mode == KEY_RELEASED ) {
-        //release all pressed fn keys if they still been pressing
-        for(int i=0;i<64;i++) {
-          if(fn_actions[i] !=0) {
-            k = keyboard_maps[dv->Keyboard_state.fn_on][i];
-            dv->Keyboard->release(k);
-            fn_actions[i] = 0;
-          }
-        }
-
-        dv->Keyboard_state.fn_on = 0;
-      }
-    break;
     
     case _JOYSTICK_UP:
       if(check_pd2() == HIGH) {
@@ -485,15 +458,15 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     case _LEFT_CTRL_KEY:
     case KEY_RIGHT_CTRL:
       if(mode == KEY_PRESSED){
-        if(dv->Keyboard_state.ctrl_lock == 0){
+        if(dv->Keyboard_state.ctrl.lock == 0){
           dv->Keyboard->press(k);
-          dv->Keyboard_state.ctrl_begin = k;
+          dv->Keyboard_state.ctrl.begin = k;
         }
       }else {
-        if(dv->Keyboard_state.ctrl_lock == 0){
+        if(dv->Keyboard_state.ctrl.lock == 0){
           dv->Keyboard->release(k);
-          dv->Keyboard_state.ctrl_begin = 0;
-          dv->Keyboard_state.ctrl_time = 0;
+          dv->Keyboard_state.ctrl.begin = 0;
+          dv->Keyboard_state.ctrl.time = 0;
         }
       }
     break;
@@ -519,12 +492,12 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
   }
 
 
-  if(dv->Keyboard_state.ctrl_lock > 0 ) {
+  if(dv->Keyboard_state.ctrl.lock > 0 ) {
     if(mode == KEY_RELEASED && k != _LEFT_CTRL_KEY && k!= KEY_RIGHT_CTRL){
-      dv->Keyboard_state.ctrl_lock = 0;
-      dv->Keyboard->release(dv->Keyboard_state.ctrl_begin);
-      dv->Keyboard_state.ctrl_begin = 0;
-      dv->Keyboard_state.ctrl_time = 0;
+      dv->Keyboard_state.ctrl.lock = 0;
+      dv->Keyboard->release(dv->Keyboard_state.ctrl.begin);
+      dv->Keyboard_state.ctrl.begin = 0;
+      dv->Keyboard_state.ctrl.time = 0;
       //dv->_Serial->println("ctrl lock released");
     }
   }

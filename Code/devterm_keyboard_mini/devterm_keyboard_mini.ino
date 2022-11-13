@@ -41,12 +41,25 @@ void setup() {
   dev_term.Keyboard_state.layer = 0;
   dev_term.Keyboard_state.prev_layer = 0;
   dev_term.Keyboard_state.fn_on = 0;
-  dev_term.Keyboard_state.shift = 0;
+  //dev_term.Keyboard_state.shift = 0;
   dev_term.Keyboard_state.backlight = 0;
   dev_term.Keyboard_state.lock = 0;
-  dev_term.Keyboard_state.ctrl_lock = 0;
-  dev_term.Keyboard_state.ctrl_time = 0;
-  dev_term.Keyboard_state.ctrl_begin = 0;
+  
+  dev_term.Keyboard_state.ctrl.lock = 0;
+  dev_term.Keyboard_state.ctrl.time = 0;
+  dev_term.Keyboard_state.ctrl.begin = 0;
+
+  dev_term.Keyboard_state.shift.lock = 0;
+  dev_term.Keyboard_state.shift.time = 0;
+  dev_term.Keyboard_state.shift.begin = 0;
+
+  dev_term.Keyboard_state.alt.lock = 0;
+  dev_term.Keyboard_state.alt.time = 0;
+  dev_term.Keyboard_state.alt.begin = 0;
+      
+  dev_term.Keyboard_state.fn.lock = 0;
+  dev_term.Keyboard_state.fn.time = 0;
+  dev_term.Keyboard_state.fn.begin = 0;  
   
   dev_term._Serial = new  USBCompositeSerial;
   
@@ -78,24 +91,34 @@ void setup() {
   delay(1000);
 }
 
+#define LOCK_TIME 50
+
 //DO NOT USE dev_term._Serial->println(""); in timer interrupt function,will block 
+void check_keyboard_lock(KEYBOARD_LOCK*lock){
+   if( lock->begin >0) {
+    lock->time++;
+
+    if( lock->time>=LOCK_TIME && lock->time<200){
+      lock->lock = 1;
+    }
+    
+    if( lock->time > 200){
+      dev_term.Keyboard->release(lock->begin);
+      lock->time = 0;
+      lock->lock = 0;
+      lock->begin = 0;
+    }
+  } 
+}
+
 #define LOCK_TIME 50
 void ctrl_timer_handler(void) {
   
-  if( dev_term.Keyboard_state.ctrl_begin >0) {
-    dev_term.Keyboard_state.ctrl_time++;
+  check_keyboard_lock(&dev_term.Keyboard_state.ctrl);
+  check_keyboard_lock(&dev_term.Keyboard_state.shift);
+  check_keyboard_lock(&dev_term.Keyboard_state.alt);
+  check_keyboard_lock(&dev_term.Keyboard_state.fn);
 
-    if(dev_term.Keyboard_state.ctrl_time>=LOCK_TIME && dev_term.Keyboard_state.ctrl_time<200){
-      dev_term.Keyboard_state.ctrl_lock = 1;
-    }
-    
-    if(dev_term.Keyboard_state.ctrl_time > 200){
-      dev_term.Keyboard->release(dev_term.Keyboard_state.ctrl_begin);
-      dev_term.Keyboard_state.ctrl_time = 0;
-      dev_term.Keyboard_state.ctrl_lock = 0;
-      dev_term.Keyboard_state.ctrl_begin = 0;
-    }
-  }
 }
 
 void loop() {

@@ -12,18 +12,28 @@ typedef struct key_debouncing{
   
 }KEY_DEB;
 
+typedef struct keyboard_lock{
+  
+  uint16_t lock;//
+  uint16_t time;//
+  uint16_t begin;//
+    
+}KEYBOARD_LOCK;
+
 typedef struct keyboard_state{
 
   uint8_t layer;
   uint8_t prev_layer;
   uint8_t fn_on;
-  uint8_t shift;
+  
   uint8_t backlight;//0 1 2 3
   uint8_t lock;//0 1
-  uint16_t ctrl_lock;//
-  uint16_t ctrl_time;//
-  uint16_t ctrl_begin;//
-  
+
+  KEYBOARD_LOCK ctrl;
+  KEYBOARD_LOCK shift;  
+  KEYBOARD_LOCK alt;
+  KEYBOARD_LOCK fn;
+      
 }KEYBOARD_STATE;
 
 class DEVTERM {
