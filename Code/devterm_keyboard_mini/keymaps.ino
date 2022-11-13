@@ -37,34 +37,6 @@ B16 mouse right
 #define _FN_KEY_LEFT_ARROW   KEY_HOME
 #define _FN_KEY_RIGHT_ARROW  KEY_END
 
-enum SKEYS {
-  _SELECT_KEY =0xe8,  //Joystick.button(n)
-  _START_KEY,          //Joystick.button(n)
-  _JOYSTICK_UP, //B1 //Joystick.Y()
-  _JOYSTICK_DOWN,    //Joystick.Y()
-  _JOYSTICK_LEFT,    //Joystick.X()
-  _JOYSTICK_RIGHT,   //Joystick.X()  
-  _JOYSTICK_A,       //Joystick.button(1)
-  _JOYSTICK_B,       //Joystick.button(2)
-  _JOYSTICK_X,       //Joystick.button(3)
-  _JOYSTICK_Y,       //Joystick.button(4)
-  _JOYSTICK_L,
-  _JOYSTICK_R,
-  _FN_KEY,
-  _MOUSE_LEFT,    // Mouse.press(1)
-  _MOUSE_MID,     // Mouse.press(2)
-  _MOUSE_RIGHT,   // Mouse.press(3)
-
-  _FN_BRIGHTNESS_UP, //USB Consumer brightness up https://github.com/torvalds/linux/blob/7fe10096c1508c7f033d34d0741809f8eecc1ed4/drivers/hid/hid-input.c#L903
-  _FN_BRIGHTNESS_DOWN, //USB Consumer brightness down 
-
-  _VOLUME_M,
-  _VOLUME_P,
-  _VOLUME_MUTE, //https://github.com/torvalds/linux/blob/7fe10096c1508c7f033d34d0741809f8eecc1ed4/drivers/hid/hid-input.c#L956
-  _TRACKBALL_BTN,
-  _FN_LOCK_KEYBOARD,
-  _FN_LIGHT_KEYBOARD,
-};
 
 #define DEF_LAYER      0x00
 #define FN_LAYER       0x01
