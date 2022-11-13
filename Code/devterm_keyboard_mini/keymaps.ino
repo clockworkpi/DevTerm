@@ -146,6 +146,27 @@ void dt_kbd_restore_layer(DEVTERM*dv) {
   
 }
 
+void press_any_key_to_release_lock(DEVTERM*dv, KEYBOARD_LOCK*lock, uint16_t k,uint8_t mode) {
+
+
+  if( lock->lock > 0 ) {
+    if(mode == KEY_RELEASED
+        && k != _LEFT_CTRL_KEY && k!= KEY_RIGHT_CTRL
+        && k != _LEFT_ALT && k!= KEY_RIGHT_ALT
+        && k != _LEFT_SHIFT_KEY && k!= KEY_RIGHT_SHIFT
+        && k != _FN_KEY) {
+      lock->lock = 0;
+      
+      if(lock->begin!= _FN_KEY) {
+	 dv->Keyboard->release(lock->begin);
+      }
+      lock->begin = 0;
+      lock->time = 0;
+      //dv->_Serial->println("ctrl lock released");
+    }
+  }
+}
+
 void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
 
   uint16_t k;
@@ -255,18 +276,25 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     }break;
     case  _FN_KEY:
       if(mode == KEY_PRESSED){
-        dv->Keyboard_state.fn_on = FN_LAYER;
+	if(dv->Keyboard_state.fn.lock == 0){
+          dv->Keyboard_state.fn_on = FN_LAYER;
+	  dv->Keyboard_state.fn.begin = k;
+	}
       }else if(mode == KEY_RELEASED ) {
-        for(int i=0;i<64;i++) {
-          if(fn_actions[i] !=0) {
-            k = keyboard_maps[dv->Keyboard_state.fn_on][i];
-            dv->Keyboard->release(k);
-            fn_actions[i] = 0;
+	if(dv->Keyboard_state.fn.lock == 0){
+          for(int i=0;i<64;i++) {
+            if(fn_actions[i] !=0) {
+              k = keyboard_maps[dv->Keyboard_state.fn_on][i];
+              dv->Keyboard->release(k);
+              fn_actions[i] = 0;
+            }
           }
+          dv->Keyboard_state.fn_on = 0;
         }
 
-        dv->Keyboard_state.fn_on = 0;
-      }
+	dv->Keyboard_state.fn.begin =0;
+        dv->Keyboard_state.fn.time = 0;
+       }
     break;
     
     default:
@@ -282,7 +310,11 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     break;
   }
 
-  
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.ctrl,k,mode);
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.alt,k,mode);
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.shift,k,mode);
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.fn,k,mode);
+
 }
 
 
@@ -308,9 +340,16 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     case _LEFT_SHIFT_KEY:
     case KEY_RIGHT_SHIFT:
       if(mode == KEY_PRESSED) {
-        dv->Keyboard->press(k);
+	if(dv->Keyboard_state.shift.lock == 0){
+          dv->Keyboard->press(k);
+	  dv->Keyboard_state.shift.begin=k;
+	}
       }else if(mode == KEY_RELEASED) {
-        dv->Keyboard->release(k);
+        if(dv->Keyboard_state.shift.lock == 0){
+          dv->Keyboard->release(k);
+	  dv->Keyboard_state.shift.begin = 0;
+          dv->Keyboard_state.shift.time = 0;
+	}
       }
     break;    
     
@@ -470,9 +509,24 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
         }
       }
     break;
-    case _CMD_KEY:
+
     case _LEFT_ALT:
     case KEY_RIGHT_ALT:
+      if(mode == KEY_PRESSED){
+	if(dv->Keyboard_state.alt.lock == 0){
+	  dv->Keyboard->press(k);
+	  dv->Keyboard_state.alt.begin=k;
+	}
+      }else {
+	if(dv->Keyboard_state.alt.lock == 0){
+          dv->Keyboard->release(k);
+	  dv->Keyboard_state.alt.begin = 0;
+	  dv->Keyboard_state.alt.time = 0;
+	}
+      }
+    break;
+
+    case _CMD_KEY:
       if(mode == KEY_PRESSED){
         dv->Keyboard->press(k);
       }else {
@@ -491,15 +545,8 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     
   }
 
-
-  if(dv->Keyboard_state.ctrl.lock > 0 ) {
-    if(mode == KEY_RELEASED && k != _LEFT_CTRL_KEY && k!= KEY_RIGHT_CTRL){
-      dv->Keyboard_state.ctrl.lock = 0;
-      dv->Keyboard->release(dv->Keyboard_state.ctrl.begin);
-      dv->Keyboard_state.ctrl.begin = 0;
-      dv->Keyboard_state.ctrl.time = 0;
-      //dv->_Serial->println("ctrl lock released");
-    }
-  }
-  
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.ctrl,k,mode);
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.alt,k,mode);
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.shift,k,mode);
+  press_any_key_to_release_lock(dv,&dv->Keyboard_state.fn,k,mode); 
 }

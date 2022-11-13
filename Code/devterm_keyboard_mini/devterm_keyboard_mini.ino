@@ -103,7 +103,9 @@ void check_keyboard_lock(KEYBOARD_LOCK*lock){
     }
     
     if( lock->time > 200){
-      dev_term.Keyboard->release(lock->begin);
+     if(lock->begin != _FN_KEY) {
+      	dev_term.Keyboard->release(lock->begin);
+      }
       lock->time = 0;
       lock->lock = 0;
       lock->begin = 0;
