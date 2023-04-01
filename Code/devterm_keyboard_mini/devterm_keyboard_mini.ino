@@ -6,7 +6,7 @@
 
 #include <USBComposite.h>
 
-#define SER_NUM_STR "20210531"
+#define SER_NUM_STR "20230307"
 
 USBHID HID;
 DEVTERM dev_term;
@@ -26,7 +26,7 @@ HardwareTimer ctrl_timer(4);
 
 void setup() {
   USBComposite.setManufacturerString("ClockworkPI");
-  USBComposite.setProductString("DevTerm");
+  USBComposite.setProductString("uConsole");
   USBComposite.setSerialString(SER_NUM_STR);
   
   dev_term.Keyboard = new HIDKeyboard(HID);
@@ -79,11 +79,12 @@ void setup() {
   timer.setPeriod(KEYBOARD_LED_PWM_PERIOD);
   timer.resume();
 
+  /*
   ctrl_timer.setPeriod(20*1000);
   ctrl_timer.attachInterrupt(1,ctrl_timer_handler);
   ctrl_timer.refresh();
   ctrl_timer.resume();
-  
+  */
   pinMode(PA8,PWM);
   pwmWrite(PA8,0);
 

@@ -227,6 +227,13 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
         dv->Consumer->release();
       }
     }break;
+    case _VOLUME_MUTE:{
+      if(mode == KEY_PRESSED) {
+        dv->Consumer->press(HIDConsumer::MUTE);
+      }else {
+        dv->Consumer->release();
+      }
+    }break;    
     case _FN_LOCK_KEYBOARD:{
       if(mode == KEY_PRESSED) {
         dv->Keyboard_state.lock = dv->Keyboard_state.lock ^ 1;
@@ -235,8 +242,7 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     case _FN_LIGHT_KEYBOARD: {
       //dv->_Serial->println("light keyboard");
       if(mode == KEY_PRESSED) {
-        dv->Keyboard_state.backlight = ( dv->Keyboard_state.backlight + 1) % 4;
-        
+        dv->Keyboard_state.backlight = dv->Keyboard_state.backlight  % 4;
         pwmWrite(PA8,backlight[ dv->Keyboard_state.backlight ] );
         if(backlight[ dv->Keyboard_state.backlight ]== 0){
           timer.pause();
@@ -244,6 +250,7 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
           timer.resume();
         }
         //dv->_Serial->println("light keyboard");
+         dv->Keyboard_state.backlight ++;
       }
     }break;
     case  _FN_KEY:
@@ -281,12 +288,12 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       }
     break;
   }
-
+  /*
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.ctrl,k,mode);
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.alt,k,mode);
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.shift,k,mode);
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.fn,k,mode);
-
+  */
 }
 
 
@@ -516,9 +523,10 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     default:break;
     
   }
-
+  /*
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.ctrl,k,mode);
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.alt,k,mode);
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.shift,k,mode);
   press_any_key_to_release_lock(dv,&dv->Keyboard_state.fn,k,mode); 
+  */
 }

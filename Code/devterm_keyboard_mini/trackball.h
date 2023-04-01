@@ -12,10 +12,10 @@
 #define EXPONENTIAL_BASE      1.2
 */
 
-#define RIGHT_PIN             HO3
-#define LEFT_PIN              HO1
-#define DOWN_PIN              HO4
-#define UP_PIN                HO2
+#define RIGHT_PIN             HO2
+#define LEFT_PIN              HO4
+#define DOWN_PIN              HO3
+#define UP_PIN                HO1
 
 
 void trackball_init(DEVTERM*);
