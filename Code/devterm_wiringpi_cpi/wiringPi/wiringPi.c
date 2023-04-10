@@ -1536,6 +1536,17 @@ void pullUpDnControl (int pin, int pud)
 
   setupCheck ("pullUpDnControl") ;
 
+#ifdef CONFIG_CLOCKWORKPI
+  if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
+  {
+    CPiPullUpDnControl(pin, pud);
+  } else {
+    if ((node = wiringPiFindNode (pin)) != NULL)
+      node->pullUpDnControl (node, pin, pud) ;
+  }
+  return ;
+#endif
+
   if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
   {
     /**/ if (wiringPiMode == WPI_MODE_PINS)

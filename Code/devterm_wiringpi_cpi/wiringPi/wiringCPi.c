@@ -22,6 +22,45 @@
 #include "softPwm.h"
 #include "softTone.h"
 
+/*
+ * A06: always write 0xffff0180 to CRU control.
+ *   - For PMUCRU (bank 0 & 1), operates on PMUCRU_CLKGATE_CON1:
+ *     0         1          8          0
+ *                                     pclk_pmu_en=0           ENABLE
+ *                                     pclk_pmugrf_en=0        ENABLE
+ *                                     pclk_intmem1_en=0       ENABLE
+ *                                     pclk_gpio0_en=0         ENABLE
+ *                          pclk_gpio1_en=0                    ENABLE
+ *                          pclk_sgrf_en=0                     ENABLE
+ *                          pclk_noc_pmu_en=0                  ENABLE
+ *                          pclk_i2c0_en=1                     DISABLE
+ *                pclk_i2c4_en=1                               DISABLE
+ *                pclk_i2c8_en=0                               ENABLE
+ *                pclk_rkpwm_pmu_en=0                          ENABLE
+ *                pclk_spi3_en=0                               ENABLE
+ *      pclk_timer_pmu_en=0                                    ENABLE
+ *      pclk_mailbox_pmu_en=0                                  ENABLE
+ *      pclk_uartm0_en=0                                       ENABLE
+ *      pclk_wdt_m0_pmu_en=0                                   ENABLE
+ *   - For CRU (bank 2, 3 & 4), operates on CRU_CLKGATE_CON31:
+ *     0         1          8          0
+ *                                     pclk_grf_en=0           ENABLE
+ *                                     pclk_intr_arb_en=0      ENABLE
+ *                                     pclk_gpio2_en=0         ENABLE
+ *                                     pclk_gpio3_en=0         ENABLE
+ *                          pclk_gpio4_en=0                    ENABLE
+ *                          pclk_timer0_en=0                   ENABLE
+ *                          pclk_timer1_en=0                   ENABLE
+ *                          pclk_i2c0_en=1                     DISABLE (!! i2c0 disabled)
+ *                pclk_hsicphy_en=1                            DISABLE
+ *                pclk_pmu_intr_arb_en=0                       ENABLE
+ *                pclk_sgrf_en=0                               ENABLE
+ *                -                                            -
+ *      -                                                      -
+ *      -                                                      -
+ *      -                                                      -
+ *      -                                                      -
+ */
 
 static int wpimode = -1 ;
 #define WPI_MODE_BCM 0
@@ -110,17 +149,17 @@ int bcmToGpioCPi[64] =
 	64,  65,      //44,45
 	-1, -1,      //46,47
 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,// ... 63	
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,// ... 63
 };
 
-  int CPI_PIN_MASK[5][32] =  //[BANK]	[INDEX]
-  {
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO0
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO1
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO2
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO3
-   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO4
-  };
+int CPI_PIN_MASK[5][32] =  //[BANK]	[INDEX]
+{
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO0
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO1
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO2
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO3
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,},//GPIO4
+};
 
 volatile uint32_t *cru_base;
 volatile uint32_t *grf_base;
@@ -141,24 +180,37 @@ static unsigned int readR(unsigned int addr)
 	unsigned int mmap_base = (addr & ~MAP_MASK);
 	unsigned int mmap_seek = (addr - mmap_base);
 
-	if(mmap_base == CRU_BASE)
-		val = *((unsigned int *)((unsigned char *)cru_base + mmap_seek));
-	else if(mmap_base == GRF_BASE)
-		val = *((unsigned int *)((unsigned char *)grf_base + mmap_seek));
-	else if(mmap_base == PMUCRU_BASE)
-		val = *((unsigned int *)((unsigned char *)pmucru_base + mmap_seek));
-	else if(mmap_base == PMUGRF_BASE)
-		val = *((unsigned int *)((unsigned char *)pmugrf_base + mmap_seek));
-	else if(mmap_base == GPIO0_BASE)
-		val = *((unsigned int *)((unsigned char *)gpio0_base + mmap_seek));
-	else if(mmap_base == GPIO1_BASE)
-		val = *((unsigned int *)((unsigned char *)gpio1_base + mmap_seek));
-	else if(mmap_base == GPIO2_BASE)
-		val = *((unsigned int *)((unsigned char *)gpio2_base + mmap_seek));
-	else if(mmap_base == GPIO3_BASE)
-		val = *((unsigned int *)((unsigned char *)gpio3_base + mmap_seek));
-	else if(mmap_base == GPIO4_BASE)
-		val = *((unsigned int *)((unsigned char *)gpio4_base + mmap_seek));
+	switch(mmap_base) {
+		case CRU_BASE:
+			val = *((unsigned int *)((unsigned char *)cru_base + mmap_seek));
+			break;
+		case GRF_BASE:
+			val = *((unsigned int *)((unsigned char *)grf_base + mmap_seek));
+			break;
+		case PMUCRU_BASE:
+			val = *((unsigned int *)((unsigned char *)pmucru_base + mmap_seek));
+			break;
+		case PMUGRF_BASE:
+			val = *((unsigned int *)((unsigned char *)pmugrf_base + mmap_seek));
+			break;
+		case GPIO0_BASE:
+			val = *((unsigned int *)((unsigned char *)gpio0_base + mmap_seek));
+			break;
+		case GPIO1_BASE:
+			val = *((unsigned int *)((unsigned char *)gpio1_base + mmap_seek));
+			break;
+		case GPIO2_BASE:
+			val = *((unsigned int *)((unsigned char *)gpio2_base + mmap_seek));
+			break;
+		case GPIO3_BASE:
+			val = *((unsigned int *)((unsigned char *)gpio3_base + mmap_seek));
+			break;
+		case GPIO4_BASE:
+			val = *((unsigned int *)((unsigned char *)gpio4_base + mmap_seek));
+			break;
+		default:
+			break;
+	}
 
 	return val;
 
@@ -184,24 +236,38 @@ static void writeR(unsigned int val, unsigned int addr)
 	unsigned int mmap_base = (addr & ~MAP_MASK);
 	unsigned int mmap_seek = (addr - mmap_base);
 
-	if(mmap_base == CRU_BASE) 
-		*((unsigned int *)((unsigned char *)cru_base + mmap_seek)) = val;
-	else if(mmap_base == GRF_BASE)
-		*((unsigned int *)((unsigned char *)grf_base + mmap_seek)) = val;
-	else if(mmap_base == PMUCRU_BASE)
-		*((unsigned int *)((unsigned char *)pmucru_base + mmap_seek)) = val;
-	else if(mmap_base == PMUGRF_BASE)
-		*((unsigned int *)((unsigned char *)pmugrf_base + mmap_seek)) = val;
-	else if(mmap_base == GPIO0_BASE)
-		*((unsigned int *)((unsigned char *)gpio0_base + mmap_seek)) = val;
-	else if(mmap_base == GPIO1_BASE)
-		*((unsigned int *)((unsigned char *)gpio1_base + mmap_seek)) = val;
-	else if(mmap_base == GPIO2_BASE)
-		*((unsigned int *)((unsigned char *)gpio2_base + mmap_seek)) = val;
-	else if(mmap_base == GPIO3_BASE)
-		*((unsigned int *)((unsigned char *)gpio3_base + mmap_seek)) = val;
-	else if(mmap_base == GPIO4_BASE)
-		*((unsigned int *)((unsigned char *)gpio4_base + mmap_seek)) = val;
+	switch(mmap_base) {
+		case CRU_BASE:
+			*((unsigned int *)((unsigned char *)cru_base + mmap_seek)) = val;
+			break;
+		case GRF_BASE:
+			*((unsigned int *)((unsigned char *)grf_base + mmap_seek)) = val;
+			break;
+		case PMUCRU_BASE:
+			*((unsigned int *)((unsigned char *)pmucru_base + mmap_seek)) = val;
+			break;
+		case PMUGRF_BASE:
+			*((unsigned int *)((unsigned char *)pmugrf_base + mmap_seek)) = val;
+			break;
+		case GPIO0_BASE:
+			*((unsigned int *)((unsigned char *)gpio0_base + mmap_seek)) = val;
+			break;
+		case GPIO1_BASE:
+			*((unsigned int *)((unsigned char *)gpio1_base + mmap_seek)) = val;
+			break;
+		case GPIO2_BASE:
+			*((unsigned int *)((unsigned char *)gpio2_base + mmap_seek)) = val;
+			break;
+		case GPIO3_BASE:
+			*((unsigned int *)((unsigned char *)gpio3_base + mmap_seek)) = val;
+			break;
+		case GPIO4_BASE:
+			*((unsigned int *)((unsigned char *)gpio4_base + mmap_seek)) = val;
+			break;
+		default:
+			break;
+	}
+
 
 #elif (defined CONFIG_CLOCKWORKPI_A04)
 
@@ -216,7 +282,7 @@ static void writeR(unsigned int val, unsigned int addr)
 #endif
 }
 
-int CPi_get_gpio_mode(int pin)
+static int __CPi_get_gpio_mode(int pin)
 {
 	unsigned int regval = 0;
 	unsigned int bank   = pin >> 5;
@@ -226,7 +292,7 @@ int CPi_get_gpio_mode(int pin)
 
 	if (CPI_PIN_MASK[bank][index] < 0)
 		return -1;
-	
+
 #ifdef CONFIG_CLOCKWORKPI_A06
 
 	unsigned int grf_phyaddr = 0, ddr_phyaddr = 0;
@@ -239,7 +305,7 @@ int CPi_get_gpio_mode(int pin)
 	else if(bank == 1){
 		grf_phyaddr = PMUGRF_BASE + ((index >> 3) << 2) + 0x10;
 		ddr_phyaddr = GPIO1_BASE + GPIO_SWPORTA_DDR_OFFSET;
-	}	
+	}
 	else if(bank == 2){
 		grf_phyaddr = GRF_BASE + ((index >> 3) << 2);
 		ddr_phyaddr = GPIO2_BASE + GPIO_SWPORTA_DDR_OFFSET;
@@ -285,12 +351,12 @@ int CPi_get_gpio_mode(int pin)
 /*
  * Set GPIO Mode
  */
-int CPi_set_gpio_mode(int pin, int mode)
+static void __CPi_set_gpio_mode(int pin, int mode)
 {
-    unsigned int regval = 0;
-    unsigned int bank   = pin >> 5;
-    unsigned int index  = pin - (bank << 5);
-    unsigned int phyaddr = 0;
+	unsigned int regval = 0;
+	unsigned int bank   = pin >> 5;
+	unsigned int index  = pin - (bank << 5);
+	unsigned int phyaddr = 0;
 
 #ifdef CONFIG_CLOCKWORKPI_A04
 
@@ -344,7 +410,7 @@ int CPi_set_gpio_mode(int pin, int mode)
 			printf("Before read reg val: 0x%x offset:%d\n",regval,offset);
 #endif
 		if (wiringPiDebug)
-		    printf("Register[%#x]: %#x index:%d\n", phyaddr, regval, index);
+			printf("Register[%#x]: %#x index:%d\n", phyaddr, regval, index);
 
 		if (INPUT == mode) {
 #ifdef CONFIG_CLOCKWORKPI_A06
@@ -391,13 +457,13 @@ int CPi_set_gpio_mode(int pin, int mode)
 			if (wiringPiDebug)
 				printf("Out mode get value: 0x%x\n",regval);
 #endif
-		} else 
+		} else
 			printf("Unknow mode\n");
 	} else
 		printf("unused pin\n");
 }
 
-int CPi_set_gpio_alt(int pin, int mode)
+static int CPi_set_gpio_alt(int pin, int mode)
 {
 #ifdef CONFIG_CLOCKWORKPI_A04
 	unsigned int regval = 0;
@@ -428,9 +494,9 @@ int CPi_set_gpio_alt(int pin, int mode)
 }
 
 /*
- * CPi Digital write 
+ * CPi Digital write
  */
-void CPi_digitalWrite(int pin, int value)
+static void __CPi_digitalWrite(int pin, int value)
 {
 	unsigned int bank   = pin >> 5;
 	unsigned int index  = pin - (bank << 5);
@@ -438,7 +504,7 @@ void CPi_digitalWrite(int pin, int value)
 	unsigned int regval = 0;
 
 #ifdef CONFIG_CLOCKWORKPI_A04
-	
+
 	if (bank >= 6) {
 		phyaddr = GPIOL_BASE + (bank -6) * 0x24 + 0x10;
 	} else {
@@ -460,7 +526,7 @@ void CPi_digitalWrite(int pin, int value)
 		cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
 	}
 	else if(bank == 2){
-		phyaddr = GPIO2_BASE + GPIO_SWPORTA_DR_OFFSET;			
+		phyaddr = GPIO2_BASE + GPIO_SWPORTA_DR_OFFSET;
 		cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
 	}
 	else if(bank == 3){
@@ -468,7 +534,7 @@ void CPi_digitalWrite(int pin, int value)
 		cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
 	}
 	else if(bank == 4){
-		phyaddr = GPIO4_BASE + GPIO_SWPORTA_DR_OFFSET;			
+		phyaddr = GPIO4_BASE + GPIO_SWPORTA_DR_OFFSET;
 		cru_phyaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
 	}
 
@@ -500,13 +566,13 @@ void CPi_digitalWrite(int pin, int value)
 				printf("HIGH val set over reg val: 0x%x\n", regval);
 		}
 
-	} 
+	}
 }
 
 /*
  * CPi Digital Read
  */
-int CPi_digitalRead(int pin)
+static int __CPi_digitalRead(int pin)
 {
 	int bank = pin >> 5;
 	int index = pin - (bank << 5);
@@ -549,6 +615,95 @@ int CPi_digitalRead(int pin)
 	return 0;
 }
 
+static void __CPi_pudctl(int _pin, int pud) 
+{
+	unsigned int regval = 0;
+	// every bank has 4 ports (A-D) x 8 pins (0-7)
+	unsigned int bank   = _pin >> 5;
+	unsigned int index  = _pin & 0x1f;
+	unsigned int port = index >> 3;
+	unsigned int pin = index & 7;
+	unsigned int phyaddr = 0;
+
+	if (CPI_PIN_MASK[bank][index] < 0) {
+		printf("unused pin\n");
+		return;
+	}
+
+#if defined(CONFIG_CLOCKWORKPI_A04)
+	// TODO
+#elif defined(CONFIG_CLOCKWORKPI_A06)
+	// cru_vaddr: see comment at the top of this file
+	// iomux_vaddr: pointing to GRF IOMUX control register
+	// pud_vaddr: pointing to GRF PU/PD control register
+	// gpio_vaddr: pointing to GPIO control register
+	unsigned int cru_vaddr, iomux_vaddr, pud_vaddr, ddr_vaddr;
+
+	switch(bank) {
+		case 0:
+			cru_vaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
+			iomux_vaddr = PMUGRF_IOMUX_0 + port*4;
+			pud_vaddr = PMUGRF_PUD_0 + port*4;
+			ddr_vaddr = GPIO0_BASE + GPIO_SWPORTA_DDR_OFFSET;
+			break;
+		case 1:
+			cru_vaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
+			iomux_vaddr = PMUGRF_IOMUX_1 + port*4;
+			pud_vaddr = PMUGRF_PUD_1 + port*4;
+			ddr_vaddr = GPIO1_BASE + GPIO_SWPORTA_DDR_OFFSET;
+			break;
+		case 2:
+			cru_vaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
+			iomux_vaddr = GRF_IOMUX_2 + port*4;
+			pud_vaddr = GRF_PUD_2 + port*4;
+			ddr_vaddr = GPIO2_BASE + GPIO_SWPORTA_DDR_OFFSET;
+			break;
+		case 3:
+			cru_vaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
+			iomux_vaddr = GRF_IOMUX_3 + port*4;
+			pud_vaddr = GRF_PUD_3 + port*4;
+			ddr_vaddr = GPIO3_BASE + GPIO_SWPORTA_DDR_OFFSET;
+			break;
+		case 4:
+			cru_vaddr = CRU_BASE + CRU_CLKGATE_CON31_OFFSET;
+			iomux_vaddr = GRF_IOMUX_4 + port*4;
+			pud_vaddr = GRF_PUD_4 + port*4;
+			ddr_vaddr = GPIO4_BASE + GPIO_SWPORTA_DDR_OFFSET;
+			break;
+		default:
+			printf("%s: invalid pin.\n", __PRETTY_FUNCTION__);
+			return;
+	}
+
+	// some necessary ceremony
+	writeR(0xffff0180, cru_vaddr);
+	regval = (readR(iomux_vaddr) >> (pin*2)) & 0x3;
+	if (regval != 0) {
+		printf("pin is not gpio\n");
+		return;
+	}
+	regval = (readR(ddr_vaddr) >> index) & 1;
+	if (regval != 0) {
+		printf("pin is not input\n");
+		return;
+	}
+	// assemble update val
+	regval =
+		(pud == PUD_OFF)  ? 0:
+		(pud == PUD_UP)   ? 1:
+		(pud == PUD_DOWN) ? 2:
+		0;
+
+	regval = regval << (pin*2);
+	regval = regval | (0x30000 << (pin*2));
+	writeR(regval, pud_vaddr);
+
+	if (wiringPiDebug){
+		regval = readR(pud_vaddr);
+		printf("PU/PD mode set over reg val: %#x\n",regval);
+	}
+#endif
+}
 
 int CPiSetup(int fd)
 {
@@ -594,6 +749,7 @@ int CPiSetup(int fd)
 
 #endif
 	wpimode = WPI_MODE_BCM;
+	return 0;
 }
 
 void CPiSetupRaw(void)
@@ -619,7 +775,7 @@ void CPiPinMode(int pin, int mode)
 		pin = bcmToGpioCPi[pin];
 	}
 
-	CPi_set_gpio_mode(pin, mode);
+	__CPi_set_gpio_mode(pin, mode);
 }
 
 void CPiDigitalWrite(int pin, int value)
@@ -640,7 +796,7 @@ void CPiDigitalWrite(int pin, int value)
 		pin = bcmToGpioCPi[pin];
 	}
 
-	CPi_digitalWrite(pin, value);
+	__CPi_digitalWrite(pin, value);
 }
 
 int CPiDigitalRead(int pin)
@@ -660,7 +816,7 @@ int CPiDigitalRead(int pin)
 		pin = bcmToGpioCPi[pin];
 	}
 
-	value = CPi_digitalRead(pin);
+	value = __CPi_digitalRead(pin);
 
 	if (wiringPiDebug)
 		printf("CPiDigitalRead: pin:%d,value:%d\n", pin, value);
@@ -668,22 +824,39 @@ int CPiDigitalRead(int pin)
 	return value;
 }
 
-void pinModeAltCP(int pin, int mode)
-{
-}
-
 void CPiBoardId (int *model, int *rev, int *mem, int *maker, int *warranty)
 {
 #ifdef CONFIG_CLOCKWORKPI_A04
-	*model = CPI_MODEL_A04; 
-	*rev = PI_VERSION_1; 
+	*model = CPI_MODEL_A04;
+	*rev = PI_VERSION_1;
 	*mem = 3;
 	*maker = 3;
 #elif defined(CONFIG_CLOCKWORKPI_A06)
-	*model = CPI_MODEL_A06; 
-	*rev = PI_VERSION_1; 
+	*model = CPI_MODEL_A06;
+	*rev = PI_VERSION_1;
 	*mem = 4;
 	*maker = 3;
 #endif
+}
+
+void CPiPullUpDnControl(int pin, int pud)
+{
+	if (wiringPiDebug)
+		printf("%s: pin:%d,pud:%d\n", __PRETTY_FUNCTION__, pin, pud);
+
+	if (pin >= GPIO_NUM) {
+		printf("%s: invaild pin:%d\n", __PRETTY_FUNCTION__, pin);
+		return;
+	}
+
+	if (wpimode == WPI_MODE_BCM) {
+		if(pin >= sizeof(bcmToGpioCPi)/sizeof(bcmToGpioCPi[0])) {
+			printf("%s: invaild pin:%d\n", __PRETTY_FUNCTION__, pin);
+			return;
+		}
+		pin = bcmToGpioCPi[pin];
+	}
+
+	__CPi_pudctl(pin, pud);
 }
 
