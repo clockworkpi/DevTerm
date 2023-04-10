@@ -1446,7 +1446,14 @@ void pinMode (int pin, int mode)
   setupCheck ("pinMode") ;
 
 #ifdef CONFIG_CLOCKWORKPI
-  CPiPinMode(pin, mode);
+
+  if ((pin & PI_GPIO_MASK) == 0)		// On-board pin
+  {
+    CPiPinMode(pin, mode);
+  } else if ((node = wiringPiFindNode (pin)) != NULL)
+  {
+      node->pinMode (node, pin, mode) ;
+  }
   return;
 #endif
 
@@ -1565,7 +1572,14 @@ int digitalRead (int pin)
   struct wiringPiNodeStruct *node = wiringPiNodes ;
 
 #ifdef CONFIG_CLOCKWORKPI
-  return CPiDigitalRead(pin);
+  if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
+  {
+    return CPiDigitalRead(pin);
+  } else {
+    if ((node = wiringPiFindNode (pin)) == NULL)
+      return LOW ;
+    return node->digitalRead (node, pin) ;
+  }
 #endif
 
   if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
@@ -1632,7 +1646,13 @@ void digitalWrite (int pin, int value)
   struct wiringPiNodeStruct *node = wiringPiNodes ;
 
 #ifdef CONFIG_CLOCKWORKPI
-  CPiDigitalWrite(pin, value);
+  if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
+  {
+    CPiDigitalWrite(pin, value);
+  } else {
+    if ((node = wiringPiFindNode (pin)) != NULL)
+      node->digitalWrite (node, pin, value) ;
+  }
   return;
 #endif
 
