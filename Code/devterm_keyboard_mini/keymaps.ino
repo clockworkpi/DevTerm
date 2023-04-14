@@ -62,7 +62,7 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
     'o','p','a','s','d','f','g','h',\  
     'j','k','l','z','x','c','v','b', \
     'n','m',',','.','/','\\',';','\'', \
-    KEY_RETURN,KEY_BACKSPACE,_FN_KEY,_FN_KEY,' ',EMP,EMP,EMP},
+    KEY_BACKSPACE,KEY_RETURN,_FN_KEY,_FN_KEY,' ',EMP,EMP,EMP},
  
   [FN_LAYER] = { _PRINT_KEY,_PAUSE_KEY,_VOLUME_MUTE,'`','[',']',KEY_F11,KEY_F12, \ 
     KEY_F1,KEY_F2,KEY_F3,KEY_F4,KEY_F5,KEY_F6,KEY_F7,KEY_F8,\  
@@ -71,7 +71,7 @@ const uint16_t keyboard_maps[][MATRIX_KEYS] = {
     'o','p','a','s','d','f','g',KEY_HOME,\  
     KEY_END,KEY_PAGE_DOWN,'l','z','x','c','v','b', \ 
     'n','m',_FN_BRIGHTNESS_DOWN,_FN_BRIGHTNESS_UP,'/','\\',';','\'', \ 
-    KEY_RETURN,KEY_DELETE,_FN_KEY,_FN_KEY,_FN_LIGHT_KEYBOARD,EMP,EMP,EMP}
+    KEY_DELETE,KEY_RETURN,_FN_KEY,_FN_KEY,_FN_LIGHT_KEYBOARD,EMP,EMP,EMP}
     
 };
 
