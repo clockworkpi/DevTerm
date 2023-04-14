@@ -241,16 +241,19 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     }break;
     case _FN_LIGHT_KEYBOARD: {
       //dv->_Serial->println("light keyboard");
+      
       if(mode == KEY_PRESSED) {
-        dv->Keyboard_state.backlight = dv->Keyboard_state.backlight  % 4;
+         dv->Keyboard_state.backlight ++;
+         if(dv->Keyboard_state.backlight >= 4) {
+          dv->Keyboard_state.backlight = 0;
+         }
+        
         pwmWrite(PA8,backlight[ dv->Keyboard_state.backlight ] );
         if(backlight[ dv->Keyboard_state.backlight ]== 0){
           timer.pause();
         }else{
           timer.resume();
         }
-        //dv->_Serial->println("light keyboard");
-         dv->Keyboard_state.backlight ++;
       }
     }break;
     case  _FN_KEY:
