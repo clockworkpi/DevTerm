@@ -167,12 +167,13 @@
 #define PRINT_STATE 0
 #define ESC_STATE 1
 #define GET_IMAGE 2
+#define GET_GRAY_IMAGE 3
 
 #define ALIGN_LEFT 0
 #define ALIGN_CENTER 1
 #define ALIGN_RIGHT 2
 
-#define IMAGE_MAX 9224
+#define IMAGE_MAX (9224*64)
 
 #define BITS8 8
 
