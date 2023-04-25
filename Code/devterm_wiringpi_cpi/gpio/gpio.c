@@ -1326,7 +1326,7 @@ static void doReadRaw (int argc, char *argv [])
 	}
 
 	pin = atoi (argv [2]) ;
-	val = CPi_digitalRead(pin);	
+	val = CPiDigitalRead(pin);	
 
 	printf ("%s\n", val == 0 ? "0" : "1") ;
 #endif
@@ -1352,9 +1352,9 @@ static void doWriteRaw (int argc, char *argv [])
 		val = atoi (argv [3]) ;
 
 	if (val == 0)
-		CPi_digitalWrite (pin, LOW) ;
+		CPiDigitalWrite (pin, LOW) ;
 	else
-		CPi_digitalWrite (pin, HIGH) ;
+		CPiDigitalWrite (pin, HIGH) ;
 #endif
 }
 

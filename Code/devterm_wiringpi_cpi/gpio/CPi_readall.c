@@ -122,13 +122,13 @@ void CPiReadAll(void)
 		printf (" | %4d", bcmToGpioCPi[pin]);
 		printf (" | %-4s", get_pin_name(bcmToGpioCPi[pin]));
 		printf (" | %4s", alts [CPi_get_gpio_mode(bcmToGpioCPi[pin])]);
-		printf (" | %d", CPi_digitalRead(bcmToGpioCPi[pin])) ;
+		printf (" | %d", CPiDigitalRead(bcmToGpioCPi[pin])) ;
 		pin2 = pin + 23;
 		printf (" | %3d", pin2);
 		printf (" | %4d", bcmToGpioCPi[pin2]);
 		printf (" | %-4s", get_pin_name(bcmToGpioCPi[pin2]));
 		printf (" | %4s", alts [CPi_get_gpio_mode(bcmToGpioCPi[pin2])]);
-		printf (" | %d", CPi_digitalRead(bcmToGpioCPi[pin2])) ;
+		printf (" | %d", CPiDigitalRead(bcmToGpioCPi[pin2])) ;
 		printf (" |\n") ;
 	}
 
@@ -158,7 +158,7 @@ void CPiReadAllRaw(void)
 				printf (" | %4d", pin2) ;
 				printf (" | %-4s", get_pin_name(pin2));
 				printf (" | %4s", alts [CPi_get_gpio_mode(pin2)]) ;
-				printf (" | %d", CPi_digitalRead(pin2)) ;
+				printf (" | %d", CPiDigitalRead(pin2)) ;
 			} else {
 				printf (" |     ") ;
 				printf (" |     ") ;
@@ -186,7 +186,7 @@ void CPiReadAllRaw(void)
 		for(i = 0; i < 5; i++) {
 			printf (" | %4d", pin2) ;
 			printf (" | %4s", alts [CPi_get_gpio_mode(pin2)]) ;
-			printf (" | %d", CPi_digitalRead(pin2)) ;
+			printf (" | %d", CPiDigitalRead(pin2)) ;
 			pin2 += 32;
 		}
 		printf (" |\n") ;

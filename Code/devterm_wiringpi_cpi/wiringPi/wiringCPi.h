@@ -47,6 +47,7 @@ extern int wiringPiDebug;
 extern int wiringPiReturnCodes;
 
 extern void CPiPinMode(int pin, int mode);
+extern int CPi_get_gpio_mode(int pin);
 extern void CPiDigitalWrite(int pin, int value);
 extern int CPiDigitalRead(int pin);
 extern void CPiSetupRaw(void);

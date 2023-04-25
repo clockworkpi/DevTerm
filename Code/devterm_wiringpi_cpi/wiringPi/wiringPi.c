@@ -975,7 +975,7 @@ void piBoardId (int *model, int *rev, int *mem, int *maker, int *warranty)
 //  unsigned int modelNum ;
 
 #ifdef CONFIG_CLOCKWORKPI
-  CPiBoardId(model, rev, mem, maker);
+  CPiBoardId(model, rev, mem, maker, warranty);
   return;
 #endif
 

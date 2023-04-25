@@ -282,7 +282,7 @@ static void writeR(unsigned int val, unsigned int addr)
 #endif
 }
 
-static int __CPi_get_gpio_mode(int pin)
+int CPi_get_gpio_mode(int pin)
 {
 	unsigned int regval = 0;
 	unsigned int bank   = pin >> 5;
