@@ -67,6 +67,10 @@ static int wpimode = -1 ;
 #define WPI_MODE_RAW 1
 #define BLOCK_SIZE (4*1024)
 
+#if(!defined(CONFIG_CLOCKWORKPI_A06) && !defined(CONFIG_CLOCKWORKPI_A04))
+#error("Unsupported board!")
+#endif
+
 #ifdef CONFIG_CLOCKWORKPI_A04
 
 int bcmToGpioCPi[64] =
@@ -287,7 +291,6 @@ int CPi_get_gpio_mode(int pin)
 	unsigned int regval = 0;
 	unsigned int bank   = pin >> 5;
 	unsigned int index  = pin - (bank << 5);
-	unsigned int phyaddr = 0;
 	unsigned char mode = -1;
 
 	if (CPI_PIN_MASK[bank][index] < 0)
@@ -330,6 +333,7 @@ int CPi_get_gpio_mode(int pin)
 	return mode + 1;
 
 #elif (defined CONFIG_CLOCKWORKPI_A04)
+	unsigned int phyaddr = 0;
 
 	int offset = ((index - ((index >> 3) << 3)) << 2);
 
@@ -373,7 +377,7 @@ static void __CPi_set_gpio_mode(int pin, int mode)
 #ifdef CONFIG_CLOCKWORKPI_A06
 
 	int offset = ((index - ((index >> 3) << 3)));
-	unsigned int cru_phyaddr, grf_phyaddr, gpio_phyaddr;
+	unsigned int cru_phyaddr = 0, grf_phyaddr = 0, gpio_phyaddr = 0;
 
 	if(bank == 0){
 		cru_phyaddr = PMUCRU_BASE + PMUCRU_CLKGATE_CON1_OFFSET;
@@ -577,7 +581,7 @@ static int __CPi_digitalRead(int pin)
 	int bank = pin >> 5;
 	int index = pin - (bank << 5);
 	int val;
-	unsigned int phyaddr;
+	unsigned int phyaddr = 0;
 
 #ifdef CONFIG_CLOCKWORKPI_A04
 
@@ -623,7 +627,6 @@ static void __CPi_pudctl(int _pin, int pud)
 	unsigned int index  = _pin & 0x1f;
 	unsigned int port = index >> 3;
 	unsigned int pin = index & 7;
-	unsigned int phyaddr = 0;
 
 	if (CPI_PIN_MASK[bank][index] < 0) {
 		printf("unused pin\n");
@@ -631,6 +634,7 @@ static void __CPi_pudctl(int _pin, int pud)
 	}
 
 #if defined(CONFIG_CLOCKWORKPI_A04)
+	unsigned int phyaddr = 0;
 	// TODO
 #elif defined(CONFIG_CLOCKWORKPI_A06)
 	// cru_vaddr: see comment at the top of this file
@@ -757,8 +761,9 @@ void CPiSetupRaw(void)
 	wpimode = WPI_MODE_RAW;
 }
 
-void CPiPinMode(int pin, int mode)
+void CPiPinMode(int _pin, int mode)
 {
+  unsigned int pin = _pin;
 	if (wiringPiDebug)
 		printf("CPiPinMode: pin:%d,mode:%d\n", pin, mode);
 
@@ -778,8 +783,9 @@ void CPiPinMode(int pin, int mode)
 	__CPi_set_gpio_mode(pin, mode);
 }
 
-void CPiDigitalWrite(int pin, int value)
+void CPiDigitalWrite(int _pin, int value)
 {
+  unsigned int pin = _pin;
 	if (wiringPiDebug)
 		printf("CPiDigitalWrite: pin:%d,value:%d\n", pin, value);
 
@@ -799,9 +805,10 @@ void CPiDigitalWrite(int pin, int value)
 	__CPi_digitalWrite(pin, value);
 }
 
-int CPiDigitalRead(int pin)
+int CPiDigitalRead(int _pin)
 {
 	int value;
+  unsigned int pin = _pin;
 
 	if (pin >= GPIO_NUM) {
 		printf("CPiDigitalRead: invaild pin:%d\n", pin);
@@ -826,6 +833,7 @@ int CPiDigitalRead(int pin)
 
 void CPiBoardId (int *model, int *rev, int *mem, int *maker, int *warranty)
 {
+  (void)warranty;
 #ifdef CONFIG_CLOCKWORKPI_A04
 	*model = CPI_MODEL_A04;
 	*rev = PI_VERSION_1;
@@ -839,8 +847,9 @@ void CPiBoardId (int *model, int *rev, int *mem, int *maker, int *warranty)
 #endif
 }
 
-void CPiPullUpDnControl(int pin, int pud)
+void CPiPullUpDnControl(int _pin, int pud)
 {
+  unsigned int pin = _pin;
 	if (wiringPiDebug)
 		printf("%s: pin:%d,pud:%d\n", __PRETTY_FUNCTION__, pin, pud);
 
