@@ -500,7 +500,8 @@ static int CPi_set_gpio_alt(int pin, int mode)
 /*
  * CPi Digital write
  */
-static void __CPi_digitalWrite(int pin, int value)
+__attribute__ ((visibility ("default")))
+void __CPi_digitalWrite(int pin, int value)
 {
 	unsigned int bank   = pin >> 5;
 	unsigned int index  = pin - (bank << 5);
@@ -576,7 +577,8 @@ static void __CPi_digitalWrite(int pin, int value)
 /*
  * CPi Digital Read
  */
-static int __CPi_digitalRead(int pin)
+__attribute__ ((visibility ("default")))
+int __CPi_digitalRead(int pin)
 {
 	int bank = pin >> 5;
 	int index = pin - (bank << 5);
