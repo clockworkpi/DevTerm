@@ -683,6 +683,23 @@ void parse_cmd(CONFIG *cfg, uint8_t *cmd, uint8_t cmdidx) {
       cmd_idx = 0;
       ser_cache.idx = 0;
     }
+    // GS v 1 p wL wH hL hH d1…dk
+    if (cmd[0] == ASCII_GS && cmd[1] == 118 && cmd[2] == 49) {
+      uint16_t width = cmd[4] + cmd[5] * 256;
+      uint16_t height = cmd[6] + cmd[7] * 256;
+      uint16_t k;
+      k = width * height;
+      if (k <= IMAGE_MAX) {
+        cfg->state = GET_GRAY_IMAGE;
+        cfg->img->num = k;
+        cfg->img->idx = 0;
+        cfg->img->width = width;
+        cfg->img->need_print = 1;
+      }
+      // do not reset_cmd()
+      cmd_idx = 0;
+      ser_cache.idx = 0;
+    }
   }
 }
 
@@ -696,6 +713,16 @@ void parse_serial_stream(CONFIG *cfg, uint8_t input_ch) {
     if (cfg->img->idx >= cfg->img->num) { // image full
       if (cfg->img->need_print == 1) {
         print_image8(cfg);
+      }
+      reset_cmd();
+      cfg->state = PRINT_STATE;
+    }
+  } else if (cfg->state == GET_GRAY_IMAGE) {
+    cfg->img->cache[cfg->img->idx] = input_ch;
+    cfg->img->idx++;
+    if (cfg->img->idx >= cfg->img->num) { // image full
+      if (cfg->img->need_print == 1) {
+        print_gray_image8(cfg);
       }
       reset_cmd();
       cfg->state = PRINT_STATE;

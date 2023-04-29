@@ -340,7 +340,7 @@ void print_dots_8bit(CONFIG *cfg, uint8_t *Array, uint8_t characters,
 
   while (y < STB_NUMBER) {
 
-    while (i < 10) {
+    while (i < cfg->density) {
 
       digitalWrite(STBx[y], HIGH);
       delayus(HEAT_TIME + cfg->density * 46);
@@ -827,6 +827,68 @@ uint8_t print_image8(CONFIG *cfg) {
     y++;
   }
   // feed_pitch1(cfg->feed_pitch,cfg->orient);
+  cfg->img->need_print = 0;
+
+  cfg->img->num = 0;
+  cfg->img->idx = 0;
+  cfg->img->width = 0;
+  DISABLE_VH;
+
+  return rv;
+}
+
+uint8_t print_gray_image8(CONFIG *cfg) {
+
+  uint16_t height;
+  uint16_t x, y, addr;
+
+  uint8_t rv;
+  uint8_t LinePixels[MAXPIXELS];
+
+  uint8_t maxchars = PRINTER_BITS / 8;
+  height = cfg->img->num / cfg->img->width;
+  y = 0;
+  addr = 0;
+  // gray print uses 4 colors with following convention
+  // 3N+0th line has cfg->density/4
+  // 3N+1th line has cfg->density/2
+  // 3N+2th line has cfg->density
+  // white pixels should be unset in all 3 lines
+  uint8_t density = cfg->density;
+  uint8_t feed_pitch = cfg->feed_pitch;
+  rv = IsPaper();
+  ENABLE_VH;
+  while (y < height) {
+    x = 0;
+    while (x < cfg->img->width) {
+      addr = x + y * cfg->img->width;
+
+      if (cfg->img->revert_bits > 0) // LSB
+        LinePixels[x] = invert_bit(cfg->img->cache[addr]);
+      else
+        LinePixels[x] = cfg->img->cache[addr];
+
+      x++;
+    }
+    rv = IsPaper();
+    if (rv == IS_PAPER) {
+      if (y % 3 == 0) {
+	cfg->density = density / 4;
+	cfg->feed_pitch = 0;
+      }
+      if (y % 3 == 1) {
+	cfg->density = density / 2;
+	cfg->feed_pitch = 0;
+      }
+      if (y % 3 == 2) {
+	cfg->density = density;
+	cfg->feed_pitch = feed_pitch;
+      }
+      print_dots_8bit_split(cfg, LinePixels, x);
+      delayus(HEAT_TIME*2);
+    }
+    y++;
+  }
   cfg->img->need_print = 0;
 
   cfg->img->num = 0;

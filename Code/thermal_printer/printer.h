@@ -37,6 +37,7 @@ uint8_t print_lines8(CONFIG *,int,int);
 uint8_t invert_bit(uint8_t a);
 
 uint8_t print_image8(CONFIG *);
+uint8_t print_gray_image8(CONFIG *);
 void print_cut_line(CONFIG *);
 
 void printer_set_font_mode(CONFIG *cfg, int);
