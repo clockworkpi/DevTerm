@@ -22,7 +22,7 @@ static const uint32_t LOOP_INTERVAL_MS = 0;
 static TickWaiter<LOOP_INTERVAL_MS> waiter;
 
 HardwareTimer timer(1);
-HardwareTimer ctrl_timer(4);
+//HardwareTimer ctrl_timer(4);
 
 void setup() {
   USBComposite.setManufacturerString("ClockworkPI");

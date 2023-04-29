@@ -80,13 +80,13 @@ static uint8_t fn_actions[MATRIX_KEYS]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 const uint16_t keys_maps[][KEYS_NUM] = {
  
-   [DEF_LAYER] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEFT, _JOYSTICK_RIGHT, \
+   [DEF_LAYER] = {KEY_UP_ARROW,KEY_DOWN_ARROW, KEY_LEFT_ARROW,KEY_RIGHT_ARROW, \
                  _JOYSTICK_A,_JOYSTICK_B, _JOYSTICK_X,_JOYSTICK_Y, \
                  _LEFT_SHIFT_KEY,KEY_RIGHT_SHIFT,_LEFT_CTRL_KEY, KEY_RIGHT_CTRL, \
                  _LEFT_ALT,  _MOUSE_LEFT,  KEY_RIGHT_ALT,_MOUSE_RIGHT,  \
                  _TRACKBALL_BTN },
                  
-   [FN_LAYER] = {_JOYSTICK_UP,_JOYSTICK_DOWN, _JOYSTICK_LEFT, _JOYSTICK_RIGHT, \
+   [FN_LAYER] = {_FN_KEY_UP_ARROW,_FN_KEY_DOWN_ARROW, _FN_KEY_LEFT_ARROW, _FN_KEY_RIGHT_ARROW, \
                  _JOYSTICK_A,_JOYSTICK_B, _JOYSTICK_X,_JOYSTICK_Y, \
                  _LEFT_SHIFT_KEY,KEY_RIGHT_SHIFT,_LEFT_CTRL_KEY, KEY_RIGHT_CTRL, \
                  _CMD_KEY,  _MOUSE_LEFT,  KEY_RIGHT_ALT,_MOUSE_RIGHT,  \
@@ -96,7 +96,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
 
 
                                       
-const uint16_t backlight[4] = {0,32,500,2000};
+const uint16_t backlight_vals[3] = {0,32,2000};
 
 uint8_t check_pd2(){ // if swtich 2 in back is set to on(HIGH)
 
@@ -244,26 +244,21 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
       
       if(mode == KEY_PRESSED) {
          dv->Keyboard_state.backlight ++;
-         if(dv->Keyboard_state.backlight >= 4) {
+         if(dv->Keyboard_state.backlight >= 3) {
           dv->Keyboard_state.backlight = 0;
          }
-        
-        pwmWrite(PA8,backlight[ dv->Keyboard_state.backlight ] );
-        if(backlight[ dv->Keyboard_state.backlight ]== 0){
-          timer.pause();
-        }else{
-          timer.resume();
-        }
+         timer.resume();
+         pwmWrite(PA8,backlight_vals[ dv->Keyboard_state.backlight ] );
       }
     }break;
     case  _FN_KEY:
       if(mode == KEY_PRESSED){
-	if(dv->Keyboard_state.fn.lock == 0){
+	      if(dv->Keyboard_state.fn.lock == 0){
           dv->Keyboard_state.fn_on = FN_LAYER;
-	  dv->Keyboard_state.fn.begin = k;
-	}
-      }else if(mode == KEY_RELEASED ) {
-	if(dv->Keyboard_state.fn.lock == 0){
+	        dv->Keyboard_state.fn.begin = k;
+	      }
+        }else if(mode == KEY_RELEASED ) {
+	      if(dv->Keyboard_state.fn.lock == 0){
           for(int i=0;i<64;i++) {
             if(fn_actions[i] !=0) {
               k = keyboard_maps[dv->Keyboard_state.fn_on][i];
@@ -274,7 +269,7 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
           dv->Keyboard_state.fn_on = 0;
         }
 
-	dv->Keyboard_state.fn.begin =0;
+	      dv->Keyboard_state.fn.begin = 0;
         dv->Keyboard_state.fn.time = 0;
        }
     break;
@@ -495,16 +490,16 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     case _LEFT_ALT:
     case KEY_RIGHT_ALT:
       if(mode == KEY_PRESSED){
-	if(dv->Keyboard_state.alt.lock == 0){
-	  dv->Keyboard->press(k);
-	  dv->Keyboard_state.alt.begin=k;
-	}
+	      if(dv->Keyboard_state.alt.lock == 0){ 
+	        dv->Keyboard->press(k);
+	        dv->Keyboard_state.alt.begin=k;
+	      }
       }else {
-	if(dv->Keyboard_state.alt.lock == 0){
+	    if(dv->Keyboard_state.alt.lock == 0){
           dv->Keyboard->release(k);
-	  dv->Keyboard_state.alt.begin = 0;
-	  dv->Keyboard_state.alt.time = 0;
-	}
+	        dv->Keyboard_state.alt.begin = 0;
+	        dv->Keyboard_state.alt.time = 0;
+	      }
       }
     break;
 
@@ -523,7 +518,13 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
         dv->Mouse->release(1);
       }
     break;
-    default:break;
+    default:
+       if(mode == KEY_PRESSED) {
+        dv->Keyboard->press(k);
+      }else if(mode == KEY_RELEASED) {
+        dv->Keyboard->release(k);
+      }
+    break;
     
   }
   /*
