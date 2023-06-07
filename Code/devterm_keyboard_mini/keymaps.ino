@@ -513,9 +513,9 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
 
     case _TRACKBALL_BTN:
       if(mode == KEY_PRESSED){
-        dv->Mouse->press(1);
+        dv->Mouse->press(MOUSE_MIDDLE);
       }else if(mode == KEY_RELEASED){
-        dv->Mouse->release(1);
+        dv->Mouse->release(MOUSE_MIDDLE);
       }
     break;
     default:
