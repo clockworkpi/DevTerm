@@ -222,7 +222,11 @@ void keyboard_action(DEVTERM*dv,uint8_t row,uint8_t col,uint8_t mode) {
     }break;
     case _VOLUME_M:{
       if(mode == KEY_PRESSED) {
-        dv->Consumer->press(HIDConsumer::VOLUME_DOWN);
+        if(dv->Keyboard_state.sf_on == 1){
+           dv->Consumer->press(HIDConsumer::VOLUME_UP); 
+        }else{
+          dv->Consumer->press(HIDConsumer::VOLUME_DOWN);
+        }
       }else {
         dv->Consumer->release();
       }
@@ -317,14 +321,16 @@ void keypad_action(DEVTERM*dv,uint8_t col,uint8_t mode) {
     case _LEFT_SHIFT_KEY:
     case KEY_RIGHT_SHIFT:
       if(mode == KEY_PRESSED) {
-	if(dv->Keyboard_state.shift.lock == 0){
+        dv->Keyboard_state.sf_on = 1;
+	      if(dv->Keyboard_state.shift.lock == 0){
           dv->Keyboard->press(k);
-	  dv->Keyboard_state.shift.begin=k;
-	}
+	        dv->Keyboard_state.shift.begin=k;
+	      }
       }else if(mode == KEY_RELEASED) {
+        dv->Keyboard_state.sf_on = 0;
         if(dv->Keyboard_state.shift.lock == 0){
           dv->Keyboard->release(k);
-	  dv->Keyboard_state.shift.begin = 0;
+	        dv->Keyboard_state.shift.begin = 0;
           dv->Keyboard_state.shift.time = 0;
 	}
       }
