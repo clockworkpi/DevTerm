@@ -96,7 +96,7 @@ const uint16_t keys_maps[][KEYS_NUM] = {
 
 
                                       
-const uint16_t backlight_vals[3] = {0,32,2000};
+const uint16_t backlight_vals[3] = {0,500,2000};
 
 uint8_t check_pd2(){ // if swtich 2 in back is set to on(HIGH)
 
