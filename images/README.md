@@ -7,4 +7,4 @@ bef6c111863f8d2e6ef1cb23be354152  http://dl.clockworkpi.com/DevTerm_CM3_v0.1a.im
 7938ed1cdda98ba6f28049a819c12dc1  http://dl.clockworkpi.com/DevTerm_CM4_v0.1.img.bz2 (32bit)  
 49aa472a6e4d81a48e0a1a26436f02c2  http://dl.clockworkpi.com/DevTerm_R01_v0.2a.img.bz2  
 
-
+ab081eabf24ae501dc3f40a9126b7e5a  http://dl.clockworkpi.com/DevTerm_CM4_v0.3e_xfce_64bit.img.7z
