@@ -39,6 +39,7 @@ For flashing the OS image, you can use the following tools:
 * Linux users can use the "dd" command to flash the image.
 
 
+## DevTerm keyboard firmware
 DevTerm keyboard firmware flash program available. You can download it from this link: [DevTerm Keyboard Firmware Flash Program](https://github.com/clockworkpi/DevTerm/raw/main/Bin/devterm_keyboard_flash.tar.gz).
 
 Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubuntu 22.04:
