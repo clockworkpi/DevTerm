@@ -15,7 +15,7 @@ http://dl.clockworkpi.com/DevTerm_CM3_v0.1a.img.bz2 (32bit)
 md5sum bef6c111863f8d2e6ef1cb23be354152  
 
 ### CM4
-* [DevTerm_CM4_v0.2b_64bit.img.7z](https://mega.nz/file/dQFijKhR#z1OsTshuHh9G7XXM1wvz0QJpXVn9u9HGcqNg6eFGbPI)  
+* http://dl.clockworkpi.com/DevTerm_CM4_v0.2b_64bit.img.7z    
 md5sum 8b2fdebe254dfa1f5f245cebb85b1e84
 
 * http://dl.clockworkpi.com/DevTerm_CM4_v0.1.img.bz2 (32bit)    
