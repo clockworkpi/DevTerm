@@ -39,9 +39,9 @@ For flashing the OS image, you can use the following tools:
 * Linux users can use the "dd" command to flash the image.
 
 
-Devterm keyboard firmware flash program available. You can download it from this link: [Devterm Keyboard Firmware Flash Program](https://github.com/clockworkpi/DevTerm/raw/main/Bin/devterm_keyboard_flash.tar.gz).
+DevTerm keyboard firmware flash program available. You can download it from this link: [DevTerm Keyboard Firmware Flash Program](https://github.com/clockworkpi/DevTerm/raw/main/Bin/devterm_keyboard_flash.tar.gz).
 
-Here's how you can flash the firmware on Devterm(A06 or CM4) or a PC running Ubuntu 22.04:
+Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubuntu 22.04:
 
 1. Download the devterm_keyboard_flash.tar.gz file.
 2. Extract the contents of the archive: `tar zxvf devterm_keyboard_flash.tar.gz`.
@@ -49,6 +49,6 @@ Here's how you can flash the firmware on Devterm(A06 or CM4) or a PC running Ubu
 4. Navigate to the extracted directory: `cd devterm_keyboard_flash`.
 5. Execute the flash script with root privileges: `sudo ./flash.sh`.
 6. If everything goes well, you will see a progress bar indicating the flashing process.
-7. If any issues occur or the keyboard loses control (which is unlikely), simply reboot Devterm to resolve it.
+7. If any issues occur or the keyboard loses control (which is unlikely), simply reboot DevTerm to resolve it.
 8. Rest assured that this flash program will not brick your keyboard.
 
