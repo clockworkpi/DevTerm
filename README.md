@@ -21,7 +21,7 @@ md5sum 8b2fdebe254dfa1f5f245cebb85b1e84
 * http://dl.clockworkpi.com/DevTerm_CM4_v0.1.img.bz2 (32bit)    
 md5sum 7938ed1cdda98ba6f28049a819c12dc1  
 
-* http://dl.clockworkpi.com/DevTerm_CM4_v0.3e_xfce_64bit.img.7z (based on rpi-lite with xfce)  
+* http://dl.clockworkpi.com/DevTerm_CM4_v0.3e_xfce_64bit.img.7z (based on [RPI-lite](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz) with xfce)  
 md5sum ab081eabf24ae501dc3f40a9126b7e5a
 
 ### R01
