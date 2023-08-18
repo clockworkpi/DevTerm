@@ -3,15 +3,15 @@
 ## OS images
 
 ### A04
-http://dl.clockworkpi.com/DevTerm_A04_v0.2h.img.bz2 (32bit)  
+* http://dl.clockworkpi.com/DevTerm_A04_v0.2h.img.bz2 (32bit)  
 md5sum acec1d02a37bfbffc9ed025fd718948e
 
 ### A06
-http://dl.clockworkpi.com/DevTerm_A06_v0.2h.img.bz2   
+* http://dl.clockworkpi.com/DevTerm_A06_v0.2h.img.bz2   
 md5sum 26f52bfde573479960d8696f407d19b9  
 
 ### CM3
-http://dl.clockworkpi.com/DevTerm_CM3_v0.1a.img.bz2 (32bit)  
+* http://dl.clockworkpi.com/DevTerm_CM3_v0.1a.img.bz2 (32bit)  
 md5sum bef6c111863f8d2e6ef1cb23be354152  
 
 ### CM4
@@ -25,7 +25,7 @@ md5sum 7938ed1cdda98ba6f28049a819c12dc1
 md5sum ab081eabf24ae501dc3f40a9126b7e5a
 
 ### R01
-http://dl.clockworkpi.com/DevTerm_R01_v0.2a.img.bz2   
+* http://dl.clockworkpi.com/DevTerm_R01_v0.2a.img.bz2   
 md5sum 49aa472a6e4d81a48e0a1a26436f02c2
 
 
