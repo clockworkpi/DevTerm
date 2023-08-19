@@ -53,3 +53,6 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 7. If any issues occur or the keyboard loses control (which is unlikely), simply reboot DevTerm to resolve it.
 8. Rest assured that this flash program will not brick your keyboard.
 
+## Community
+Please visit our [forum](https://forum.clockworkpi.com/) for more information
+
