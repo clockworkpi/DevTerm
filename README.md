@@ -64,6 +64,10 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 * How to print a self test page.  
 `echo -en "\x12\x54" >  /tmp/DEVTERM_PRINTER_IN`
 
+* How to print a text file.  
+`curl -L https://github.com/clockworkpi/DevTerm/raw/main/README.md | tee >  /tmp/DEVTERM_PRINTER_IN`  
+
+
 * [Learning more...](https://github.com/clockworkpi/DevTerm/tree/main/Code/thermal_printer)
 
 
