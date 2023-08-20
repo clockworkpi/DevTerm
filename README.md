@@ -32,13 +32,13 @@ md5sum 49aa472a6e4d81a48e0a1a26436f02c2
 
 
 
+After downloading the files, you will need to extract or decompress them. Please keep in mind that MacOS 11.6 or a higher version is required to extract 7z files.  
+  
+To flash the OS image, you can use the following tools:  
+  
+- For Windows and macOS users, [Etcher](https://etcher.balena.io/) can be used to flash the image.  
+- Linux users can employ the "dd" command to flash the image.  
 
-After downloading the files, you need to uncompress them. Please note that MacOS requires version 11.6 or higher to uncompress 7z files.
-
-For flashing the OS image, you can use the following tools:
-
-* Windows and macOS users can use [Etcher](https://etcher.balena.io/) to flash the image.
-* Linux users can use the "dd" command to flash the image.
 
 
 ## DevTerm Keyboard Firmware
