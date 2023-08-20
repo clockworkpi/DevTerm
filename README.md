@@ -1,23 +1,6 @@
 # DevTerm
 
-## Assembly guidelines
-
-* [Assembly guidelines](https://github.com/clockworkpi/DevTerm/blob/main/Clockwork_DevTerm_Assembly_Guidelines.pdf)  
-
-## Schematic
-
-* [DevTerm A06 core mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_A06_Core_for_Mainboard_V3.14_Schematic.pdf)
-* [DevTerm battery schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Battery_Schematic.pdf) 
-* [DevTerm Ext schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Ext_Schematic.pdf)
-* [DevTerm keyboard schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Schematic.pdf)
-* [DevTerm keyboard trackball schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Trackball_Schematic.pdf)
-* [DevTerm R01 core mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_R01_Core_for_Mainboard_V3.14_Schematic.pdf)
-* [Mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_Mainboard_V3.14_Schematic.pdf)
-* [Thermal printer schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/Spec_MTP02-I.pdf)
-* [LCD screen schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/ICNL9707_Datasheet.pdf)
-* [CM4 adapter schematic](https://github.com/clockworkpi/DevTerm/blob/main/clockwork_Adapter_CM4_Schematic.pdf)
-
-## OS images
+## DevTerm OS Images
 
 ### A04
 * http://dl.clockworkpi.com/DevTerm_A04_v0.2h.img.bz2 (32bit)  
@@ -56,7 +39,7 @@ For flashing the OS image, you can use the following tools:
 * Linux users can use the "dd" command to flash the image.
 
 
-## DevTerm keyboard firmware
+## DevTerm Keyboard Firmware
 DevTerm keyboard firmware flash program available. You can download it from this link: [DevTerm Keyboard Firmware Flash Program](https://github.com/clockworkpi/DevTerm/raw/main/Bin/devterm_keyboard_flash.tar.gz).
 
 Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubuntu 22.04:
@@ -71,17 +54,33 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 8. Rest assured that this flash program will not brick your keyboard.
 
 
-## Thermal printer testing commands
+## Thermal Printer Testing Commands
 
-* Hello World  
+* How to print "Hello World".  
 `echo "hello world\n\n\n\n\n\n\n\n\n\n" > /tmp/DEVTERM_PRINTER_IN`
 
-* print the test page  
+* How to print a self test page.  
 `echo -en "\x12\x54" >  /tmp/DEVTERM_PRINTER_IN`
 
-* [more](https://github.com/clockworkpi/DevTerm/tree/main/Code/thermal_printer)
+* [Learning more...](https://github.com/clockworkpi/DevTerm/tree/main/Code/thermal_printer)
 
+
+## Assembly guidelines
+
+* [Assembly guidelines](https://github.com/clockworkpi/DevTerm/blob/main/Clockwork_DevTerm_Assembly_Guidelines.pdf)  
+
+## Schematic
+
+* [DevTerm A06 core mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_A06_Core_for_Mainboard_V3.14_Schematic.pdf)
+* [DevTerm battery schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Battery_Schematic.pdf) 
+* [DevTerm Ext schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Ext_Schematic.pdf)
+* [DevTerm keyboard schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Schematic.pdf)
+* [DevTerm keyboard trackball schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Trackball_Schematic.pdf)
+* [DevTerm R01 core mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_R01_Core_for_Mainboard_V3.14_Schematic.pdf)
+* [Mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_Mainboard_V3.14_Schematic.pdf)
+* [CM4 adapter schematic](https://github.com/clockworkpi/DevTerm/blob/main/clockwork_Adapter_CM4_Schematic.pdf)
+* [Learning more...](Schematics/)
 
 ## Community
-Please visit our [forum](https://forum.clockworkpi.com/) for more information
+Please visit our [Github Wiki](https://github.com/clockworkpi/DevTerm/wiki) and https://forum.clockworkpi.com for more information.
 
