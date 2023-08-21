@@ -90,15 +90,40 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 ## Gearbox 
 ### A04
 
-Gearbox is a script tool used to adjust the A04 chip.  
+Gearbox is a script tool used to adjust the A04 CPU frequency.  
 you can get it by running 
 ```
 sudo apt update 
 sudo apt install -y devterm-gearbox-a04
 ```
-you can run `devterm-gearbox-a04` to see the current core status.
+you can run `devterm-a04-gearbox` to see the current core status.
 
 
+```
+
+Current Status:
++-----------------------------------+
+|            Cortex-A53             |
++--------+--------+--------+--------+
+| CPU 0  | CPU 1  | CPU 2  | CPU 3  |
++--------+--------+--------+--------+
+|1320Mhz |1320Mhz |  OFF   |  OFF   |
++--------+--------+--------+--------+
+CPU Governor: ondemand
+
+```
+
+Run `sudo devterm-a04-gearbox -s n` to set gear, n would be 1,2,3,4,5
+
+There are 5 gears in gearbox
+
+```
+               1 for simple console tasks with long battery life.
+               2 for simple writing tasks with long battery life.
+               3 for most 2D games and emulators.
+               4 for playing videos and 3D games,browsing websites.
+               5 for performance-first tasks.
+```
 
 
 ### A06 
@@ -125,7 +150,7 @@ Current Status:
 CPU Governor: schedutil    GPU Governor: simple_ondemand
 ```
 
-Run `sudo a06-gearbox -s n` to set gear
+Run `sudo a06-gearbox -s n` to set gear,n would be 1,2,3,4,5,6
 
 There are 6 gears in gearbox
 
