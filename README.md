@@ -90,8 +90,15 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 ## Gearbox 
 
 Gearbox(A06 only) is a script tool used to adjust the big.LITTLE architecture of the A06 chip.  
+you can get it by running 
+```
+sudo apt update 
+sudo apt install -y devterm-gearbox-a06
+```
 
 In latest os image of A06, default Gearbox is set to use 4 LITTLE core with 816Mhz,GPU at 400Mhz
+
+you can run `a06-gearbox` to see the current core status.
 
 ```
 Current Status:
@@ -104,8 +111,6 @@ Current Status:
 +--------+--------+--------+--------+--------+--------+-----------+
 CPU Governor: schedutil    GPU Governor: simple_ondemand
 ```
-
-you can run `a06-gearbox` to see the current core status.
 
 Run `sudo a06-gearbox -s n` to set gear
 
