@@ -113,7 +113,7 @@ CPU Governor: ondemand
 
 ```
 
-Run `sudo devterm-a04-gearbox -s n` to set gear, n would be 1,2,3,4,5
+Run `sudo devterm-a04-gearbox -s [GEAR]` to set gear, GEAR would be 1,2,3,4,5
 
 There are 5 gears in gearbox
 
@@ -150,7 +150,7 @@ Current Status:
 CPU Governor: schedutil    GPU Governor: simple_ondemand
 ```
 
-Run `sudo a06-gearbox -s n` to set gear,n would be 1,2,3,4,5,6
+Run `sudo a06-gearbox -s [GEAR]` to set gear,GEAR would be 1,2,3,4,5,6
 
 There are 6 gears in gearbox
 
