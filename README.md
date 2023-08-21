@@ -88,8 +88,19 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 * [Learning more...](Schematics/)
 
 ## Gearbox 
+### A04
 
-Gearbox(A06 only) is a script tool used to adjust the big.LITTLE architecture of the A06 chip.  
+Gearbox is a script tool used to adjust the big.LITTLE architecture of the A06 chip.  
+you can get it by running 
+```
+sudo apt update 
+sudo apt install -y devterm-gearbox-a04
+```
+
+
+
+### A06 
+Gearbox is a script tool used to adjust the big.LITTLE architecture of the A06 chip.  
 you can get it by running 
 ```
 sudo apt update 
