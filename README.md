@@ -87,6 +87,41 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 * [CM4 adapter schematic](https://github.com/clockworkpi/DevTerm/blob/main/clockwork_Adapter_CM4_Schematic.pdf)
 * [Learning more...](Schematics/)
 
+## Gearbox 
+
+Gearbox(A06 only) is a script tool used to adjust the big.LITTLE architecture of the A06 chip.  
+
+In latest os image of A06, default Gearbox is set to use 4 LITTLE core with 816Mhz,GPU at 400Mhz
+
+```
+Current Status:
++-----------------------------------+-----------------+-----------+
+|            Cortex-A53             |   Cortex-A72    | Mali-T860 |
++--------+--------+--------+--------+--------+--------+-----------+
+| CPU 0  | CPU 1  | CPU 2  | CPU 3  | CPU 4  | CPU 5  |    GPU    |
++--------+--------+--------+--------+--------+--------+-----------+
+| 816Mhz | 816Mhz | 816Mhz | 816Mhz |  OFF   |  OFF   |   400MHz  |
++--------+--------+--------+--------+--------+--------+-----------+
+CPU Governor: schedutil    GPU Governor: simple_ondemand
+```
+
+you can run `a06-gearbox` to see the current core status.
+
+Run `sudo a06-gearbox -s n` to set gear
+
+There are 6 gears in gearbox
+
+```
+               1 for simple writing tasks with long battery life.
+               2 for browsing most websites with long battery life.
+               3 for most 2D games and emulators.
+               4 for playing videos and 3D games.
+               5 for performance-first tasks.
+               6 for max performance, max power (usage).
+
+```
+
+
 ## Community
 Please visit our [Github Wiki](https://github.com/clockworkpi/DevTerm/wiki) and https://forum.clockworkpi.com for more information.
 
