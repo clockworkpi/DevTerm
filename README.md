@@ -78,12 +78,13 @@ Here's how you can flash the firmware on DevTerm(A06 or CM4) or a PC running Ubu
 ## Schematic
 
 * [DevTerm A06 core mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_A06_Core_for_Mainboard_V3.14_Schematic.pdf)
-* [DevTerm battery schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Battery_Schematic.pdf) 
-* [DevTerm Ext schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Ext_Schematic.pdf)
-* [DevTerm keyboard schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Schematic.pdf)
-* [DevTerm keyboard trackball schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Trackball_Schematic.pdf)
 * [DevTerm R01 core mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_R01_Core_for_Mainboard_V3.14_Schematic.pdf)
 * [Mainboard v3.14 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_Mainboard_V3.14_Schematic.pdf)
+* [Mainboard v3.14-V5 schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_Mainboard_V3.14_V5_Schematic.pdf)
+* [DevTerm keyboard schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Schematic.pdf)
+* [DevTerm keyboard trackball schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Keyboard_Trackball_Schematic.pdf)
+* [DevTerm Ext schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Ext_Schematic.pdf)
+* [DevTerm battery schematic](https://github.com/clockworkpi/DevTerm/blob/main/Schematics/clockwork_DevTerm_Battery_Schematic.pdf) 
 * [CM4 adapter schematic](https://github.com/clockworkpi/DevTerm/blob/main/clockwork_Adapter_CM4_Schematic.pdf)
 * [Learning more...](Schematics/)
 
