@@ -44,7 +44,25 @@ https://github.com/clockworkpi/DevTerm/blob/81addc7f4ba1eb4acb2f59fb1fef70386dbe
 #### DC2 # n   
 n:0-F, set printer printing density 
 
-`echo -en "\x12\x23\x8" > /tmp/DEVTERM_PRINTER_IN`
+```
+echo -en "\x12\x23\x0" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x1" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x2" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x3" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x4" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x5" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x6" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x7" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x8" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\x9" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\xa" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\xb" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\xc" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\xd" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\xe" > /tmp/DEVTERM_PRINTER_IN
+echo -en "\x12\x23\xf" > /tmp/DEVTERM_PRINTER_IN
+```
+
 
 #### DC2 T  
 print the test page  
