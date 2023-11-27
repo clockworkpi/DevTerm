@@ -63,6 +63,8 @@ echo -en "\x12\x23\xe" > /tmp/DEVTERM_PRINTER_IN
 echo -en "\x12\x23\xf" > /tmp/DEVTERM_PRINTER_IN
 ```
 
+default density is 6
+
 
 #### DC2 T  
 print the test page  
