@@ -23,4 +23,15 @@ then restart systemd service to take effect
 
 `sudo systemctl restart devterm-fan-temp-daemon`
 
+## How to control the fan from GPIO
+
+``` start the fan
+sudo gpio mode 17 out
+sudo gpio write 17 1
+```
+
+```stop the fan
+sudo gpio mode 17 out
+sudo gpio write 17 0
+```
 
