@@ -31,6 +31,10 @@ md5sum ab081eabf24ae501dc3f40a9126b7e5a
 md5sum 49aa472a6e4d81a48e0a1a26436f02c2
 
 
+## Images mirror
+
+* Community-driven download mirror: [http://dl.clockworkpi.io](http://dl.clockworkpi.io)
+
 
 After downloading the files, you will need to extract or decompress them. Please keep in mind that MacOS 11.6 or a higher version is required to extract 7z files.  
   
