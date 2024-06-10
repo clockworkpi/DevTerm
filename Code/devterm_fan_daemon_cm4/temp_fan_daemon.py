@@ -11,7 +11,7 @@ def isDigit(x):
         return False
 
 def measure_temp():
-    temp = os.popen("/opt/vc/bin/vcgencmd measure_temp").readline()
+    temp = os.popen("/usr/bin/vcgencmd measure_temp").readline()
     temp2 = temp.replace("temp=","")
     temp3 = temp2.replace("'C","").strip()
     #print(temp3)
