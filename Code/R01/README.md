@@ -2,7 +2,7 @@
 
 Devterm R01
 
-`d1\_twm.tar.bz2`  devterm r01 stock os image twm configs  
+`d1_twm.tar.bz2`  devterm r01 stock os image twm configs  
 ```
 .
 ..
@@ -17,6 +17,11 @@ Devterm R01
 readme
 ```
 
-`tar xpjfv d1\_twm.tar.bz2 -C /home/cpi`  
+`tar xpjfv d1_twm.tar.bz2 -C /home/cpi`  
  
-
+## Expand R01 rootfs partition size
+```
+wget https://github.com/clockworkpi/DevTerm/raw/main/Code/R01/expand_devterm_d1_root.sh
+chmod +x expand_devterm_d1_root.sh
+sudo ./expand_devterm_d1_root.sh
+```
