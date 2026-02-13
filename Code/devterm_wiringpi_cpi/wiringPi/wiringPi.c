@@ -975,7 +975,7 @@ void piBoardId (int *model, int *rev, int *mem, int *maker, int *warranty)
 //  unsigned int modelNum ;
 
 #ifdef CONFIG_CLOCKWORKPI
-  CPiBoardId(model, rev, mem, maker);
+  CPiBoardId(model, rev, mem, maker, warranty);
   return;
 #endif
 
@@ -1535,6 +1535,17 @@ void pullUpDnControl (int pin, int pud)
   struct wiringPiNodeStruct *node = wiringPiNodes ;
 
   setupCheck ("pullUpDnControl") ;
+
+#ifdef CONFIG_CLOCKWORKPI
+  if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
+  {
+    CPiPullUpDnControl(pin, pud);
+  } else {
+    if ((node = wiringPiFindNode (pin)) != NULL)
+      node->pullUpDnControl (node, pin, pud) ;
+  }
+  return ;
+#endif
 
   if ((pin & PI_GPIO_MASK) == 0)		// On-Board Pin
   {
