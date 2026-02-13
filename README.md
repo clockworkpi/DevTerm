@@ -2,33 +2,18 @@
 
 ## DevTerm OS Images
 
-### A04
-* http://dl.clockworkpi.com/DevTerm_A04_v0.2h.img.bz2 (32bit)  
-md5sum acec1d02a37bfbffc9ed025fd718948e
+|Product | Image name  |Release date | System  | Kernel |Size|      Downloads      | MD5sum | 
+|--------|:----------|:------------|:--------|:--------------|:------------|:--------------|:---------:| 
+|DevTerm A04 | DevTerm_A04_v0.2h.img.bz2 | Sep  7  2022 | 32-bit| Linux 5.10.75 | 1.9G | [Download](http://dl.clockworkpi.com/DevTerm_A04_v0.2h.img.bz2 ) ([Mirror](https://drive.google.com/file/d/1Zz_OSlA4OjTjBLvIAv26_ClYp2ug0sXL/view?usp=drive_link))| acec1d02a37bfbffc9ed025fd718948e |  
+|DevTerm A06 | DevTerm_A06_v0.2h.img.bz2| Sep  7  2022 | 64-bit| Linux 5.10.60 | 1.9G | [Download]( http://dl.clockworkpi.com/DevTerm_A06_v0.2h.img.bz2) ([Mirror](https://drive.google.com/file/d/1KGCASFUxV2XVg-UjV3ICccdaMSwuH_NK/view?usp=drive_link))| 26f52bfde573479960d8696f407d19b9 |
+|DevTerm CM3 | DevTerm_CM3_v0.1a.img.bz2| Jan 15  2022 | 32-bit| Linux 4.19.127| 3.0G | [Download](http://dl.clockworkpi.com/DevTerm_CM3_v0.1a.img.bz2  ) ([Mirror](https://drive.google.com/file/d/1ogdES-rp_06hResyiDYQgG9PvPVoe49Z/view?usp=drive_link ))| bef6c111863f8d2e6ef1cb23be354152 |
+|DevTerm CM4| DevTerm_CM4_v0.2b_64bit.img.7z| May 20 20204| 64-bit| Linux 5.10.17 | 1.1G | [Download]( http://dl.clockworkpi.com/DevTerm_CM4_v0.2b_64bit.img.7z) ([Mirror]( https://drive.google.com/file/d/1BDTi7IDRFqPxJNW-GhdwC3j5pQUjr-Ii/view?usp=drive_link )) | 8b2fdebe254dfa1f5f245cebb85b1e84 |
+|DevTerm CM4| DevTerm_CM4_v0.3e_xfce_64bit.img.7z | May 20 20204| 64-bit| Linux 5.10.17  | 1.2G | [Download](http://dl.clockworkpi.com/DevTerm_CM4_v0.3e_xfce_64bit.img.7z  ) ([Mirror]( https://drive.google.com/file/d/1DBGcK2pOv_jEJa2iehfaYmo8ESluyHRP/view?usp=drive_link  )) |  ab081eabf24ae501dc3f40a9126b7e5a|
+|DevTerm R01| DevTerm_R01_v0.2a.img.bz2 | Sep  7  2022| 64-bit| Linux 5.4.61   | 2.8G| [Download](http://dl.clockworkpi.com/DevTerm_R01_v0.2a.img.bz2  ) ([Mirror]( https://drive.google.com/file/d/1RcTlJhUhEy0R4VwMPIojV8yEDBKTgmi0/view?usp=drive_link )) |  49aa472a6e4d81a48e0a1a26436f02c2 |
 
-### A06
-* http://dl.clockworkpi.com/DevTerm_A06_v0.2h.img.bz2   
-md5sum 26f52bfde573479960d8696f407d19b9  
 
-### CM3
-* http://dl.clockworkpi.com/DevTerm_CM3_v0.1a.img.bz2 (32bit)  
-md5sum bef6c111863f8d2e6ef1cb23be354152  
-
-### CM4
-* http://dl.clockworkpi.com/DevTerm_CM4_v0.2b_64bit.img.7z    
-md5sum 8b2fdebe254dfa1f5f245cebb85b1e84
-
-* http://dl.clockworkpi.com/DevTerm_CM4_v0.1.img.bz2 (32bit)    
-md5sum 7938ed1cdda98ba6f28049a819c12dc1  
-
-* http://dl.clockworkpi.com/DevTerm_CM4_v0.3e_xfce_64bit.img.7z (based on [RPI-lite](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz) with xfce)  
-md5sum ab081eabf24ae501dc3f40a9126b7e5a  
+DevTerm_CM4_v0.3e_xfce_64bit.img.7z (based on [RPI-lite](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz) with xfce)  
  This version is optimized for immersive writing and comes pre-installed with [Obsidian](https://obsidian.md/).  
-
-
-### R01
-* http://dl.clockworkpi.com/DevTerm_R01_v0.2a.img.bz2   
-md5sum 49aa472a6e4d81a48e0a1a26436f02c2
 
 
 ## Images mirror
