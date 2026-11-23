@@ -292,6 +292,7 @@ void DebugPrintHeader (cups_page_header2_t* pHeader)
 static inline unsigned compress_buffer(unsigned char *pBuf, unsigned iSize,
                          unsigned int iWideStride, unsigned int iStride) {
   const unsigned char *pEnd = pBuf + iSize;
+  unsigned char *pStart = pBuf;
   unsigned char *pTarget = pBuf;
   while (pBuf < pEnd) {
     int iBytes = min(pEnd - pBuf, iStride);
@@ -299,7 +300,7 @@ static inline unsigned compress_buffer(unsigned char *pBuf, unsigned iSize,
     pTarget += iBytes;
     pBuf += iWideStride;
   }
-  return min(iSize, pTarget - pBuf);
+  return min(iSize, pTarget - pStart);
 }
 
 // returns -1 if whole line iz filled by zeros. Otherwise 0.
